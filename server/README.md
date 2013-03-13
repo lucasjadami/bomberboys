@@ -1,2 +1,2 @@
-Bomberboys server
+Bomberboys Server
 ===
