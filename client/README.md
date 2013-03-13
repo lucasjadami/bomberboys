@@ -1,2 +1,2 @@
-Bomberboys client
+Bomberboys Client
 ===
