@@ -6,10 +6,10 @@ require 'bomberboys_client/version'
 Gem::Specification.new do |spec|
   spec.name          = "bomberboys_client"
   spec.version       = BomberboysClient::VERSION
-  spec.authors       = ["Rafael Regis"]
-  spec.email         = ["rafael.regisp@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.authors       = ["Lucas Adami", "Rafael Regis"]
+  spec.email         = ["lucasjadami@gmail.com", "rafael.regisp@gmail.com"]
+  spec.description   = %q{Bomberboys client}
+  spec.summary       = %q{Bomberboys client}
   spec.homepage      = ""
   spec.license       = "MIT"
 
