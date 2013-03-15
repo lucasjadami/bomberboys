@@ -1,4 +1,5 @@
 #include "non_blocking_tcp_connection.h"
+#include "output.h"
 #include <unistd.h>
 #include <signal.h>
 #include <cstdlib>
@@ -8,7 +9,9 @@ Connection* 		connection;
 
 void exitHandler(int s)
 {
-	delete connection;
+	info("Server closed");
+
+    delete connection;
 	exit(0);
 }
 
@@ -19,9 +22,13 @@ int main(int argc, char *argv[])
    	sigIntHandler.sa_flags = 0;
    	sigaction(SIGINT, &sigIntHandler, NULL);
 
+    info("Bomberboys server 1.0");
+
+    int port = 10011;
 	connection = new NonBlockingTcpConnection();
-	connection->create();
-	connection->init(10011);
+	connection->init(port);
+
+	info("Server connection stabilished at port %d", port);
 
 	while (true)
 	{

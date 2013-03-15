@@ -2,16 +2,33 @@
 #include "output.h"
 #include <cstring>
 
+Connection::Connection()
+{
+        idCount = 0;
+}
+
+Connection::~Connection()
+{
+    if (serverSocket != NULL)
+        delete serverSocket;
+}
+
 void Connection::init(int port)
 {
-    memset(&serverSocket, 0, sizeof(serverSocket));
-	serverSocket.sin_family = AF_INET;
-	serverSocket.sin_port = htons(port);
-	serverSocket.sin_addr.s_addr = INADDR_ANY;
+    int serverFd = create();
 
-	if (bind(serverFd, (sockaddr*) &serverSocket, sizeof(serverSocket)) < 0)
+    sockaddr_in address;
+
+    memset(&address, 0, sizeof(address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	if (bind(serverFd, (sockaddr*) &address, sizeof(address)) < 0)
   		error("ERROR on binding");
 
-  	listen(serverFd, 5);
+    serverSocket = new Socket(serverFd, address);
+
+    listen(serverFd, MAX_CONNECTIONS);
 }
 

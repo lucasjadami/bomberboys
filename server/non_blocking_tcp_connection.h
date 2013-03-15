@@ -7,17 +7,20 @@ class NonBlockingTcpConnection : public Connection
 {
 public:
 
-	void        create();
-	void        process();
+	void process();
+
+protected:
+
+    int  create();
 
 private:
 
-    timeval     selectTimeout;
-	int 	    maxFd;
+    timeval selectTimeout;
+	int 	maxFd;
 
-	void        getNewClient();
-	void        processClients(fd_set&);
-	void        createFdSet(fd_set&);
+	void getNewClient();
+	void processClients(fd_set&);
+	void createFdSet(fd_set&);
 
 };
 

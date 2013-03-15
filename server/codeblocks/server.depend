@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1363366357 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/main.cpp
+1363383659 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/main.cpp
 	"non_blocking_tcp_connection.h"
+	"output.h"
 	<unistd.h>
 	<signal.h>
 	<cstdlib>
@@ -13,28 +14,36 @@
 	<utility>
 	<unistd.h>
 
-1363379547 /media/files/Academic/Redes-Mestrado/bomberboys/server/non_blocking_tcp_connection.h
+1363382739 /media/files/Academic/Redes-Mestrado/bomberboys/server/non_blocking_tcp_connection.h
 	"connection.h"
 
-1363366015 /media/files/Academic/Redes-Mestrado/bomberboys/server/connection.h
+1363382729 /media/files/Academic/Redes-Mestrado/bomberboys/server/connection.h
+	"socket.h"
 	<sys/types.h>
 	<sys/socket.h>
 	<netinet/in.h>
 	<map>
 
-1363365189 /media/files/Academic/Redes-Mestrado/bomberboys/server/output.h
+1363383729 /media/files/Academic/Redes-Mestrado/bomberboys/server/output.h
 	<cstdio>
 
-1363365198 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/connection.cpp
+1363382620 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/connection.cpp
 	"connection.h"
 	"output.h"
 	<cstring>
 
-1363379022 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/non_blocking_tcp_connection.cpp
+1363383001 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/non_blocking_tcp_connection.cpp
 	"non_blocking_tcp_connection.h"
 	"output.h"
 	<fcntl.h>
 	<cstdlib>
 	<utility>
 	<unistd.h>
+
+1363382402 /media/files/Academic/Redes-Mestrado/bomberboys/server/socket.h
+	<sys/socket.h>
+	<netinet/in.h>
+
+1363381963 source:/media/files/Academic/Redes-Mestrado/bomberboys/server/socket.cpp
+	"socket.h"
 
