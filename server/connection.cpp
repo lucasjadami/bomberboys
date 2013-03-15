@@ -1,6 +1,7 @@
 #include "connection.h"
 #include "output.h"
 #include <cstring>
+#include <unistd.h>
 
 Connection::Connection()
 {
@@ -9,8 +10,18 @@ Connection::Connection()
 
 Connection::~Connection()
 {
+    std::map<int, Socket*>::iterator it = clientSockets.begin();
+    while (it != clientSockets.end())
+    {
+        delete it->second;
+        it++;
+    }
+
     if (serverSocket != NULL)
+    {
+        close(serverSocket->getFd());
         delete serverSocket;
+    }
 }
 
 void Connection::init(int port)

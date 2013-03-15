@@ -1,6 +1,11 @@
 # Temp files
 *~
 
+# CodeBlocks files
+
+*.depend
+*.layout
+
 # Folders
 codeblocks/bin
 codeblocks/obj

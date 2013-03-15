@@ -45,33 +45,33 @@ void NonBlockingTcpConnection::getNewClient()
 		error("ERROR on accept");
 
 	maxFd = clientFd > maxFd ? clientFd : maxFd;
-	clientSockets.insert(std::make_pair(idCount++, Socket(clientFd, address)));
+	clientSockets.insert(std::make_pair(idCount++, new Socket(clientFd, address)));
 
 	debug("New connection");
 }
 
 void NonBlockingTcpConnection::processClients(fd_set& readFdSet)
 {
-	std::map<int, Socket>::iterator it = clientSockets.begin();
+	std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
         bool removeIt = false;
-        if (FD_ISSET(it->second.getFd(), &readFdSet))
+        Socket* socket = it->second;
+        if (FD_ISSET(socket->getFd(), &readFdSet))
         {
             int bytesRead;
-            if ((bytesRead = recv(it->second.getFd(), buffer, sizeof buffer, 0)) <= 0)
+            if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), sizeof(socket->getInBuffer()), 0)) <= 0)
             {
+                removeIt = true;
                 if (bytesRead == 0)
-                    removeIt = true;
+                    debug("Connection closed");
                 else
                     error("ERROR on recv");
-                close(it->second.getFd());
-
-                debug("Connection closed");
+                close(socket->getFd());
             }
             else
             {
-                debug("%s\n", buffer);
+                socket->updateInBuffer(bytesRead);
             }
         }
 
@@ -86,10 +86,11 @@ void NonBlockingTcpConnection::createFdSet(fd_set& fdSet)
 {
     FD_ZERO(&fdSet);
     FD_SET(serverSocket->getFd(), &fdSet);
-    std::map<int, Socket>::iterator it = clientSockets.begin();
+
+    std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
-        FD_SET(it->second.getFd(), &fdSet);
+        FD_SET(it->second->getFd(), &fdSet);
         it++;
     }
 }
