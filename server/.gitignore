@@ -1,19 +1,6 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-
 # Temp files
 *~
 
-# Server executable
-server
+# Folders
+codeblocks/bin
+codeblocks/obj
