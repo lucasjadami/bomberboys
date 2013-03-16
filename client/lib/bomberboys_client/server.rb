@@ -10,13 +10,28 @@ module BomberboysClient
       }
     end
 
-    def send(action, parameters)
+    def send_message(action, parameters)
+      puts encoded(parameters.unshift(action))
     end
 
-    def register(game = Game.new)
+    def register(game)
+      @game = game
     end
 
     def start
+      message = ["\x06", "\x02", "\x01", "\x01"]
+      loop do
+        game.send(@server_actions[message.first], *decoded(message.shift))
+        puts message
+      end
+    end
+
+    private
+    def decoded(array)
+      array.map { |p| p.join('') }
+    end
+
+    def encoded(array)
     end
   end
 end
