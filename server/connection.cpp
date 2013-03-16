@@ -3,9 +3,10 @@
 #include <cstring>
 #include <unistd.h>
 
-Connection::Connection()
+Connection::Connection(void (*connectionHandler)(int, Socket*))
 {
-        idCount = 0;
+    this->connectionHandler = connectionHandler;
+    idCount = 0;
 }
 
 Connection::~Connection()
@@ -13,6 +14,7 @@ Connection::~Connection()
     std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
+        shutdown(it->second->getFd(), SHUT_RDWR);
         delete it->second;
         it++;
     }
@@ -38,7 +40,7 @@ void Connection::init(int port)
 	if (bind(serverFd, (sockaddr*) &address, sizeof(address)) < 0)
   		error("ERROR on binding");
 
-    serverSocket = new Socket(serverFd, address);
+    serverSocket = new Socket(-1, serverFd, address);
 
     listen(serverFd, MAX_CONNECTIONS);
 }

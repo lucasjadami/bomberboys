@@ -9,11 +9,14 @@
 
 #define MAX_CONNECTIONS 100
 
+#define EVENT_CLIENT_CONNECTED      0
+#define EVENT_CLIENT_DISCONNECTED   1
+
 class Connection
 {
 public:
 
-                    Connection();
+                    Connection(void (*)(int, Socket*));
                    ~Connection();
             void    init(int port);
 	virtual	void    process() {};
@@ -25,6 +28,7 @@ protected:
 	unsigned int            idCount;
 
 	virtual int     create() { return -1; };
+	void            (*connectionHandler)(int, Socket*);
 
 };
 

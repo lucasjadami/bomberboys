@@ -7,6 +7,7 @@ class NonBlockingTcpConnection : public Connection
 {
 public:
 
+         NonBlockingTcpConnection(void (*)(int, Socket*));
 	void process();
 
 protected:
@@ -19,7 +20,7 @@ private:
 	int 	maxFd;
 
 	void getNewClient();
-	void processClients(fd_set&);
+	void processClients(fd_set&, fd_set&);
 	void createFdSet(fd_set&);
 
 };
