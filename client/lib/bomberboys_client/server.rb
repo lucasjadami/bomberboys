@@ -1,10 +1,12 @@
 module BomberboysClient
   class Server
     def initialize
-      @actions = {
-        "\x00" => :login,    "\x01" => :add_player,   "\x02" => :remove_player,
-        "\x03" => :move_me,  "\x04" => :move_player,  "\x05" => :plant_bomb,
+      @server_actions = {
+        "\x01" => :add_player,   "\x02" => :remove_player, "\x04" => :move_player,
         "\x06" => :add_bomb, "\x07" => :explode_bomb, "\x08" => :fall_player
+      }
+      @client_actions = {
+        :login => "\x00", :move_me => "\x03", :plant_bomb => "\x05"
       }
     end
 
