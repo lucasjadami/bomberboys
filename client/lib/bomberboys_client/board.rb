@@ -1,7 +1,6 @@
 module BomberboysClient
   class Board
-    attr_reader :remote_players, :bombs
-    attr_accessor :local_player
+    attr_reader :players, :bombs
 
     def initialize
       @players = {}
