@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Server" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+				<Option output="bin/debug/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -16,8 +16,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/Server" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
+				<Option output="bin/release/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -33,10 +33,18 @@
 		</Compiler>
 		<Unit filename="../connection.cpp" />
 		<Unit filename="../connection.h" />
+		<Unit filename="../game.cpp" />
+		<Unit filename="../game.h" />
 		<Unit filename="../main.cpp" />
 		<Unit filename="../non_blocking_tcp_connection.cpp" />
 		<Unit filename="../non_blocking_tcp_connection.h" />
 		<Unit filename="../output.h" />
+		<Unit filename="../packet.cpp" />
+		<Unit filename="../packet.h" />
+		<Unit filename="../player.cpp" />
+		<Unit filename="../player.h" />
+		<Unit filename="../socket.cpp" />
+		<Unit filename="../socket.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
