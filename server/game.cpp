@@ -19,7 +19,7 @@ void Game::connectionHandler(int eventId, Socket* socket)
 {
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
-        Player* newPlayer = new Player(socket);
+        Player* newPlayer = new Player(socket, MAP_WIDTH / 2, MAP_HEIGHT / 2);
         players.push_back(newPlayer);
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
@@ -90,8 +90,9 @@ Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    data[0] = PACKET_ADD_PLAYER;
-    memcpy(data + 1, player->getName(), sizeof(char) * NAME_SIZE);
+    putBytes(data, player->getX(), 2);
+    putBytes(data + 2, player->getY(), 2);
+    memcpy(data + 5, player->getName(), sizeof(char) * NAME_SIZE);
     Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
     return packet;
 }
@@ -100,7 +101,17 @@ Packet* Game::createRemovePlayerPacket(int id)
 {
     char* data = new char[PACKET_REMOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_REMOVE_PLAYER_SIZE);
-    data[0] = id & 0xFF;
-    data[1] = id & 0xFF00;
+    putBytes(data, id, 2);
     return new Packet(PACKET_REMOVE_PLAYER, data);
+}
+
+void Game::putBytes(char* data, int value, int bytes)
+{
+    int mask = 0xFF;
+
+    for (int i = 0; i < bytes; ++i)
+    {
+        data[i] = value & mask;
+        mask = mask << 8;
+    }
 }

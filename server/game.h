@@ -5,6 +5,8 @@
 #include "socket.h"
 #include <vector>
 
+#define MAP_WIDTH   600
+#define MAP_HEIGHT  420
 class Game
 {
 public:
@@ -21,6 +23,7 @@ private:
     void    parseLoginPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
+    void    putBytes(char*, int, int);
 
 };
 
