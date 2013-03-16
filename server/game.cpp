@@ -3,16 +3,30 @@
 #include "connection.h"
 #include <cstdlib>
 #include <cstring>
+#include <Box2D/Common/b2Math.h>
 
 Game::Game()
 {
-
+    world = NULL;
 }
 
 Game::~Game()
 {
+    if (world != NULL)
+        delete world;
     for (unsigned int i = 0; i < players.size(); ++i)
         delete players[i];
+}
+
+void Game::createWorld()
+{
+    b2Vec2 gravity(0.0f, 0.0f);
+
+    b2AABB bounds;
+    bounds.lowerBound = b2Vec2(0.0f, 0.0f);
+    bounds.upperBound = b2Vec2(MAP_WIDTH, MAP_HEIGHT);
+
+    world = new b2World(bounds, gravity, true);
 }
 
 void Game::connectionHandler(int eventId, Socket* socket)

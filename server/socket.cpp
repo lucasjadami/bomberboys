@@ -57,7 +57,7 @@ void Socket::updateInBuffer(int bytesRead)
 
     if (inPointer > 0)
     {
-        int packetId = inBuffer[0] - '0';
+        int packetId = inBuffer[0];
         if (packetId == PACKET_LOGIN)
         {
             if (inPointer > PACKET_LOGIN_SIZE)

@@ -7,7 +7,7 @@
 
 struct sigaction 	    sigIntHandler;
 Connection* 		    connection;
-Game*                    game;
+Game*                   game;
 
 void exitHandler(int s)
 {
@@ -38,6 +38,9 @@ int main(int argc, char *argv[])
 	info("Server connection stabilished at port %d", port);
 
 	game = new Game();
+	game->createWorld();
+
+	info("World created");
 
 	while (true)
 	{

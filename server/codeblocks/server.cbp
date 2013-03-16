@@ -31,6 +31,9 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add library="box2d" />
+		</Linker>
 		<Unit filename="../connection.cpp" />
 		<Unit filename="../connection.h" />
 		<Unit filename="../game.cpp" />
