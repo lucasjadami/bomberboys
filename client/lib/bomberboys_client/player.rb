@@ -19,7 +19,7 @@ module BomberboysClient
       [@x, @y]
     end
 
-    def die
+    def kill
       @dead = true
     end
 
