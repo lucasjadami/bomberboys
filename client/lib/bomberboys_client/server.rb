@@ -1,25 +1,20 @@
 module BomberboysClient
   class Server
-    def initialize(game = Game.new)
+    def initialize
       @actions = {
         "\x00" => :login,    "\x01" => :add_player,   "\x02" => :remove_player,
         "\x03" => :move_me,  "\x04" => :move_player,  "\x05" => :plant_bomb,
         "\x06" => :add_bomb, "\x07" => :explode_bomb, "\x08" => :fall_player
       }
-      @game = game
     end
 
-    def accept
+    def send(action, parameters)
     end
 
-    def login(name)
+    def register(game = Game.new)
     end
 
-    # direction = :N, :NE, :E, :SE, :S, :SW, :W, :NW
-    def move_me(direction)
-    end
-
-    def plant_bomb
+    def start
     end
   end
 end
