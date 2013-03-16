@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <utility>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 NonBlockingTcpConnection::NonBlockingTcpConnection(void (*connectionHandler)(int, Socket*))
     : Connection(connectionHandler)
@@ -59,7 +60,7 @@ void NonBlockingTcpConnection::getNewClient()
 
     connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
-	debug("New connection");
+	debug("New connection from %s", inet_ntoa(address.sin_addr));
 }
 
 void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFdSet)
@@ -76,7 +77,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
             if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), sizeof(socket->getInBuffer()), 0)) <= 0)
             {
                 if (bytesRead == 0)
-                    debug("Connection closed");
+                    debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
                 else
                     error("ERROR on recv");
                 removeIt = true;
