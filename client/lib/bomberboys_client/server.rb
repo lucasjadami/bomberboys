@@ -2,11 +2,11 @@ module BomberboysClient
   class Server
     def initialize
       @server_actions = {
-        "\x01" => :add_player,   "\x02" => :remove_player, "\x04" => :move_player,
-        "\x06" => :add_bomb, "\x07" => :explode_bomb, "\x08" => :fall_player
+        0x01 => :add_player,   0x02 => :remove_player, 0x04 => :move_player,
+        0x06 => :add_bomb, 0x07 => :explode_bomb, 0x08 => :fall_player
       }
       @client_actions = {
-        :login => "\x00", :move_me => "\x03", :plant_bomb => "\x05"
+        :login => 0x00, :move_me => 0x03, :plant_bomb => 0x05
       }
     end
 
@@ -19,7 +19,7 @@ module BomberboysClient
     end
 
     def start
-      message = ["\x06", "\x02", "\x01", "\x01"]
+      message = [0x06, 0x02, 0x01, 0x01]
       loop do
         game.send(@server_actions[message.first], *decoded(message.shift))
         puts message
