@@ -11,7 +11,6 @@ module BomberboysClient
     end
 
     def send_message(action, parameters)
-      puts encoded(parameters.unshift(action))
     end
 
     def register(game)
@@ -21,17 +20,8 @@ module BomberboysClient
     def start
       message = [0x06, 0x02, 0x01, 0x01]
       loop do
-        game.send(@server_actions[message.first], *decoded(message.shift))
-        puts message
+        game.send(@server_actions[message.first], message.shift)
       end
-    end
-
-    private
-    def decoded(array)
-      array.map { |p| p.join('') }
-    end
-
-    def encoded(array)
     end
   end
 end
