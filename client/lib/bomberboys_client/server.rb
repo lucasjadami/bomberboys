@@ -18,9 +18,9 @@ module BomberboysClient
     end
 
     def start
-      message = [0x06, 0x02, 0x01, 0x01]
+      message = "h\n\n\n\n\n\nasdf"
       loop do
-        game.send(@server_actions[message.first], message.shift)
+        game.send(@server_actions[message[0]], message[1..-1])
       end
     end
   end
