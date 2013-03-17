@@ -20,7 +20,8 @@ module BomberboysClient
     end
 
     def move_me(direction)
-      @socket.print Message.new(:move_me, [direction]).pack
+      dir = { n:0, ne:1, e:2, se:3, s:4, sw:5, w:6, nw:7 }
+      @socket.print Message.new(:move_me, [dir[direction]]).pack
     end
 
     def plant_bomb

@@ -35,10 +35,10 @@ when '?'
 when '0'
 when '1'
   print 'name: '
-  connection.login(gets.chomp)
+  connection.login(gets.chomp[0..19])
 when '2'
-  print 'direction (N, S, E, W, NE, NW, SE, SW): '
-  connection.move_me(gets.chomp)
+  print 'direction (n, s, e, w, ne, nw, se, sw): '
+  connection.move_me(gets.chomp.to_sym)
 when '3'
   connection.plant_bomb
 end
