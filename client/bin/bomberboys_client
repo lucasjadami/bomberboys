@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/bomberboys_client'
+
+address = ARGV[0] || 'localhost' 
+port = ARGV[1] || 4000
+
+socket = TCPSocket.open(address, port)
+
+connection = Connection.new(socket)
+game = Game.new
+
+connection.register(game)
+
+Thread.new do
+  connection.start
+  socket.close
+end
