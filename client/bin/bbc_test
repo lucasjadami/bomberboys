@@ -56,3 +56,5 @@ while option != '4'
   print "> "
   option = gets.chomp
 end
+
+socket.close
