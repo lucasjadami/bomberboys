@@ -1,37 +1,30 @@
 module BomberboysClient
   class Server
-    def initialize
-      @server_actions = {
-        "\x01" => :add_player,   "\x02" => :remove_player, "\x04" => :move_player,
-        "\x06" => :add_bomb, "\x07" => :explode_bomb, "\x08" => :fall_player
-      }
-      @client_actions = {
-        :login => "\x00", :move_me => "\x03", :plant_bomb => "\x05"
-      }
+    def initialize(address, port)
     end
 
-    def send_message(action, parameters)
-      puts encoded(parameters.unshift(action))
-    end
-
-    def register(game)
-      @game = game
+    def register(listener)
+      @listener = listener 
     end
 
     def start
-      message = ["\x06", "\x02", "\x01", "\x01"]
+      str_message = "h\n\n\n\n\n\nasdf"
       loop do
-        game.send(@server_actions[message.first], *decoded(message.shift))
-        puts message
+        message = Message.unpack(str_message)
+        listener.send(message.action, *message.params)
       end
     end
 
-    private
-    def decoded(array)
-      array.map { |p| p.join('') }
+    def login(name)
+      Message.new(:login, [name]).pack
     end
 
-    def encoded(array)
+    def move_me(direction)
+      Message.new(:move_me, [direction]).pack
+    end
+
+    def plant_bomb
+      Message.new(:plant_bomb).pack
     end
   end
 end

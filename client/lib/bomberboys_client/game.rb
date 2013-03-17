@@ -4,8 +4,10 @@ module BomberboysClient
       @board = Board.new
     end
 
-    def add_player(id, name)
-      @board.players[player.id] = Player.new(id, name, @board.players.empty?)
+    def add_player(id, x, y, name)
+      player = Player.new(id, name, @board.players.empty?)
+      player.move(x, y)
+      @board.players[id] = player
     end
 
     def remove_player(id)
