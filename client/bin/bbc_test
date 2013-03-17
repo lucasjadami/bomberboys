@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require 'socket'
+
+require_relative '../lib/bomberboys_client'
+include BomberboysClient
+
+def help
+  puts 'Choose a action:'
+  puts '? to see this menu'
+  puts '0 to see context'
+  puts '1 to login'
+  puts '2 to move_me'
+  puts '3 to plant_bomb'
+  puts '4 to exit'
+end
+
+address = ARGV[0] || 'localhost' 
+port = ARGV[1] || 4000
+
+begin
+  socket = TCPSocket.open(address, port)
+rescue
+  raise "No server listening on #{address}:#{port}"
+end
+
+connection = Connection.new(socket)
+game = Game.new
+connection.register(game)
+
+Thread.new do
+  connection.start
+  socket.close
+end
+
+help
+
+print "> "
+option = gets.chomp
+while option != '4'
+  case option
+  when '?'
+    help
+  when '0'
+    puts game.board
+  when '1'
+    print 'name: '
+    connection.login(gets.chomp[0..19])
+  when '2'
+    print 'direction (n, s, e, w, ne, nw, se, sw): '
+    connection.move_me(gets.chomp.to_sym)
+  when '3'
+    connection.plant_bomb
+  end
+
+  print "> "
+  option = gets.chomp
+end
+
+socket.close

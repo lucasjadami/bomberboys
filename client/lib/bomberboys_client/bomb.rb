@@ -19,5 +19,9 @@ module BomberboysClient
     def exploded?
       @exploded
     end
+
+    def to_s
+      "{id:#{@id},pos:#{self.position}}"
+    end
   end
 end
