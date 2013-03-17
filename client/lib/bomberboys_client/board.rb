@@ -6,5 +6,9 @@ module BomberboysClient
       @players = {}
       @bombs   = {}
     end
+
+    def to_s
+      "players: #{@players.values}\nbombs: #{@bombs.values}"
+    end
   end
 end

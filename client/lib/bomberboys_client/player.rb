@@ -30,5 +30,9 @@ module BomberboysClient
     def local?
       @local
     end
+
+    def to_s
+      "{id:#{@id},pos:#{self.position},local:#{self.local?},dead:#{self.dead?}}"
+    end
   end
 end
