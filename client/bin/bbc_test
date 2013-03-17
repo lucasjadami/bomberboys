@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/bomberboys_client'
+
+def help
+  puts 'Choose a action:'
+  puts '? to see this menu'
+  puts '0 to see context'
+  puts '1 to login'
+  puts '2 to move_me'
+  puts '3 to plant_bomb'
+end
+
+address = ARGV[0] || 'localhost' 
+port = ARGV[1] || 4000
+
+socket = TCPSocket.open(address, port)
+
+connection = Connection.new(socket)
+game = Game.new
+
+connection.register(game)
+
+Thread.new do
+  connection.start
+  socket.close
+end
+
+help
+option = gets.chomp
+
+case option
+when '?'
+  help
+when '0'
+when '1'
+  print 'name: '
+  connection.login(gets.chomp)
+when '2'
+  print 'direction (N, S, E, W, NE, NW, SE, SW): '
+  connection.move_me(gets.chomp)
+when '3'
+  connection.plant_bomb
+end
