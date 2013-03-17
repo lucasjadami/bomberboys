@@ -1,5 +1,5 @@
 module BomberboysClient
-  class Server
+  class Connection 
     def initialize(address, port)
     end
 
