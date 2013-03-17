@@ -16,7 +16,7 @@ module BomberboysClient
     end
 
     def action
-      ACTION.key(action)
+      ACTION.key(@action)
     end
 
     def pack
@@ -25,11 +25,15 @@ module BomberboysClient
       message.pack('C' << MASK[@action])
     end
 
+    def to_s
+      "#{self.action}: #{@params.join(" ")}"
+    end
+
     def self.unpack(str)
       action, str_params = str.unpack('CA*')
       params = str_params.unpack(MASK[action])
 
-      Message.new(ACTION[action], params)
+      Message.new(ACTION.key(action), params)
     end
   end
 end
