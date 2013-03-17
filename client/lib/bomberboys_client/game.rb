@@ -14,7 +14,9 @@ module BomberboysClient
       @board.players[id].move(x, y)
     end
 
-    def remove_player(id)
+    def remove_player(params)
+      id = bytes_to_str(params[0..1])
+
       @board.delete(id)
     end
 
