@@ -4,35 +4,29 @@ module BomberboysClient
       @board = Board.new
     end
 
-    def add_player(params)
-      id, x, y, name = params.unpack('SSSA*')
+    def add_player(id, x, y, name)
       player = Player.new(id, name, @board.players.empty?)
       player.move(x, y)
       @board.players[id] = player
     end
 
-    def remove_player(params)
-      id = params.unpack('S').first
+    def remove_player(id)
       @board.delete(id)
     end
 
-    def move_player(params)
-      id, x, y = params.unpack('SSS')
+    def move_player(id, x, y)
       @board.players[id].move(x, y)
     end
 
-    def fall_player(params)
-      id = params.unpack('S').first
+    def fall_player(id)
       @board.players[id].kill
     end
 
-    def add_bomb(params)
-      id, x, y = params.unpack('SSS')
+    def add_bomb(id, x, y)
       @board.bombs[id] = Bomb.new(id, x, y)
     end
 
-    def explode_bomb(params)
-      id = params.unpack('S').first
+    def explode_bomb(id)
       @board.bombs[id].explode
     end
   end
