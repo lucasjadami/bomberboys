@@ -175,7 +175,7 @@ void Game::parseMoveMePacket(Packet* packet, Player* player)
             impulse.x = -10.0f; break;
     }
 
-    player->getBody()->ApplyLinearImpulse(impulse, player->getBody()->GetWorldCenter());
+    player->applyImpulse(impulse);
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)

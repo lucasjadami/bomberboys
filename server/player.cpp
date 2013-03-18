@@ -1,11 +1,14 @@
 #include "player.h"
+#include "output.h"
 #include <cstdlib>
+#include <time.h>
 
 Player::Player(Socket* socket)
 {
     this->socket = socket;
     body = NULL;
     name = NULL;
+    lastImpulse = 0;
 }
 
 Player::~Player()
@@ -53,4 +56,19 @@ void Player::saveLastPosition()
 bool Player::isLastPositionDifferent()
 {
     return lastX != (int) body->GetPosition().x || lastY != (int) body->GetPosition().y;
+}
+
+void Player::applyImpulse(b2Vec2& impulse)
+{
+    timespec time;
+    if (clock_gettime(CLOCK_REALTIME, &time) == -1)
+        error("ERROR on gettime");
+
+    // Everything is converted to milliseconds.
+    int now = time.tv_sec * 1000 + time.tv_nsec / 1000000;
+    if (now - lastImpulse > 50)
+    {
+        lastImpulse = now;
+        body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
+    }
 }

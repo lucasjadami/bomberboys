@@ -18,6 +18,7 @@ public:
    void     setBody(b2Body*);
    void     saveLastPosition();
    bool     isLastPositionDifferent();
+   void     applyImpulse(b2Vec2&);
 
 private:
 
@@ -26,6 +27,7 @@ private:
     b2Body* body;
     int     lastX;
     int     lastY;
+    int     lastImpulse;
 
 };
 
