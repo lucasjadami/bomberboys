@@ -1,9 +1,12 @@
 #include "game.h"
 #include "packet.h"
 #include "connection.h"
+#include "output.h"
 #include <cstdlib>
 #include <cstring>
 #include <Box2D/Common/b2Math.h>
+#include <Box2D/Collision/Shapes/b2PolygonShape.h>
+#include <Box2D/Collision/Shapes/b2CircleShape.h>
 
 Game::Game()
 {
@@ -21,19 +24,14 @@ Game::~Game()
 void Game::createWorld()
 {
     b2Vec2 gravity(0.0f, 0.0f);
-
-    b2AABB bounds;
-    bounds.lowerBound = b2Vec2(0.0f, 0.0f);
-    bounds.upperBound = b2Vec2(MAP_WIDTH, MAP_HEIGHT);
-
-    world = new b2World(bounds, gravity, true);
+    world = new b2World(gravity);
 }
 
 void Game::connectionHandler(int eventId, Socket* socket)
 {
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
-        Player* newPlayer = new Player(socket, MAP_WIDTH / 2, MAP_HEIGHT / 2);
+        Player* newPlayer = new Player(socket);
         players.push_back(newPlayer);
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
@@ -44,6 +42,8 @@ void Game::connectionHandler(int eventId, Socket* socket)
             Player* player = *it;
             if (player->getSocket()->getId() == socket->getId())
             {
+                if (player->isPlaying())
+                    world->DestroyBody(player->getBody());
                 delete player;
                 it = players.erase(it);
             }
@@ -60,36 +60,63 @@ void Game::connectionHandler(int eventId, Socket* socket)
     }
 }
 
-void Game::updateGamePackets()
+void Game::update()
 {
+    world->Step(1.0f / 60.0f, 6, 2);
+
     for (unsigned int i = 0; i < players.size(); ++i)
     {
         Player* player = players[i];
-        Packet* packet;
-        if ((packet = player->getSocket()->getInPacket()) != NULL)
+
+        updatePlayerPackets(player);
+        if (player->isPlaying())
+            updatePlayerMovement(player);
+    }
+}
+
+void Game::updatePlayerPackets(Player* player)
+{
+    Packet* packet;
+    while ((packet = player->getSocket()->getInPacket()) != NULL)
+    {
+        if (packet->getId() == PACKET_LOGIN)
         {
-            if (packet->getId() == PACKET_LOGIN)
+            parseLoginPacket(packet, player);
+
+            Packet* newPacket = createAddPlayerPacket(player);
+            player->getSocket()->addOutPacket(newPacket);
+
+            for (unsigned int i = 0; i < players.size(); ++i)
             {
-                parseLoginPacket(packet, player);
+                if (players[i] == player || !players[i]->isPlaying())
+                    continue;
 
-                Packet* newPacket = createAddPlayerPacket(player);
+                newPacket = createAddPlayerPacket(player);
+                players[i]->getSocket()->addOutPacket(newPacket);
+
+                newPacket = createAddPlayerPacket(players[i]);
                 player->getSocket()->addOutPacket(newPacket);
-
-                for (unsigned int j = 0; j < players.size(); ++j)
-                {
-                    if (j == i || !players[j]->isPlaying())
-                        continue;
-
-                    newPacket = createAddPlayerPacket(player);
-                    players[j]->getSocket()->addOutPacket(newPacket);
-
-                    newPacket = createAddPlayerPacket(players[j]);
-                    player->getSocket()->addOutPacket(newPacket);
-                }
             }
-            delete packet;
+        }
+        delete packet;
+    }
+}
+
+void Game::updatePlayerMovement(Player* player)
+{
+    if (player->isLastPositionDifferent())
+    {
+        for (unsigned int i = 0; i < players.size(); ++i)
+        {
+            if (!players[i]->isPlaying())
+                continue;
+
+            Packet* newPacket = createMovePlayerPacket(player);
+            players[i]->getSocket()->addOutPacket(newPacket);
         }
     }
+
+    player->saveLastPosition();
 }
 
 void Game::parseLoginPacket(Packet* packet, Player* player)
@@ -98,14 +125,38 @@ void Game::parseLoginPacket(Packet* packet, Player* player)
     memcpy(name, packet->getData(), sizeof(char) * PACKET_LOGIN_SIZE);
     name[NAME_SIZE - 1] = '\0';
     player->setName(name);
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(MAP_WIDTH / 2, MAP_HEIGHT / 2);
+
+    b2Body* body = world->CreateBody(&bodyDef);
+
+    b2CircleShape dynamicCircle;
+    dynamicCircle.m_radius = 3.0f;
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicCircle;
+    fixtureDef.density = 0.01f;
+    fixtureDef.friction = 0.3f;
+
+    body->CreateFixture(&fixtureDef);
+    body->SetLinearDamping(0.1f);
+
+    b2Vec2 force;
+    force.Set(100.0f, 0.0f);
+    body->ApplyForceToCenter(force);
+
+    player->setBody(body);
+    player->saveLastPosition();
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    putBytes(data, player->getX(), 2);
-    putBytes(data + 2, player->getY(), 2);
+    putBytes(data, player->getBody()->GetPosition().x, 2);
+    putBytes(data + 2, player->getBody()->GetPosition().y, 2);
     memcpy(data + 5, player->getName(), sizeof(char) * NAME_SIZE);
     Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
     return packet;
@@ -117,6 +168,16 @@ Packet* Game::createRemovePlayerPacket(int id)
     memset(data, 0, sizeof(char) * PACKET_REMOVE_PLAYER_SIZE);
     putBytes(data, id, 2);
     return new Packet(PACKET_REMOVE_PLAYER, data);
+}
+
+Packet* Game::createMovePlayerPacket(Player* player)
+{
+    char* data = new char[PACKET_MOVE_PLAYER_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_MOVE_PLAYER_SIZE);
+    putBytes(data, player->getSocket()->getId(), 2);
+    putBytes(data + 2, (int) player->getBody()->GetPosition().x, 2);
+    putBytes(data + 4, (int) player->getBody()->GetPosition().y, 2);
+    return new Packet(PACKET_MOVE_PLAYER, data);
 }
 
 void Game::putBytes(char* data, int value, int bytes)

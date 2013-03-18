@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	{
 		usleep(1000);
 		connection->process();
-		game->updateGamePackets();
+		game->update();
 	}
 
 	return 0;

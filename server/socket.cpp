@@ -88,13 +88,15 @@ void Socket::updateOutBuffer(int bytesWritten)
     Packet* packet = outPackets.empty() ? NULL : outPackets[0];
     if (packet != NULL)
     {
-        int size = INT_MAX;
+        int size = INT_MAX / 2;
         switch (packet->getId())
         {
             case PACKET_ADD_PLAYER:
                 size = PACKET_ADD_PLAYER_SIZE; break;
             case PACKET_REMOVE_PLAYER:
                 size = PACKET_REMOVE_PLAYER_SIZE; break;
+            case PACKET_MOVE_PLAYER:
+                size = PACKET_MOVE_PLAYER_SIZE; break;
         }
 
         if (outPointer + size + 1 <= BUFFER_SIZE)

@@ -30,9 +30,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="/opt/Box2D/include/" />
 		</Compiler>
 		<Linker>
-			<Add library="box2d" />
+			<Add library="Box2D" />
+			<Add directory="/opt/Box2D/lib/" />
 		</Linker>
 		<Unit filename="../connection.cpp" />
 		<Unit filename="../connection.h" />

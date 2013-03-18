@@ -1,11 +1,10 @@
 #include "player.h"
 #include <cstdlib>
 
-Player::Player(Socket* socket, int x, int y)
+Player::Player(Socket* socket)
 {
     this->socket = socket;
-    this->x = x;
-    this->y = y;
+    body = NULL;
     name = NULL;
 }
 
@@ -35,12 +34,23 @@ bool Player::isPlaying()
     return name != NULL;
 }
 
-int Player::getX()
+b2Body* Player::getBody()
 {
-    return x;
+    return body;
 }
 
-int Player::getY()
+void Player::setBody(b2Body* body)
 {
-    return y;
+    this->body = body;
+}
+
+void Player::saveLastPosition()
+{
+    lastX = (int) body->GetPosition().x;
+    lastY = (int) body->GetPosition().y;
+}
+
+bool Player::isLastPositionDifferent()
+{
+    return lastX != (int) body->GetPosition().x || lastY != (int) body->GetPosition().y;
 }

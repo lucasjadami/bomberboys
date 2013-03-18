@@ -2,26 +2,30 @@
 #define PLAYER_H
 
 #include "socket.h"
+#include <Box2D/Box2D.h>
 
 class Player
 {
 public:
 
-            Player(Socket*, int, int);
+            Player(Socket*);
            ~Player();
    char*    getName();
    void     setName(char*);
    Socket*  getSocket();
    bool     isPlaying();
-   int      getX();
-   int      getY();
+   b2Body*  getBody();
+   void     setBody(b2Body*);
+   void     saveLastPosition();
+   bool     isLastPositionDifferent();
 
 private:
 
     Socket* socket;
     char*   name;
-    int     x;
-    int     y;
+    b2Body* body;
+    int     lastX;
+    int     lastY;
 
 };
 
