@@ -41,6 +41,11 @@ char* Socket::getInBuffer()
     return inBuffer + inPointer;
 }
 
+int Socket::getInBufferSize()
+{
+    return sizeof(char) * (BUFFER_SIZE - inPointer);
+}
+
 char* Socket::getOutBuffer()
 {
     return outBuffer;
@@ -58,19 +63,27 @@ void Socket::updateInBuffer(int bytesRead)
     if (inPointer > 0)
     {
         int packetId = inBuffer[0];
-        if (packetId == PACKET_LOGIN)
+        int size = INT_MAX / 2;
+        switch (packetId)
         {
-            if (inPointer > PACKET_LOGIN_SIZE)
-            {
-                char* data = new char[PACKET_LOGIN_SIZE];
-                memcpy(data, inBuffer + 1, sizeof(char) * PACKET_LOGIN_SIZE);
-                inPackets.push_back(new Packet(PACKET_LOGIN, data));
+            case PACKET_LOGIN:
+                size = PACKET_LOGIN_SIZE; break;
+            case PACKET_MOVE_ME:
+                size = PACKET_MOVE_ME_SIZE; break;
+        }
 
-                memcpy(auxBuffer, inBuffer + inPointer, sizeof(inBuffer + inPointer));
-                memcpy(inBuffer, auxBuffer, sizeof(auxBuffer));
+        if (inPointer > size)
+        {
+            char* data = new char[size];
+            memcpy(data, inBuffer + 1, sizeof(char) * size);
+            inPackets.push_back(new Packet(packetId, data));
 
-                inPointer -= PACKET_LOGIN_SIZE + 1;
-            }
+            memcpy(auxBuffer, inBuffer + size + 1, sizeof(char) * (BUFFER_SIZE - (size + 1)));
+            memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
+
+            inPointer -= size + 1;
+
+            updateInBuffer(0);
         }
     }
 }
@@ -81,7 +94,7 @@ void Socket::updateOutBuffer(int bytesWritten)
     {
         outPointer -= bytesWritten;
 
-        memcpy(auxBuffer, outBuffer + outPointer, sizeof(outBuffer + outPointer));
+        memcpy(auxBuffer, outBuffer + outPointer, sizeof(char) * (BUFFER_SIZE -  outPointer));
         memcpy(outBuffer, auxBuffer, sizeof(auxBuffer));
     }
 

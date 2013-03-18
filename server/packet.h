@@ -6,11 +6,13 @@
 #define PACKET_LOGIN            0
 #define PACKET_ADD_PLAYER       1
 #define PACKET_REMOVE_PLAYER    2
+#define PACKET_MOVE_ME          3
 #define PACKET_MOVE_PLAYER      4
 
 #define PACKET_LOGIN_SIZE           NAME_SIZE
 #define PACKET_ADD_PLAYER_SIZE      2 + 2 + 2 + NAME_SIZE
 #define PACKET_REMOVE_PLAYER_SIZE   2
+#define PACKET_MOVE_ME_SIZE         1
 #define PACKET_MOVE_PLAYER_SIZE     2 + 2 + 2
 
 class Packet

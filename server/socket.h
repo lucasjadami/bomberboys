@@ -18,6 +18,7 @@ public:
     int         getFd();
     sockaddr_in getAddress();
     char*       getInBuffer();
+    int         getInBufferSize();
     char*       getOutBuffer();
     int         getOutBufferSize();
     void        updateInBuffer(int);

@@ -62,7 +62,7 @@ void Game::connectionHandler(int eventId, Socket* socket)
 
 void Game::update()
 {
-    world->Step(1.0f / 60.0f, 6, 2);
+    world->Step(1.0f / 60.0f, 8, 3);
 
     for (unsigned int i = 0; i < players.size(); ++i)
     {
@@ -97,6 +97,10 @@ void Game::updatePlayerPackets(Player* player)
                 newPacket = createAddPlayerPacket(players[i]);
                 player->getSocket()->addOutPacket(newPacket);
             }
+        }
+        else if (packet->getId() == PACKET_MOVE_ME)
+        {
+            parseMoveMePacket(packet, player);
         }
         delete packet;
     }
@@ -138,10 +142,6 @@ void Game::createPlayerBody(Player* player)
     body->CreateFixture(&fixtureDef);
     body->SetLinearDamping(0.1f);
 
-    b2Vec2 force;
-    force.Set(1000.0f, 0.0f);
-    body->ApplyForceToCenter(force);
-
     player->setBody(body);
 }
 
@@ -154,6 +154,28 @@ void Game::parseLoginPacket(Packet* packet, Player* player)
 
     createPlayerBody(player);
     player->saveLastPosition();
+}
+
+void Game::parseMoveMePacket(Packet* packet, Player* player)
+{
+    int direction = packet->getData()[0];
+
+    b2Vec2 impulse;
+    impulse.SetZero();
+
+    switch (direction)
+    {
+        case 0:
+            impulse.y = 10.0f; break;
+        case 2:
+            impulse.x = 10.0f; break;
+        case 4:
+            impulse.y = -10.0f; break;
+        case 6:
+            impulse.x = -10.0f; break;
+    }
+
+    player->getBody()->ApplyLinearImpulse(impulse, player->getBody()->GetWorldCenter());
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)

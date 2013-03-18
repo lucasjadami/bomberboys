@@ -74,7 +74,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
         if (FD_ISSET(socket->getFd(), &readFdSet))
         {
             int bytesRead;
-            if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), sizeof(socket->getInBuffer()), 0)) <= 0)
+            if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), socket->getInBufferSize(), 0)) <= 0)
             {
                 if (bytesRead == 0)
                     debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));

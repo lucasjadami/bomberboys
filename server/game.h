@@ -28,6 +28,7 @@ private:
     void    updatePlayerMovement(Player*);
     void    createPlayerBody(Player*);
     void    parseLoginPacket(Packet*, Player*);
+    void    parseMoveMePacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
     Packet* createMovePlayerPacket(Player*);
