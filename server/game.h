@@ -26,6 +26,7 @@ private:
 
     void    updatePlayerPackets(Player*);
     void    updatePlayerMovement(Player*);
+    void    createPlayerBody(Player*);
     void    parseLoginPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);

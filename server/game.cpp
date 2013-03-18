@@ -119,13 +119,8 @@ void Game::updatePlayerMovement(Player* player)
     player->saveLastPosition();
 }
 
-void Game::parseLoginPacket(Packet* packet, Player* player)
+void Game::createPlayerBody(Player* player)
 {
-    char* name = new char[NAME_SIZE];
-    memcpy(name, packet->getData(), sizeof(char) * PACKET_LOGIN_SIZE);
-    name[NAME_SIZE - 1] = '\0';
-    player->setName(name);
-
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(MAP_WIDTH / 2, MAP_HEIGHT / 2);
@@ -133,7 +128,7 @@ void Game::parseLoginPacket(Packet* packet, Player* player)
     b2Body* body = world->CreateBody(&bodyDef);
 
     b2CircleShape dynamicCircle;
-    dynamicCircle.m_radius = 3.0f;
+    dynamicCircle.m_radius = 10.0f;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicCircle;
@@ -144,10 +139,20 @@ void Game::parseLoginPacket(Packet* packet, Player* player)
     body->SetLinearDamping(0.1f);
 
     b2Vec2 force;
-    force.Set(100.0f, 0.0f);
+    force.Set(1000.0f, 0.0f);
     body->ApplyForceToCenter(force);
 
     player->setBody(body);
+}
+
+void Game::parseLoginPacket(Packet* packet, Player* player)
+{
+    char* name = new char[NAME_SIZE];
+    memcpy(name, packet->getData(), sizeof(char) * PACKET_LOGIN_SIZE);
+    name[NAME_SIZE - 1] = '\0';
+    player->setName(name);
+
+    createPlayerBody(player);
     player->saveLastPosition();
 }
 
@@ -155,9 +160,10 @@ Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    putBytes(data, player->getBody()->GetPosition().x, 2);
-    putBytes(data + 2, player->getBody()->GetPosition().y, 2);
-    memcpy(data + 5, player->getName(), sizeof(char) * NAME_SIZE);
+    putBytes(data, player->getSocket()->getId(), 2);
+    putBytes(data + 2, player->getBody()->GetPosition().x, 2);
+    putBytes(data + 4, player->getBody()->GetPosition().y, 2);
+    memcpy(data + 6, player->getName(), sizeof(char) * NAME_SIZE);
     Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
     return packet;
 }
@@ -186,7 +192,7 @@ void Game::putBytes(char* data, int value, int bytes)
 
     for (int i = 0; i < bytes; ++i)
     {
-        data[i] = value & mask;
+        data[bytes - i - 1] = (value & mask) >> (8 * i);
         mask = mask << 8;
     }
 }

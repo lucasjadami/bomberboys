@@ -79,7 +79,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
                 if (bytesRead == 0)
                     debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
                 else
-                    error("ERROR on recv");
+                    warning("ERROR on recv");
                 removeIt = true;
                 close(socket->getFd());
             }
@@ -94,7 +94,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
             int bytesWritten;
             if ((bytesWritten = send(socket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0)) < 0)
             {
-                error("ERROR on send");
+                warning("ERROR on send");
                 removeIt = true;
                 close(socket->getFd());
             }

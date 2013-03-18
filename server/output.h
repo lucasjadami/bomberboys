@@ -23,6 +23,7 @@ inline int exit()
 }
 
 #define info(...)       printf(__VA_ARGS__) && printf("\n")
+#define warning(...)    printf("%s", BROWN) && printf(__VA_ARGS__) && printf("\n%s", NONE)
 #define error(...)      printf("%s", RED) && printf(__VA_ARGS__) && printf("\n%s", NONE) && exit()
 #define debug(...)   	printf("%s", BLUE) && printf(__VA_ARGS__) && printf("\n%s", NONE)
 
