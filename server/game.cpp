@@ -70,9 +70,9 @@ void Game::connectionHandler(int eventId, Socket* socket)
     }
 }
 
-void Game::update()
+void Game::update(float time, float velocityIterations, float positionIterations)
 {
-    world->Step(1.0f / 60.0f, 8, 3);
+    world->Step(time, velocityIterations, positionIterations);
 
     for (unsigned int i = 0; i < players.size(); ++i)
     {
@@ -98,6 +98,11 @@ void Game::update()
         else
             ++it;
     }
+}
+
+b2World* Game::getWorld()
+{
+    return world;
 }
 
 void Game::updatePlayerPackets(Player* player)

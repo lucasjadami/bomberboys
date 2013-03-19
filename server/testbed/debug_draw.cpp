@@ -19,7 +19,7 @@
 *
 */
 
-#include "render.h"
+#include "debug_draw.h"
 
 #ifdef __APPLE__
 	#include <GLUT/glut.h>

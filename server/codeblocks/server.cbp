@@ -68,16 +68,19 @@
 		<Unit filename="../player.h" />
 		<Unit filename="../socket.cpp" />
 		<Unit filename="../socket.h" />
-		<Unit filename="../testbed/main.cpp">
+		<Unit filename="../testbed/debug_draw.cpp">
 			<Option target="Testbed" />
 		</Unit>
-		<Unit filename="../testbed/render.cpp">
-			<Option target="Testbed" />
-		</Unit>
-		<Unit filename="../testbed/render.h">
+		<Unit filename="../testbed/debug_draw.h">
 			<Option target="Testbed" />
 		</Unit>
 		<Unit filename="../testbed/settings.h">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/testbed.cpp">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/testbed.h">
 			<Option target="Testbed" />
 		</Unit>
 		<Extensions>
