@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DDEBUG" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -25,6 +26,20 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Testbed">
+				<Option output="bin/testbed/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/testbed/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DTESTBED" />
+				</Compiler>
+				<Linker>
+					<Add library="glui" />
+					<Add library="GL" />
 				</Linker>
 			</Target>
 		</Build>
@@ -53,6 +68,27 @@
 		<Unit filename="../player.h" />
 		<Unit filename="../socket.cpp" />
 		<Unit filename="../socket.h" />
+		<Unit filename="../testbed/game_test.cpp">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/game_test.h">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/main.cpp">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/render.cpp">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/render.h">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/test.cpp">
+			<Option target="Testbed" />
+		</Unit>
+		<Unit filename="../testbed/test.h">
+			<Option target="Testbed" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
