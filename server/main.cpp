@@ -22,6 +22,7 @@ void connectionHandler(int eventId, Socket* socket)
     game->connectionHandler(eventId, socket);
 }
 
+#ifndef TESTBED
 int main(int argc, char *argv[])
 {
 	sigIntHandler.sa_handler = exitHandler;
@@ -51,3 +52,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+#endif
