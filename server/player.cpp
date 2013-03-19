@@ -64,8 +64,7 @@ void Player::applyImpulse(b2Vec2& impulse)
     if (clock_gettime(CLOCK_REALTIME, &time) == -1)
         error("ERROR on gettime");
 
-    // Everything is converted to milliseconds.
-    int now = time.tv_sec * 1000 + time.tv_nsec / 1000000;
+    long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
     if (now - lastImpulse > 50)
     {
         lastImpulse = now;

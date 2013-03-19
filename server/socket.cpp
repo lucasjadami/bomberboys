@@ -70,6 +70,8 @@ void Socket::updateInBuffer(int bytesRead)
                 size = PACKET_LOGIN_SIZE; break;
             case PACKET_MOVE_ME:
                 size = PACKET_MOVE_ME_SIZE; break;
+            case PACKET_PLANT_BOMB:
+                size = PACKET_PLANT_BOMB_SIZE; break;
         }
 
         if (inPointer > size)
@@ -110,6 +112,12 @@ void Socket::updateOutBuffer(int bytesWritten)
                 size = PACKET_REMOVE_PLAYER_SIZE; break;
             case PACKET_MOVE_PLAYER:
                 size = PACKET_MOVE_PLAYER_SIZE; break;
+            case PACKET_ADD_BOMB:
+                size = PACKET_ADD_BOMB_SIZE; break;
+            case PACKET_EXPLODE_BOMB:
+                size = PACKET_EXPLODE_BOMB_SIZE; break;
+            case PACKET_FALL_PLAYER:
+                size = PACKET_FALL_PLAYER_SIZE; break;
         }
 
         if (outPointer + size + 1 <= BUFFER_SIZE)

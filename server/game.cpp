@@ -4,6 +4,7 @@
 #include "output.h"
 #include <cstdlib>
 #include <cstring>
+#include <utility>
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <Box2D/Collision/Shapes/b2CircleShape.h>
@@ -19,6 +20,8 @@ Game::~Game()
         delete world;
     for (unsigned int i = 0; i < players.size(); ++i)
         delete players[i];
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        delete it->second;
 }
 
 void Game::createWorld()
@@ -36,6 +39,13 @@ void Game::connectionHandler(int eventId, Socket* socket)
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
     {
+        Bomb* bomb = bombs.find(socket->getId()) == bombs.end() ? NULL : bombs[socket->getId()];
+        if (bomb != NULL)
+        {
+            explodeBomb(bomb);
+            bombs.erase(socket->getId());
+        }
+
         std::vector<Player*>::iterator it = players.begin();
         while (it != players.end())
         {
@@ -72,6 +82,19 @@ void Game::update()
         if (player->isPlaying())
             updatePlayerMovement(player);
     }
+
+    std::map<int, Bomb*>::iterator it = bombs.begin();
+    while (it != bombs.end())
+    {
+        Bomb* bomb = it->second;
+        if (bomb->explode())
+        {
+            explodeBomb(bomb);
+            bombs.erase(it++);
+        }
+        else
+            ++it;
+    }
 }
 
 void Game::updatePlayerPackets(Player* player)
@@ -80,28 +103,11 @@ void Game::updatePlayerPackets(Player* player)
     while ((packet = player->getSocket()->getInPacket()) != NULL)
     {
         if (packet->getId() == PACKET_LOGIN)
-        {
             parseLoginPacket(packet, player);
-
-            Packet* newPacket = createAddPlayerPacket(player);
-            player->getSocket()->addOutPacket(newPacket);
-
-            for (unsigned int i = 0; i < players.size(); ++i)
-            {
-                if (players[i] == player || !players[i]->isPlaying())
-                    continue;
-
-                newPacket = createAddPlayerPacket(player);
-                players[i]->getSocket()->addOutPacket(newPacket);
-
-                newPacket = createAddPlayerPacket(players[i]);
-                player->getSocket()->addOutPacket(newPacket);
-            }
-        }
         else if (packet->getId() == PACKET_MOVE_ME)
-        {
             parseMoveMePacket(packet, player);
-        }
+        else if (packet->getId() == PACKET_PLANT_BOMB)
+            parsePlantBombPacket(packet, player);
         delete packet;
     }
 }
@@ -123,6 +129,27 @@ void Game::updatePlayerMovement(Player* player)
     player->saveLastPosition();
 }
 
+void Game::explodeBomb(Bomb* bomb)
+{
+    for (unsigned int i = 0; i < players.size(); ++i)
+    {
+        Player* player = players[i];
+
+        Packet* newPacket = createExplodeBombPacket(bomb);
+        player->getSocket()->addOutPacket(newPacket);
+
+        b2Vec2 blastDir = player->getBody()->GetWorldCenter() - bomb->getBody()->GetWorldCenter();
+        float distance = blastDir.Normalize();
+        distance = distance == 0 ? 1 : distance;
+        float invDistance = 20.0f / distance;
+        float impulseMag = b2Min(900.0f * invDistance * invDistance, 200.0f);
+        player->getBody()->ApplyLinearImpulse(impulseMag * blastDir, player->getBody()->GetWorldCenter());
+    }
+
+    world->DestroyBody(bomb->getBody());
+    delete bomb;
+}
+
 void Game::createPlayerBody(Player* player)
 {
     b2BodyDef bodyDef;
@@ -132,17 +159,40 @@ void Game::createPlayerBody(Player* player)
     b2Body* body = world->CreateBody(&bodyDef);
 
     b2CircleShape dynamicCircle;
-    dynamicCircle.m_radius = 10.0f;
+    dynamicCircle.m_radius = PLAYER_RADIUS;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicCircle;
     fixtureDef.density = 0.01f;
     fixtureDef.friction = 0.3f;
+    fixtureDef.restitution = 0.5f;
 
     body->CreateFixture(&fixtureDef);
     body->SetLinearDamping(0.1f);
 
     player->setBody(body);
+}
+
+void Game::createBombBody(Bomb* bomb, Player* player)
+{
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_staticBody;
+    bodyDef.position.Set(player->getBody()->GetPosition().x, player->getBody()->GetPosition().y);
+
+    b2Body* body = world->CreateBody(&bodyDef);
+
+    b2PolygonShape staticPolygon;
+    staticPolygon.SetAsBox(BOMB_SIZE / 2, BOMB_SIZE / 2);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &staticPolygon;
+    fixtureDef.density = 0.0f;
+    fixtureDef.friction = 0.0f;
+    fixtureDef.filter.maskBits = 0;
+
+    body->CreateFixture(&fixtureDef);
+
+    bomb->setBody(body);
 }
 
 void Game::parseLoginPacket(Packet* packet, Player* player)
@@ -154,6 +204,27 @@ void Game::parseLoginPacket(Packet* packet, Player* player)
 
     createPlayerBody(player);
     player->saveLastPosition();
+
+    Packet* newPacket = createAddPlayerPacket(player);
+    player->getSocket()->addOutPacket(newPacket);
+
+    for (unsigned int i = 0; i < players.size(); ++i)
+    {
+        if (players[i] == player || !players[i]->isPlaying())
+            continue;
+
+        newPacket = createAddPlayerPacket(player);
+        players[i]->getSocket()->addOutPacket(newPacket);
+
+        newPacket = createAddPlayerPacket(players[i]);
+        player->getSocket()->addOutPacket(newPacket);
+    }
+
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+    {
+        newPacket = createAddBombPacket(it->second);
+        player->getSocket()->addOutPacket(newPacket);
+    }
 }
 
 void Game::parseMoveMePacket(Packet* packet, Player* player)
@@ -166,16 +237,33 @@ void Game::parseMoveMePacket(Packet* packet, Player* player)
     switch (direction)
     {
         case 0:
-            impulse.y = 10.0f; break;
+            impulse.y = MOVEMENT_IMPULSE; break;
         case 2:
-            impulse.x = 10.0f; break;
+            impulse.x = MOVEMENT_IMPULSE; break;
         case 4:
-            impulse.y = -10.0f; break;
+            impulse.y = -MOVEMENT_IMPULSE; break;
         case 6:
-            impulse.x = -10.0f; break;
+            impulse.x = -MOVEMENT_IMPULSE; break;
     }
 
     player->applyImpulse(impulse);
+}
+
+void Game::parsePlantBombPacket(Packet* packet, Player* player)
+{
+    if (bombs.find(player->getSocket()->getId()) == bombs.end())
+    {
+        Bomb* bomb = new Bomb(player->getSocket()->getId());
+        createBombBody(bomb, player);
+
+        bombs.insert(std::make_pair(player->getSocket()->getId(), bomb));
+
+        for (unsigned int i = 0; i < players.size(); ++i)
+        {
+            Packet* newPacket = createAddBombPacket(bomb);
+            players[i]->getSocket()->addOutPacket(newPacket);
+        }
+    }
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)
@@ -206,6 +294,24 @@ Packet* Game::createMovePlayerPacket(Player* player)
     putBytes(data + 2, (int) player->getBody()->GetPosition().x, 2);
     putBytes(data + 4, (int) player->getBody()->GetPosition().y, 2);
     return new Packet(PACKET_MOVE_PLAYER, data);
+}
+
+Packet* Game::createAddBombPacket(Bomb* bomb)
+{
+    char* data = new char[PACKET_ADD_BOMB_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_ADD_BOMB_SIZE);
+    putBytes(data, bomb->getId(), 2);
+    putBytes(data + 2, (int) bomb->getBody()->GetPosition().x, 2);
+    putBytes(data + 4, (int) bomb->getBody()->GetPosition().y, 2);
+    return new Packet(PACKET_ADD_BOMB, data);
+}
+
+Packet* Game::createExplodeBombPacket(Bomb* bomb)
+{
+    char* data = new char[PACKET_EXPLODE_BOMB_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_EXPLODE_BOMB_SIZE);
+    putBytes(data, bomb->getId(), 2);
+    return new Packet(PACKET_EXPLODE_BOMB, data);
 }
 
 void Game::putBytes(char* data, int value, int bytes)

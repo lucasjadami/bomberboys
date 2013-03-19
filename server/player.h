@@ -4,6 +4,9 @@
 #include "socket.h"
 #include <Box2D/Box2D.h>
 
+#define PLAYER_RADIUS 10.0f
+#define MOVEMENT_IMPULSE 10.0f
+
 class Player
 {
 public:
@@ -22,12 +25,12 @@ public:
 
 private:
 
-    Socket* socket;
-    char*   name;
-    b2Body* body;
-    int     lastX;
-    int     lastY;
-    int     lastImpulse;
+    Socket*     socket;
+    char*       name;
+    b2Body*     body;
+    int         lastX;
+    int         lastY;
+    long long   lastImpulse;
 
 };
 
