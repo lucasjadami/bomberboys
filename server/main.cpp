@@ -5,9 +5,9 @@
 #include <signal.h>
 #include <cstdlib>
 
-struct sigaction 	    sigIntHandler;
-Connection* 		    connection;
-Game*                   game;
+struct sigaction    sigIntHandler;
+Connection* 	    connection;
+Game*               game;
 
 void exitHandler(int s)
 {

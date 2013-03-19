@@ -29,6 +29,7 @@ private:
 
     void    updatePlayerPackets(Player*);
     void    updatePlayerMovement(Player*);
+    void    fallPlayer(Player*);
     void    explodeBomb(Bomb*);
     void    createPlayerBody(Player*);
     void    createBombBody(Bomb*, Player*);
@@ -40,6 +41,7 @@ private:
     Packet* createMovePlayerPacket(Player*);
     Packet* createAddBombPacket(Bomb*);
     Packet* createExplodeBombPacket(Bomb*);
+    Packet* createFallPlayerPacket(Player*);
     void    putBytes(char*, int, int);
 
 };

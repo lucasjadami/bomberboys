@@ -80,7 +80,10 @@ void Game::update()
 
         updatePlayerPackets(player);
         if (player->isPlaying())
+        {
+            fallPlayer(player);
             updatePlayerMovement(player);
+        }
     }
 
     std::map<int, Bomb*>::iterator it = bombs.begin();
@@ -127,6 +130,28 @@ void Game::updatePlayerMovement(Player* player)
     }
 
     player->saveLastPosition();
+}
+
+void Game::fallPlayer(Player* player)
+{
+    if (player->getBody()->GetPosition().x < 0.0f - PLAYER_RADIUS || player->getBody()->GetPosition().x > MAP_WIDTH + PLAYER_RADIUS
+            || player->getBody()->GetPosition().y < 0.0f - PLAYER_RADIUS || player->getBody()->GetPosition().y > MAP_HEIGHT + PLAYER_RADIUS)
+    {
+        b2Vec2 position;
+        position.Set(MAP_WIDTH / 2, MAP_HEIGHT / 2);
+        player->getBody()->SetTransform(position, 0.0f);
+
+        player->saveLastPosition();
+
+        for (unsigned int i = 0; i < players.size(); ++i)
+        {
+            Packet* newPacket = createFallPlayerPacket(player);
+            players[i]->getSocket()->addOutPacket(newPacket);
+
+            newPacket = createMovePlayerPacket(player);
+            players[i]->getSocket()->addOutPacket(newPacket);
+        }
+    }
 }
 
 void Game::explodeBomb(Bomb* bomb)
@@ -312,6 +337,14 @@ Packet* Game::createExplodeBombPacket(Bomb* bomb)
     memset(data, 0, sizeof(char) * PACKET_EXPLODE_BOMB_SIZE);
     putBytes(data, bomb->getId(), 2);
     return new Packet(PACKET_EXPLODE_BOMB, data);
+}
+
+Packet* Game::createFallPlayerPacket(Player* player)
+{
+    char* data = new char[PACKET_FALL_PLAYER_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
+    putBytes(data, player->getSocket()->getId(), 2);
+    return new Packet(PACKET_FALL_PLAYER, data);
 }
 
 void Game::putBytes(char* data, int value, int bytes)
