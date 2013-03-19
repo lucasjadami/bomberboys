@@ -15,8 +15,8 @@ def help
   puts '4 to exit'
 end
 
-address = ARGV[0] || 'localhost' 
-port = ARGV[1] || 4000
+address = ARGV[0] || 'localhost'
+port = ARGV[1] || 10011
 
 begin
   socket = TCPSocket.open(address, port)
@@ -36,7 +36,7 @@ end
 help
 
 print "> "
-option = gets.chomp
+option = $stdin.gets.chomp
 while option != '4'
   case option
   when '?'
@@ -45,16 +45,16 @@ while option != '4'
     puts game.board
   when '1'
     print 'name: '
-    connection.login(gets.chomp[0..19])
+    connection.login($stdin.gets.chomp[0..19])
   when '2'
     print 'direction (n, s, e, w, ne, nw, se, sw): '
-    connection.move_me(gets.chomp.to_sym)
+    connection.move_me($stdin.gets.chomp.to_sym)
   when '3'
     connection.plant_bomb
   end
 
   print "> "
-  option = gets.chomp
+  option = $stdin.gets.chomp
 end
 
 socket.close
