@@ -18,6 +18,7 @@ public:
     int         getFd();
     sockaddr_in getAddress();
     char*       getInBuffer();
+    int         getInBufferSize();
     char*       getOutBuffer();
     int         getOutBufferSize();
     void        updateInBuffer(int);
@@ -27,16 +28,16 @@ public:
 
 private:
 
-    int                 id;
-    int                 fd;
-    sockaddr_in         address;
-    char                auxBuffer[BUFFER_SIZE];
-    char                inBuffer[BUFFER_SIZE];
-    char                outBuffer[BUFFER_SIZE];
-    int                 inPointer;
-    int                 outPointer;
-    std::vector<Packet*> inPackets;
-    std::vector<Packet*> outPackets;
+    int                     id;
+    int                     fd;
+    sockaddr_in             address;
+    char                    auxBuffer[BUFFER_SIZE];
+    char                    inBuffer[BUFFER_SIZE];
+    char                    outBuffer[BUFFER_SIZE];
+    int                     inPointer;
+    int                     outPointer;
+    std::vector<Packet*>    inPackets;
+    std::vector<Packet*>    outPackets;
 };
 
 #endif

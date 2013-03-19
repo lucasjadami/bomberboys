@@ -5,9 +5,9 @@
 #include <signal.h>
 #include <cstdlib>
 
-struct sigaction 	    sigIntHandler;
-Connection* 		    connection;
-Game*                   game;
+struct sigaction    sigIntHandler;
+Connection* 	    connection;
+Game*               game;
 
 void exitHandler(int s)
 {
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	{
 		usleep(1000);
 		connection->process();
-		game->updateGamePackets();
+		game->update();
 	}
 
 	return 0;

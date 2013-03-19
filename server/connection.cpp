@@ -15,6 +15,7 @@ Connection::~Connection()
     while (it != clientSockets.end())
     {
         shutdown(it->second->getFd(), SHUT_RDWR);
+        close(it->second->getFd());
         delete it->second;
         it++;
     }
@@ -29,6 +30,10 @@ Connection::~Connection()
 void Connection::init(int port)
 {
     int serverFd = create();
+
+    int yes = 1;
+    if (setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+        error("ERROR on set SO_REUSEADDR");
 
     sockaddr_in address;
 
