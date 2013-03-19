@@ -9,7 +9,7 @@ module BomberboysClient
     end
 
     def start
-      while str_message = @socket.gets
+      while str_message = @socket.recv(100)
         message = Message.unpack(str_message)
         if @listener.respond_to?(message.action)
           @listener.send(message.action, *message.params)
