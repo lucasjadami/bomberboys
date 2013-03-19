@@ -68,12 +68,6 @@
 		<Unit filename="../player.h" />
 		<Unit filename="../socket.cpp" />
 		<Unit filename="../socket.h" />
-		<Unit filename="../testbed/game_test.cpp">
-			<Option target="Testbed" />
-		</Unit>
-		<Unit filename="../testbed/game_test.h">
-			<Option target="Testbed" />
-		</Unit>
 		<Unit filename="../testbed/main.cpp">
 			<Option target="Testbed" />
 		</Unit>
@@ -83,10 +77,7 @@
 		<Unit filename="../testbed/render.h">
 			<Option target="Testbed" />
 		</Unit>
-		<Unit filename="../testbed/test.cpp">
-			<Option target="Testbed" />
-		</Unit>
-		<Unit filename="../testbed/test.h">
+		<Unit filename="../testbed/settings.h">
 			<Option target="Testbed" />
 		</Unit>
 		<Extensions>

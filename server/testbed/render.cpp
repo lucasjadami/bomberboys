@@ -14,6 +14,9 @@
 * 2. Altered source versions must be plainly marked as such, and must not be
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
+*
+* This source code is altered from the original version.
+*
 */
 
 #include "render.h"
@@ -27,8 +30,6 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
-
-using namespace std;
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {

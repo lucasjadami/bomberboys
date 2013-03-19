@@ -14,35 +14,36 @@
 * 2. Altered source versions must be plainly marked as such, and must not be
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
+*
+* This source code is altered from the original version.
+*
 */
 
 #include "render.h"
-#include "test.h"
+#include "settings.h"
+#include "../game.h"
 #include <GL/glui.h>
-#include <cstdio>
-#include <GL/freeglut.h>
 
-using namespace std;
+#ifdef __APPLE__
+	#include <GLUT/glut.h>
+#else
+	#include <GL/freeglut.h>
+#endif
 
-namespace
-{
-	int32 testIndex = 0;
-	int32 testSelection = 0;
-	int32 testCount = 0;
-	TestEntry* entry;
-	Test* test;
-	Settings settings;
-	int32 width = 640;
-	int32 height = 480;
-	int32 framePeriod = 16;
-	int32 mainWindow;
-	float settingsHz = 60.0;
-	GLUI *glui;
-	float32 viewZoom = 1.0f;
-	int tx, ty, tw, th;
-	bool rMouseDown;
-	b2Vec2 lastp;
-}
+Settings    settings;
+int32       width = MAP_WIDTH;
+int32       height = MAP_HEIGHT;
+int32       framePeriod = 16;
+int32       mainWindow;
+float       settingsHz = 60.0;
+GLUI*       glui;
+float32     viewZoom = 1.0f;
+int         tx,
+            ty,
+            tw,
+            th;
+bool        rMouseDown;
+b2Vec2      lastp;
 
 static void Resize(int32 w, int32 h)
 {
@@ -99,28 +100,15 @@ static void SimulationLoop()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	test->SetTextLine(30);
 	b2Vec2 oldCenter = settings.viewCenter;
 	settings.hz = settingsHz;
-	test->Step(&settings);
+
+    // TODO: world update.
 
 	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)
         Resize(width, height);
 
-	test->DrawTitle(5, 15, entry->name);
-
 	glutSwapBuffers();
-
-	if (testSelection != testIndex)
-	{
-		testIndex = testSelection;
-		delete test;
-		entry = g_testEntries + testIndex;
-		test = entry->createFcn();
-		viewZoom = 1.0f;
-		settings.viewCenter.Set(0.0f, 20.0f);
-		Resize(width, height);
-	}
 }
 
 static void Keyboard(unsigned char key, int x, int y)
@@ -147,39 +135,9 @@ static void Keyboard(unsigned char key, int x, int y)
             viewZoom = b2Max(0.9f * viewZoom, 0.02f);
             Resize(width, height);
             break;
-		// Press 'r' to reset.
-        case 'r':
-            delete test;
-            test = entry->createFcn();
-            break;
-		// Press space to launch a bomb.
-        case ' ':
-            if (test)
-                test->LaunchBomb();
-            break;
         case 'p':
             settings.pause = !settings.pause;
             break;
-		// Press [ to prev test.
-        case '[':
-            --testSelection;
-            if (testSelection < 0)
-            {
-                testSelection = testCount - 1;
-            }
-            glui->sync_live();
-            break;
-		// Press ] to next test.
-        case ']':
-            ++testSelection;
-            if (testSelection == testCount)
-                testSelection = 0;
-            glui->sync_live();
-            break;
-
-        default:
-            if (test)
-                test->Keyboard(key);
 	}
 }
 
@@ -224,9 +182,6 @@ static void KeyboardUp(unsigned char key, int x, int y)
 {
 	B2_NOT_USED(x);
 	B2_NOT_USED(y);
-
-	if (test)
-        test->KeyboardUp(key);
 }
 
 static void Mouse(int32 button, int32 state, int32 x, int32 y)
@@ -235,18 +190,20 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 	if (button == GLUT_LEFT_BUTTON)
 	{
 		int mod = glutGetModifiers();
-		b2Vec2 p = ConvertScreenToWorld(x, y);
+		/*b2Vec2 p = */ConvertScreenToWorld(x, y);
 		if (state == GLUT_DOWN)
 		{
-			b2Vec2 p = ConvertScreenToWorld(x, y);
 			if (mod == GLUT_ACTIVE_SHIFT)
-                test->ShiftMouseDown(p);
+            {
+            }
 			else
-                test->MouseDown(p);
+            {
+            }
 		}
 
 		if (state == GLUT_UP)
-            test->MouseUp(p);
+        {
+        }
 	}
 	else if (button == GLUT_RIGHT_BUTTON)
 	{
@@ -264,7 +221,6 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y)
 static void MouseMotion(int32 x, int32 y)
 {
 	b2Vec2 p = ConvertScreenToWorld(x, y);
-	test->MouseMove(p);
 
 	if (rMouseDown)
 	{
@@ -290,9 +246,6 @@ static void MouseWheel(int wheel, int direction, int x, int y)
 
 static void Restart(int)
 {
-	delete test;
-	entry = g_testEntries + testIndex;
-	test = entry->createFcn();
     Resize(width, height);
 }
 
@@ -319,18 +272,6 @@ static void SingleStep(int)
 #ifdef TESTBED
 int main(int argc, char** argv)
 {
-	testCount = 0;
-	while (g_testEntries[testCount].createFcn != NULL)
-	{
-		++testCount;
-	}
-
-	testIndex = b2Clamp(testIndex, 0, testCount-1);
-	testSelection = testIndex;
-
-	entry = g_testEntries + testIndex;
-	test = entry->createFcn();
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(width, height);
@@ -355,8 +296,6 @@ int main(int argc, char** argv)
 		GLUI_SUBWINDOW_RIGHT );
 
 	glui->add_statictext("Tests");
-	GLUI_Listbox* testList =
-		glui->add_listbox("", &testSelection);
 
 	glui->add_separator();
 
@@ -391,15 +330,6 @@ int main(int argc, char** argv)
 	glui->add_checkbox_to_panel(drawPanel, "Center of Masses", &settings.drawCOMs);
 	glui->add_checkbox_to_panel(drawPanel, "Statistics", &settings.drawStats);
 	glui->add_checkbox_to_panel(drawPanel, "Profile", &settings.drawProfile);
-
-	int32 testCount = 0;
-	TestEntry* e = g_testEntries;
-	while (e->createFcn)
-	{
-		testList->add_item(testCount, e->name);
-		++testCount;
-		++e;
-	}
 
 	glui->add_button("Pause", 0, Pause);
 	glui->add_button("Single Step", 0, SingleStep);
