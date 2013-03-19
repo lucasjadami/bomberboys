@@ -1,7 +1,6 @@
 #include "player.h"
-#include "output.h"
+#include "time.h"
 #include <cstdlib>
-#include <time.h>
 
 Player::Player(Socket* socket)
 {
@@ -61,8 +60,7 @@ bool Player::isLastPositionDifferent()
 void Player::applyImpulse(b2Vec2& impulse)
 {
     timespec time;
-    if (clock_gettime(CLOCK_REALTIME, &time) == -1)
-        error("ERROR on gettime");
+    getTime(&time);
 
     long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
     if (now - lastImpulse > 50)
