@@ -34,8 +34,11 @@
 		</Compiler>
 		<Linker>
 			<Add library="Box2D" />
+			<Add library="rt" />
 			<Add directory="/opt/Box2D/lib/" />
 		</Linker>
+		<Unit filename="../bomb.cpp" />
+		<Unit filename="../bomb.h" />
 		<Unit filename="../connection.cpp" />
 		<Unit filename="../connection.h" />
 		<Unit filename="../game.cpp" />
