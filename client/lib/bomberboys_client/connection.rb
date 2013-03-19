@@ -11,7 +11,11 @@ module BomberboysClient
     def start
       while str_message = @socket.gets
         message = Message.unpack(str_message)
-        listener.send(message.action, *message.params)
+        if @listener.respond_to?(message.action)
+          @listener.send(message.action, *message.params)
+        else
+          puts "ERROR: Listener doesn't respond to #{message.action}."
+        end
       end
     end
 
