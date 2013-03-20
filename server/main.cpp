@@ -36,32 +36,12 @@ void connectionHandler(int eventId, Socket* socket)
 }
 
 #ifdef TESTBED
-void gameUpdateHandler(Settings* settings)
+void gameDrawHandler(Settings* settings)
 {
-    stepCount++;
-
-    connection->process();
-
     b2World* world = game->getWorld();
 
-    float32 timeStep = settings->hz > 0.0f ? 1.0f / settings->hz : float32(0.0f);
-
-	uint32 flags = 0;
-	flags += settings->drawShapes * b2Draw::e_shapeBit;
-	flags += settings->drawJoints * b2Draw::e_jointBit;
-	flags += settings->drawAABBs * b2Draw::e_aabbBit;
-	flags += settings->drawPairs * b2Draw::e_pairBit;
-	flags += settings->drawCOMs * b2Draw::e_centerOfMassBit;
-	debugDraw.SetFlags(flags);
-
-	world->SetWarmStarting(settings->enableWarmStarting > 0);
-	world->SetContinuousPhysics(settings->enableContinuous > 0);
-	world->SetSubStepping(settings->enableSubStepping > 0);
-
-    game->update(timeStep, settings->velocityIterations, settings->positionIterations);
-
-    b2AABB aabb;
     b2Color c;
+    b2AABB aabb;
 
     aabb.lowerBound = b2Vec2(0.0f, 0.0f);
     aabb.upperBound = b2Vec2(MAP_WIDTH, MAP_HEIGHT);
@@ -156,6 +136,31 @@ void gameUpdateHandler(Settings* settings)
 		textLine += 15;
 	}
 }
+
+void gameUpdateHandler(Settings* settings)
+{
+    stepCount++;
+
+    connection->process();
+
+    b2World* world = game->getWorld();
+
+    float32 timeStep = settings->hz > 0.0f ? 1.0f / settings->hz : float32(0.0f);
+
+	uint32 flags = 0;
+	flags += settings->drawShapes * b2Draw::e_shapeBit;
+	flags += settings->drawJoints * b2Draw::e_jointBit;
+	flags += settings->drawAABBs * b2Draw::e_aabbBit;
+	flags += settings->drawPairs * b2Draw::e_pairBit;
+	flags += settings->drawCOMs * b2Draw::e_centerOfMassBit;
+	debugDraw.SetFlags(flags);
+
+	world->SetWarmStarting(settings->enableWarmStarting > 0);
+	world->SetContinuousPhysics(settings->enableContinuous > 0);
+	world->SetSubStepping(settings->enableSubStepping > 0);
+
+    game->update(timeStep, settings->velocityIterations, settings->positionIterations);
+}
 #endif
 
 int main(int argc, char** argv)
@@ -190,7 +195,7 @@ int main(int argc, char** argv)
     memset(&maxProfile, 0, sizeof(b2Profile));
     memset(&totalProfile, 0, sizeof(b2Profile));
 
-    launchTestbed(gameUpdateHandler, argc, argv, MAP_WIDTH, MAP_HEIGHT);
+    launchTestbed(gameUpdateHandler, gameDrawHandler, argc, argv, MAP_WIDTH, MAP_HEIGHT);
 #endif
 
 	return 0;

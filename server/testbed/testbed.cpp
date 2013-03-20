@@ -33,7 +33,8 @@
 Settings    settings;
 int32       width;
 int32       height;
-int32       framePeriod = 16;
+int32       drawPeriod = 16;
+int32       updatePeriod = 1;
 int32       mainWindow;
 GLUI*       glui;
 float32     viewZoom = 12.0f;
@@ -43,6 +44,7 @@ int         tx,
             th;
 void (*exitHandler)(int);
 void (*gameUpdateHandler)(Settings*);
+void (*gameDrawHandler)(Settings*);
 
 void resize(int32 w, int32 h)
 {
@@ -84,22 +86,27 @@ b2Vec2 convertScreenToWorld(int32 x, int32 y)
 	return p;
 }
 
-// This is used to control the frame rate.
-void timer(int)
+void drawTimer(int)
 {
 	glutSetWindow(mainWindow);
 	glutPostRedisplay();
-	glutTimerFunc(framePeriod, timer, 0);
+	glutTimerFunc(drawPeriod, drawTimer, 0);
 }
 
-void simulationLoop()
+void updateTimer(int)
+{
+	gameUpdateHandler(&settings);
+	glutTimerFunc(updatePeriod, updateTimer, 0);
+}
+
+void drawLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-    gameUpdateHandler(&settings);
+    gameDrawHandler(&settings);
 
 	glutSwapBuffers();
 }
@@ -229,9 +236,11 @@ void exit_(int code)
 	raise(SIGINT);
 }
 
-void launchTestbed(void (*gameUpdateHandler_)(Settings*), int argc, char** argv, float width_, float height_)
+void launchTestbed(void (*gameUpdateHandler_)(Settings*), void (*gameDrawHandler_)(Settings*),
+                   int argc, char** argv, float width_, float height_)
 {
     gameUpdateHandler = gameUpdateHandler_;
+    gameDrawHandler = gameDrawHandler_;
     width = width_;
     height = height_;
     settings.viewCenter.x = width / 2;
@@ -245,7 +254,7 @@ void launchTestbed(void (*gameUpdateHandler_)(Settings*), int argc, char** argv,
 	mainWindow = glutCreateWindow(title);
 	//glutSetOption (GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
-	glutDisplayFunc(simulationLoop);
+	glutDisplayFunc(drawLoop);
 	GLUI_Master.set_glutReshapeFunc(resize);
 	GLUI_Master.set_glutKeyboardFunc(keyboard);
 	GLUI_Master.set_glutSpecialFunc(keyboardSpecial);
@@ -292,8 +301,8 @@ void launchTestbed(void (*gameUpdateHandler_)(Settings*), int argc, char** argv,
 	glui->add_button("Quit", 0,(GLUI_Update_CB)exit_);
 	glui->set_main_gfx_window(mainWindow);
 
-	// Use a timer to control the frame rate.
-	glutTimerFunc(framePeriod, timer, 0);
+	glutTimerFunc(drawPeriod, drawTimer, 0);
+	glutTimerFunc(updatePeriod, updateTimer, 0);
 
 	glutMainLoop();
 

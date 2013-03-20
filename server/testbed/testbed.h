@@ -3,6 +3,6 @@
 
 #include "settings.h"
 
-extern void launchTestbed(void (*)(Settings*), int, char**, float, float);
+extern void launchTestbed(void (*)(Settings*), void (*)(Settings*), int, char**, float, float);
 
 #endif
