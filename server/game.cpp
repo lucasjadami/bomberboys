@@ -172,7 +172,7 @@ void Game::explodeBomb(Bomb* bomb)
         float distance = blastDir.Normalize();
         distance = distance == 0 ? 1 : distance;
         float invDistance = 20.0f / distance;
-        float impulseMag = b2Min(900.0f * invDistance * invDistance, 200.0f);
+        float impulseMag = b2Min(900.0f * invDistance * invDistance, BOMB_MAX_IMPULSE);
         player->getBody()->ApplyLinearImpulse(impulseMag * blastDir, player->getBody()->GetWorldCenter());
     }
 

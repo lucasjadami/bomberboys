@@ -3,8 +3,9 @@
 
 #include <Box2D/Box2D.h>
 
-#define BOMB_TIME   5000
-#define BOMB_SIZE   5
+#define BOMB_TIME           5000
+#define BOMB_SIZE           5
+#define BOMB_MAX_IMPULSE    200.0f
 
 class Bomb
 {
