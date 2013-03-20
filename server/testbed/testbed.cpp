@@ -24,7 +24,7 @@
 #include <GL/glui.h>
 #include <signal.h>
 
-#ifdef __APPLE__
+#ifdef MAC_OS
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>
@@ -128,7 +128,7 @@ void keyboard(unsigned char key, int x, int y)
 	switch (key)
 	{
         case 27:
-#ifndef __APPLE__
+#ifndef MAC_OS
             // freeglut specific function
             glutLeaveMainLoop();
 #endif

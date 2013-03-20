@@ -21,7 +21,7 @@
 
 #include "debug_draw.h"
 
-#ifdef __APPLE__
+#ifdef MAC_OS
 #include <GLUT/glut.h>
 #else
 #include <GL/freeglut.h>

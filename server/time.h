@@ -6,14 +6,14 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-#ifdef __APPLE__
+#ifdef MAC_OS
 #include <mach/clock.h>
 #include <mach/mach.h>
 #endif
 
 inline void getTime(struct timespec *time)
 {
-#ifdef __APPLE__ // OS X does not have clock_gettime, use clock_get_time.
+#ifdef MAC_OS // OS X does not have clock_gettime, use clock_get_time.
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
