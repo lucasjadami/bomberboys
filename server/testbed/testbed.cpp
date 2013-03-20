@@ -25,9 +25,9 @@
 #include <signal.h>
 
 #ifdef __APPLE__
-	#include <GLUT/glut.h>
+#include <GLUT/glut.h>
 #else
-	#include <GL/freeglut.h>
+#include <GL/freeglut.h>
 #endif
 
 Settings    settings;
@@ -45,6 +45,15 @@ int         tx,
 void (*exitHandler)(int);
 void (*gameUpdateHandler)(Settings*);
 void (*gameDrawHandler)(Settings*);
+
+void exit_(int code)
+{
+	// TODO: freeglut is not building on OSX.
+#ifdef FREEGLUT
+	glutLeaveMainLoop();
+#endif
+	raise(SIGINT);
+}
 
 void resize(int32 w, int32 h)
 {
@@ -123,7 +132,7 @@ void keyboard(unsigned char key, int x, int y)
             // freeglut specific function
             glutLeaveMainLoop();
 #endif
-            exit(0);
+            exit_(0);
             break;
 		// Press 'z' to zoom out.
         case 'z':
@@ -225,15 +234,6 @@ void mouseWheel(int wheel, int direction, int x, int y)
 	else
         viewZoom *= 1.1f;
 	resize(width, height);
-}
-
-void exit_(int code)
-{
-	// TODO: freeglut is not building on OSX.
-#ifdef FREEGLUT
-	glutLeaveMainLoop();
-#endif
-	raise(SIGINT);
 }
 
 void launchTestbed(void (*gameUpdateHandler_)(Settings*), void (*gameDrawHandler_)(Settings*),

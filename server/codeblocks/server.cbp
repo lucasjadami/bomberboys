@@ -7,7 +7,54 @@
 		<Option compiler="gcc" />
 		<Option virtualFolders="testbed/;network/;game/;misc/;" />
 		<Build>
-			<Target title="Debug">
+			<Target title="Debug-Linux">
+				<Option output="bin/debug/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+					<Add directory="/opt/Box2D/include/" />
+				</Compiler>
+				<Linker>
+					<Add library="rt" />
+					<Add directory="/opt/Box2D/lib/" />
+				</Linker>
+			</Target>
+			<Target title="Release-Linux">
+				<Option output="bin/release/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="/opt/Box2D/include/" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="rt" />
+					<Add directory="/opt/Box2D/lib/" />
+				</Linker>
+			</Target>
+			<Target title="Testbed-Linux">
+				<Option output="bin/testbed/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/testbed/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DTESTBED" />
+					<Add directory="/opt/Box2D/include/" />
+				</Compiler>
+				<Linker>
+					<Add library="glui" />
+					<Add library="GL" />
+					<Add library="rt" />
+					<Add directory="/opt/Box2D/lib/" />
+				</Linker>
+			</Target>
+			<Target title="Debug-Mac">
 				<Option output="bin/debug/server" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/debug/" />
 				<Option type="1" />
@@ -17,7 +64,7 @@
 					<Add option="-DDEBUG" />
 				</Compiler>
 			</Target>
-			<Target title="Release">
+			<Target title="Release-Mac">
 				<Option output="bin/release/server" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/release/" />
 				<Option type="1" />
@@ -29,7 +76,7 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
-			<Target title="Testbed">
+			<Target title="Testbed-Mac">
 				<Option output="bin/testbed/server" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/testbed/" />
 				<Option type="1" />
@@ -39,19 +86,17 @@
 					<Add option="-DTESTBED" />
 				</Compiler>
 				<Linker>
+					<Add option="-framework OpenGL" />
+					<Add option="-framework GLUT" />
 					<Add library="glui" />
-					<Add library="GL" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="/opt/Box2D/include/" />
 		</Compiler>
 		<Linker>
 			<Add library="Box2D" />
-			<Add library="rt" />
-			<Add directory="/opt/Box2D/lib/" />
 		</Linker>
 		<Unit filename="../bomb.cpp">
 			<Option virtualFolder="game/" />
@@ -103,23 +148,28 @@
 		</Unit>
 		<Unit filename="../testbed/debug_draw.cpp">
 			<Option virtualFolder="testbed/" />
-			<Option target="Testbed" />
+			<Option target="Testbed-Linux" />
+			<Option target="Testbed-Mac" />
 		</Unit>
 		<Unit filename="../testbed/debug_draw.h">
 			<Option virtualFolder="testbed/" />
-			<Option target="Testbed" />
+			<Option target="Testbed-Linux" />
+			<Option target="Testbed-Mac" />
 		</Unit>
 		<Unit filename="../testbed/settings.h">
 			<Option virtualFolder="testbed/" />
-			<Option target="Testbed" />
+			<Option target="Testbed-Linux" />
+			<Option target="Testbed-Mac" />
 		</Unit>
 		<Unit filename="../testbed/testbed.cpp">
 			<Option virtualFolder="testbed/" />
-			<Option target="Testbed" />
+			<Option target="Testbed-Linux" />
+			<Option target="Testbed-Mac" />
 		</Unit>
 		<Unit filename="../testbed/testbed.h">
 			<Option virtualFolder="testbed/" />
-			<Option target="Testbed" />
+			<Option target="Testbed-Linux" />
+			<Option target="Testbed-Mac" />
 		</Unit>
 		<Unit filename="../time.h">
 			<Option virtualFolder="misc/" />
