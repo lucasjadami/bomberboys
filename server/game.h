@@ -15,11 +15,12 @@ class Game
 {
 public:
 
-            Game();
-           ~Game();
-    void    createWorld();
-    void    connectionHandler(int, Socket*);
-    void    update();
+             Game();
+            ~Game();
+    void     createWorld();
+    void     connectionHandler(int, Socket*);
+    void     update(float, float, float);
+    b2World* getWorld();
 
 private:
 
