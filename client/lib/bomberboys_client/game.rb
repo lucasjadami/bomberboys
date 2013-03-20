@@ -25,11 +25,11 @@ module BomberboysClient
     end
 
     def add_bomb(id, x, y)
-      @board.bombs[id] = Bomb.new(id, x, y)
+      @board.add_bomb(Bomb.new(id, x, y))
     end
 
     def explode_bomb(id)
-      @board.bombs[id].explode
+      @board.bomb(id).explode
     end
   end
 end
