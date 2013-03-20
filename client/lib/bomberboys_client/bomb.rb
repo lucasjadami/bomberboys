@@ -2,10 +2,11 @@ module BomberboysClient
   class Bomb
     attr_reader :id
 
-    def initialize(id, x = 0, y = 0)
+    def initialize(id, x = 0, y = 0, radius = 5)
       @exploded = false
       @x, @y = x, y
       @id = id
+      @radius = radius
     end
 
     def position
@@ -18,6 +19,10 @@ module BomberboysClient
 
     def exploded?
       @exploded
+    end
+
+    def explosion_radius
+      @radius
     end
 
     def to_s

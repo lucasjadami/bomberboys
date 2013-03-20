@@ -3,12 +3,11 @@ module BomberboysClient
     attr_reader :name, :id
     attr_reader :local
 
-    def initialize(id, name, local = false)
+    def initialize(id, name)
       @x = @y = 0
       @dead = false
       @name = name
       @id = id
-      @local = local
     end
 
     def move(x, y)
