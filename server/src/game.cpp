@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <utility>
+#include <time.h>
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <Box2D/Collision/Shapes/b2CircleShape.h>
@@ -12,6 +13,7 @@
 Game::Game()
 {
     world = NULL;
+    srand(time(NULL));
 }
 
 Game::~Game()
@@ -148,6 +150,8 @@ void Game::fallPlayer(Player* player)
 
         player->saveLastPosition();
 
+        player->getBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+
         for (unsigned int i = 0; i < players.size(); ++i)
         {
             Packet* newPacket = createFallPlayerPacket(player);
@@ -169,8 +173,14 @@ void Game::explodeBomb(Bomb* bomb)
         player->getSocket()->addOutPacket(newPacket);
 
         b2Vec2 blastDir = player->getBody()->GetWorldCenter() - bomb->getBody()->GetWorldCenter();
+
+        if (blastDir.x == 0 && blastDir.y == 0)
+        {
+            blastDir.x = rand() % 2 == 0 ? -1 : 1;
+            blastDir.y = rand() % 2 == 0 ? -1 : 1;
+        }
+
         float distance = blastDir.Normalize();
-        distance = distance == 0 ? 1 : distance;
         float invDistance = 20.0f / distance;
         float impulseMag = b2Min(900.0f * invDistance * invDistance, BOMB_MAX_IMPULSE);
         player->getBody()->ApplyLinearImpulse(impulseMag * blastDir, player->getBody()->GetWorldCenter());
@@ -268,12 +278,20 @@ void Game::parseMoveMePacket(Packet* packet, Player* player)
     {
         case 0:
             impulse.y = MOVEMENT_IMPULSE; break;
+        case 1:
+            impulse.x = MOVEMENT_IMPULSE; impulse.y = MOVEMENT_IMPULSE; break;
         case 2:
             impulse.x = MOVEMENT_IMPULSE; break;
+        case 3:
+            impulse.x = MOVEMENT_IMPULSE; impulse.y = -MOVEMENT_IMPULSE; break;
         case 4:
             impulse.y = -MOVEMENT_IMPULSE; break;
+        case 5:
+            impulse.x = -MOVEMENT_IMPULSE; impulse.y = -MOVEMENT_IMPULSE; break;
         case 6:
             impulse.x = -MOVEMENT_IMPULSE; break;
+        case 7:
+            impulse.x = -MOVEMENT_IMPULSE; impulse.y = MOVEMENT_IMPULSE; break;
     }
 
     player->applyImpulse(impulse);

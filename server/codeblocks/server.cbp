@@ -101,80 +101,80 @@
 		<Linker>
 			<Add library="Box2D" />
 		</Linker>
-		<Unit filename="../bomb.cpp">
+		<Unit filename="../src/bomb.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../bomb.h">
+		<Unit filename="../src/bomb.h">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../connection.cpp">
+		<Unit filename="../src/connection.cpp">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../connection.h">
+		<Unit filename="../src/connection.h">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../game.cpp">
+		<Unit filename="../src/game.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../game.h">
+		<Unit filename="../src/game.h">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../main.cpp">
+		<Unit filename="../src/main.cpp">
 			<Option virtualFolder="misc/" />
 		</Unit>
-		<Unit filename="../non_blocking_tcp_connection.cpp">
+		<Unit filename="../src/non_blocking_tcp_connection.cpp">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../non_blocking_tcp_connection.h">
+		<Unit filename="../src/non_blocking_tcp_connection.h">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../output.h">
+		<Unit filename="../src/output.h">
 			<Option virtualFolder="misc/" />
 		</Unit>
-		<Unit filename="../packet.cpp">
+		<Unit filename="../src/packet.cpp">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../packet.h">
+		<Unit filename="../src/packet.h">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../player.cpp">
+		<Unit filename="../src/player.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../player.h">
+		<Unit filename="../src/player.h">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../socket.cpp">
+		<Unit filename="../src/socket.cpp">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../socket.h">
+		<Unit filename="../src/socket.h">
 			<Option virtualFolder="network/" />
 		</Unit>
-		<Unit filename="../testbed/debug_draw.cpp">
+		<Unit filename="../src/testbed/debug_draw.cpp">
 			<Option virtualFolder="testbed/" />
 			<Option target="Testbed-Linux" />
 			<Option target="Testbed-Mac" />
 		</Unit>
-		<Unit filename="../testbed/debug_draw.h">
+		<Unit filename="../src/testbed/debug_draw.h">
 			<Option virtualFolder="testbed/" />
 			<Option target="Testbed-Linux" />
 			<Option target="Testbed-Mac" />
 		</Unit>
-		<Unit filename="../testbed/settings.h">
+		<Unit filename="../src/testbed/settings.h">
 			<Option virtualFolder="testbed/" />
 			<Option target="Testbed-Linux" />
 			<Option target="Testbed-Mac" />
 		</Unit>
-		<Unit filename="../testbed/testbed.cpp">
+		<Unit filename="../src/testbed/testbed.cpp">
 			<Option virtualFolder="testbed/" />
 			<Option target="Testbed-Linux" />
 			<Option target="Testbed-Mac" />
 		</Unit>
-		<Unit filename="../testbed/testbed.h">
+		<Unit filename="../src/testbed/testbed.h">
 			<Option virtualFolder="testbed/" />
 			<Option target="Testbed-Linux" />
 			<Option target="Testbed-Mac" />
 		</Unit>
-		<Unit filename="../time.h">
+		<Unit filename="../src/time.h">
 			<Option virtualFolder="misc/" />
 		</Unit>
 		<Extensions>
