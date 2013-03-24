@@ -101,6 +101,12 @@
 		<Linker>
 			<Add library="Box2D" />
 		</Linker>
+		<Unit filename="../src/blocking_tcp_connection.cpp">
+			<Option virtualFolder="network/" />
+		</Unit>
+		<Unit filename="../src/blocking_tcp_connection.h">
+			<Option virtualFolder="network/" />
+		</Unit>
 		<Unit filename="../src/bomb.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>

@@ -1,4 +1,5 @@
 #include "non_blocking_tcp_connection.h"
+#include "blocking_tcp_connection.h"
 #include "output.h"
 #include "game.h"
 
@@ -22,11 +23,14 @@ b2Profile           totalProfile;
 int                 stepCount;
 #endif
 
+//#define NON_BLOCKING_TCP_CONNECTION
+#define BLOCKING_TCP_CONNECTION
+
 void exitHandler(int s)
 {
 	info("Server closed");
+	delete connection;
     delete game;
-    delete connection;
 	exit(0);
 }
 
@@ -172,8 +176,19 @@ int main(int argc, char** argv)
 
     info("Bomberboys server 1.0");
 
-    int port = 10011;
+#ifdef NON_BLOCKING_TCP_CONNECTION
+    info("Using non-blocking TCP connection");
 	connection = new NonBlockingTcpConnection(&connectionHandler);
+#else
+#ifdef BLOCKING_TCP_CONNECTION
+    info("Using blocking TCP connection");
+    connection = new BlockingTcpConnection(&connectionHandler);
+#else
+    error("Connection type unknown");
+#endif
+#endif
+
+    int port = 10011;
 	connection->init(port);
 
 	info("Server connection stabilished at port %d", port);

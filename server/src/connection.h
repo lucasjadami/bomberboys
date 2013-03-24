@@ -17,7 +17,7 @@ class Connection
 public:
 
                     Connection(void (*)(int, Socket*));
-                   ~Connection();
+    virtual        ~Connection();
             void    init(int port);
 	virtual	void    process() {};
 
