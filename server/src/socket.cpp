@@ -11,6 +11,11 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     outPointer = 0;
     memset(inBuffer, 0, sizeof(inBuffer));
     memset(outBuffer, 0, sizeof(outBuffer));
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_init(&inMutex, NULL);
+    pthread_mutex_init(&outMutex, NULL);
+#endif
 }
 
 Socket::~Socket()
@@ -19,6 +24,11 @@ Socket::~Socket()
         delete inPackets[i];
     for (unsigned int i = 0; i < outPackets.size(); ++i)
         delete outPackets[i];
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_destroy(&inMutex, NULL);
+    pthread_mutex_destroy(&outMutex, NULL);
+#endif
 }
 
 sockaddr_in Socket::getAddress()
@@ -78,7 +88,14 @@ void Socket::updateInBuffer(int bytesRead)
         {
             char* data = new char[size];
             memcpy(data, inBuffer + 1, sizeof(char) * size);
+
+#ifdef BLOCKING_TCP_CONNECTION
+            pthread_mutex_lock(&inMutex);
+#endif
             inPackets.push_back(new Packet(packetId, data));
+#ifdef BLOCKING_TCP_CONNECTION
+            pthread_mutex_unlock(&inMutex);
+#endif
 
             memcpy(auxBuffer, inBuffer + size + 1, sizeof(char) * (BUFFER_SIZE - (size + 1)));
             memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
@@ -99,6 +116,10 @@ void Socket::updateOutBuffer(int bytesWritten)
         memcpy(auxBuffer, outBuffer + outPointer, sizeof(char) * (BUFFER_SIZE -  outPointer));
         memcpy(outBuffer, auxBuffer, sizeof(auxBuffer));
     }
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_lock(&outMutex);
+#endif
 
     Packet* packet = outPackets.empty() ? NULL : outPackets[0];
     if (packet != NULL)
@@ -131,19 +152,42 @@ void Socket::updateOutBuffer(int bytesWritten)
             outPackets.erase(outPackets.begin());
         }
     }
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_unlock(&outMutex);
+#endif
 }
 
 void Socket::addOutPacket(Packet* packet)
 {
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_lock(&outMutex);
+#endif
+
     outPackets.push_back(packet);
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_unlock(&outMutex);
+#endif
 }
 
 Packet* Socket::getInPacket()
 {
-    if (inPackets.empty())
-        return NULL;
+    Packet* packet = NULL;
 
-    Packet* packet = inPackets[0];
-    inPackets.erase(inPackets.begin());
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_lock(&inMutex);
+#endif
+
+    if (!inPackets.empty())
+    {
+        packet = inPackets[0];
+        inPackets.erase(inPackets.begin());
+    }
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_unlock(&outMutex);
+#endif
+
     return packet;
 }

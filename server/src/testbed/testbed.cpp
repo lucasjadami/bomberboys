@@ -48,7 +48,6 @@ void (*gameDrawHandler)(Settings*);
 
 void exit_(int code)
 {
-	// TODO: freeglut is not building on OSX.
 #ifdef FREEGLUT
 	glutLeaveMainLoop();
 #endif

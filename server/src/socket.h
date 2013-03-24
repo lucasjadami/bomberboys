@@ -6,6 +6,10 @@
 #include <netinet/in.h>
 #include <vector>
 
+#ifdef BLOCKING_TCP_CONNECTION
+#include <pthread.h>
+#endif
+
 #define BUFFER_SIZE 256
 
 class Socket
@@ -38,6 +42,12 @@ private:
     int                     outPointer;
     std::vector<Packet*>    inPackets;
     std::vector<Packet*>    outPackets;
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_t         inMutex;
+    pthread_mutex_t         outMutex;
+#endif
+
 };
 
 #endif

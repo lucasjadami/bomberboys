@@ -24,7 +24,7 @@ public:
          ~BlockingTcpConnection();
 	void  process();
 	void  getNewClient();
-	void  disconnectClientAndKillThreads(Thread*, bool);
+	void  disconnectClientAndKillThread(Thread*, bool);
 
 protected:
 

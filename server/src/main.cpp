@@ -15,6 +15,7 @@
 struct sigaction    sigIntHandler;
 Connection* 	    connection;
 Game*               game;
+bool                gameRunning = true;
 
 #ifdef TESTBED
 DebugDraw           debugDraw;
@@ -29,9 +30,13 @@ int                 stepCount;
 void exitHandler(int s)
 {
 	info("Server closed");
-	delete connection;
+	gameRunning = false;
+
+#ifdef TESTBED
+    delete connection;
     delete game;
-	exit(0);
+    exit(0);
+#endif
 }
 
 void connectionHandler(int eventId, Socket* socket)
@@ -199,7 +204,7 @@ int main(int argc, char** argv)
 	info("World created");
 
 #ifndef TESTBED
-	while (true)
+	while (gameRunning)
 	{
 		usleep(1000);
 		connection->process();
@@ -212,6 +217,9 @@ int main(int argc, char** argv)
 
     launchTestbed(gameUpdateHandler, gameDrawHandler, argc, argv, MAP_WIDTH, MAP_HEIGHT);
 #endif
+
+    delete connection;
+    delete game;
 
 	return 0;
 }

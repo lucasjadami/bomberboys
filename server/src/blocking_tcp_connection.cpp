@@ -33,7 +33,7 @@ void* clientSendThread(void* threadPtr)
         else if (bytesWritten < 0)
         {
             warning("ERROR on send");
-            connection->disconnectClientAndKillThreads(thread, true);
+            connection->disconnectClientAndKillThread(thread, true);
         }
         socket->updateOutBuffer(bytesWritten);
         pthread_mutex_unlock(&thread->mutex);
@@ -63,7 +63,7 @@ void* clientRecvThread(void* threadPtr)
                 debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
             else
                 warning("ERROR on recv");
-            connection->disconnectClientAndKillThreads(thread, false);
+            connection->disconnectClientAndKillThread(thread, false);
         }
         socket->updateInBuffer(bytesRead);
         pthread_mutex_unlock(&thread->mutex);
@@ -95,6 +95,7 @@ BlockingTcpConnection::~BlockingTcpConnection()
         shutdown(socket->getFd(), SHUT_RDWR);
         pthread_join(thread->pthreadRecv, NULL);
         pthread_join(thread->pthreadSend, NULL);
+        pthread_mutex_destroy(&thread->mutex);
         delete thread;
     }
 }
@@ -159,7 +160,7 @@ void BlockingTcpConnection::getNewClient()
 	debug("New connection from %s", inet_ntoa(address.sin_addr));
 }
 
-void BlockingTcpConnection::disconnectClientAndKillThreads(Thread* thread, bool sendThread)
+void BlockingTcpConnection::disconnectClientAndKillThread(Thread* thread, bool sendThread)
 {
     Socket* socket = thread->socket;
 
@@ -167,13 +168,5 @@ void BlockingTcpConnection::disconnectClientAndKillThreads(Thread* thread, bool 
 
     thread->running = false;
     pthread_mutex_unlock(&thread->mutex);
-
-    if (sendThread)
-        pthread_join(thread->pthreadRecv, NULL);
-    else
-        pthread_join(thread->pthreadSend, NULL);
-
-    pthread_mutex_destroy(&thread->mutex);
-
     pthread_exit(NULL);
 }
