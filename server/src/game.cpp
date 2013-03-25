@@ -136,12 +136,18 @@ void Game::updatePlayerPackets(Player* player)
     Packet* packet;
     while ((packet = player->getSocket()->getInPacket()) != NULL)
     {
-        if (packet->getId() == PACKET_LOGIN)
-            parseLoginPacket(packet, player);
-        else if (packet->getId() == PACKET_MOVE_ME)
-            parseMoveMePacket(packet, player);
-        else if (packet->getId() == PACKET_PLANT_BOMB)
-            parsePlantBombPacket(packet, player);
+        if (!player->isPlaying())
+        {
+            if (packet->getId() == PACKET_LOGIN)
+                parseLoginPacket(packet, player);
+        }
+        else
+        {
+            if (packet->getId() == PACKET_MOVE_ME)
+                parseMoveMePacket(packet, player);
+            else if (packet->getId() == PACKET_PLANT_BOMB)
+                parsePlantBombPacket(packet, player);
+        }
         delete packet;
     }
 }

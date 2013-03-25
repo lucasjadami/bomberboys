@@ -28,9 +28,9 @@ void NonBlockingUdpConnection::process()
 		error("ERROR on select");
 
 	if (FD_ISSET(serverSocket->getFd(), &readFdSet))
-        readClient();
+        readFromClient();
     if (FD_ISSET(serverSocket->getFd(), &writeFdSet))
-        writeClients();
+        writeToClients();
 }
 
 int NonBlockingUdpConnection::create()
@@ -44,7 +44,7 @@ int NonBlockingUdpConnection::create()
     return serverFd;
 }
 
-void NonBlockingUdpConnection::readClient()
+void NonBlockingUdpConnection::readFromClient()
 {
 	sockaddr_in address;
 	socklen_t addressLen = sizeof(address);
@@ -89,9 +89,11 @@ void NonBlockingUdpConnection::readClient()
         else
             warning("ERROR on recv %s", strerror(errno));
 
+        connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
+
+        clientSockets.erase(socket->getId());
+        clientDescriptors.erase(socket->getFd());
         delete socket;
-        clientSockets.erase(clientDescriptors[clientFd]);
-        clientDescriptors.erase(clientFd);
     }
     else
     {
@@ -100,7 +102,7 @@ void NonBlockingUdpConnection::readClient()
     }
 }
 
-void NonBlockingUdpConnection::writeClients()
+void NonBlockingUdpConnection::writeToClients()
 {
     std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
@@ -127,8 +129,10 @@ void NonBlockingUdpConnection::writeClients()
         if (removeIt)
         {
             connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
-            delete socket;
+
             clientSockets.erase(it++);
+            clientDescriptors.erase(socket->getFd());
+            delete socket;
         }
         else
             it++;

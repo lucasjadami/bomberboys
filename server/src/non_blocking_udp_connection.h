@@ -17,13 +17,17 @@ protected:
 private:
 
     timeval                         selectTimeout;
+
+    // IP addresses are identified by numbers.
     short                           addressIdentifierCount;
     std::map<unsigned long, short>  addressIdentifiers;
+
     // The descriptors on UDP don't exist. The fd used is based on IP + port.
+    // This map maps fds into ids.
     std::map<int, int>              clientDescriptors;
 
-	void readClient();
-	void writeClients();
+	void readFromClient();
+	void writeToClients();
 	void createFdSet(fd_set&);
 
 };

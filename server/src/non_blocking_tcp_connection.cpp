@@ -107,8 +107,8 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
         if (removeIt)
         {
             connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
-            delete socket;
             clientSockets.erase(it++);
+            delete socket;
         }
         else
             it++;
