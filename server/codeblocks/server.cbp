@@ -134,6 +134,12 @@
 		<Unit filename="../src/non_blocking_tcp_connection.h">
 			<Option virtualFolder="network/" />
 		</Unit>
+		<Unit filename="../src/non_blocking_udp_connection.cpp">
+			<Option virtualFolder="network/" />
+		</Unit>
+		<Unit filename="../src/non_blocking_udp_connection.h">
+			<Option virtualFolder="network/" />
+		</Unit>
 		<Unit filename="../src/output.h">
 			<Option virtualFolder="misc/" />
 		</Unit>
