@@ -29,6 +29,7 @@ public:
     void        updateOutBuffer(int);
     void        addOutPacket(Packet*);
     Packet*     getInPacket();
+    void        appendInBuffer(char*, int);
 
 private:
 

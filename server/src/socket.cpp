@@ -191,3 +191,9 @@ Packet* Socket::getInPacket()
 
     return packet;
 }
+
+void Socket::appendInBuffer(char* buffer, int size)
+{
+    if (size + inPointer <= BUFFER_SIZE)
+        memcpy(inBuffer, buffer, sizeof(char) * size);
+}

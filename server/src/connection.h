@@ -23,9 +23,9 @@ public:
 
 protected:
 
-    Socket*                 serverSocket;
-	std::map<int, Socket*> 	clientSockets;
-	unsigned int            idCount;
+    Socket*                         serverSocket;
+	std::map<int, Socket*> 	        clientSockets;
+	int                             idCount;
 
 	virtual int     create() { return -1; };
 	void            (*connectionHandler)(int, Socket*);

@@ -3,6 +3,8 @@
 
 #include <signal.h>
 #include <cstdio>
+#include <errno.h>
+#include <cstring>
 
 #define RED     "\033[0;31m"
 #define CYAN    "\033[0;36m"
