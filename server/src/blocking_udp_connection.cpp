@@ -68,7 +68,6 @@ BlockingUdpConnection::~BlockingUdpConnection()
     for (std::map<int, Thread*>::iterator it = clientThreads.begin(); it != clientThreads.end(); ++it)
     {
         Thread* thread = it->second;
-        Socket* socket = thread->socket;
 
         pthread_join(thread->pthreadSend, NULL);
         pthread_mutex_destroy(&thread->mutex);

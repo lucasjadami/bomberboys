@@ -5,7 +5,7 @@
 		<Option title="Server" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="testbed/;network/;game/;misc/;" />
+		<Option virtualFolders="testbed/;network/;game/;misc/;network/connection/;network/other/;" />
 		<Build>
 			<Target title="Debug-Linux">
 				<Option output="bin/debug/server" prefix_auto="1" extension_auto="1" />
@@ -102,10 +102,16 @@
 			<Add library="Box2D" />
 		</Linker>
 		<Unit filename="../src/blocking_tcp_connection.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/blocking_tcp_connection.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
+		</Unit>
+		<Unit filename="../src/blocking_udp_connection.cpp">
+			<Option virtualFolder="network/connection/" />
+		</Unit>
+		<Unit filename="../src/blocking_udp_connection.h">
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/bomb.cpp">
 			<Option virtualFolder="game/" />
@@ -114,10 +120,13 @@
 			<Option virtualFolder="game/" />
 		</Unit>
 		<Unit filename="../src/connection.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/connection.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
+		</Unit>
+		<Unit filename="../src/connection_thread.h">
+			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/game.cpp">
 			<Option virtualFolder="game/" />
@@ -129,25 +138,25 @@
 			<Option virtualFolder="misc/" />
 		</Unit>
 		<Unit filename="../src/non_blocking_tcp_connection.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/non_blocking_tcp_connection.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/non_blocking_udp_connection.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/non_blocking_udp_connection.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/output.h">
 			<Option virtualFolder="misc/" />
 		</Unit>
 		<Unit filename="../src/packet.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/packet.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/player.cpp">
 			<Option virtualFolder="game/" />
@@ -156,10 +165,10 @@
 			<Option virtualFolder="game/" />
 		</Unit>
 		<Unit filename="../src/socket.cpp">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/socket.h">
-			<Option virtualFolder="network/" />
+			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/testbed/debug_draw.cpp">
 			<Option virtualFolder="testbed/" />
