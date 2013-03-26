@@ -1,6 +1,7 @@
 #include "non_blocking_tcp_connection.h"
 #include "non_blocking_udp_connection.h"
 #include "blocking_tcp_connection.h"
+#include "blocking_udp_connection.h"
 #include "output.h"
 #include "game.h"
 
@@ -26,8 +27,13 @@ int                 stepCount;
 #endif
 
 //#define NON_BLOCKING_TCP_CONNECTION
-#define NON_BLOCKING_UDP_CONNECTION
+//#define NON_BLOCKING_UDP_CONNECTION
 //#define BLOCKING_TCP_CONNECTION
+#define BLOCKING_UDP_CONNECTION
+
+#if defined(BLOCKING_UDP_CONNECTION) || defined(BLOCKING_TCP_CONNECTION)
+#define BLOCKING_MODE
+#endif
 
 void exitHandler(int s)
 {
@@ -183,21 +189,20 @@ int main(int argc, char** argv)
 
     info("Bomberboys server 1.0");
 
-#ifdef NON_BLOCKING_TCP_CONNECTION
+#if defined(NON_BLOCKING_TCP_CONNECTION)
     info("Using non-blocking TCP connection");
 	connection = new NonBlockingTcpConnection(&connectionHandler);
-#else
-#ifdef NON_BLOCKING_UDP_CONNECTION
+#elif defined(NON_BLOCKING_UDP_CONNECTION)
     info("Using non-blocking UDP connection");
 	connection = new NonBlockingUdpConnection(&connectionHandler);
-#else
-#ifdef BLOCKING_TCP_CONNECTION
+#elif defined(BLOCKING_TCP_CONNECTION)
     info("Using blocking TCP connection");
     connection = new BlockingTcpConnection(&connectionHandler);
+#elif defined(BLOCKING_UDP_CONNECTION)
+    info("Using blocking UDP connection");
+    connection = new BlockingUdpConnection(&connectionHandler);
 #else
     error("Connection type unknown");
-#endif
-#endif
 #endif
 
     int port = 10011;

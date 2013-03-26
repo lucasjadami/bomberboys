@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-void* mainThread(void* threadPtr)
+static void* mainThread(void* threadPtr)
 {
     Thread* thread = (Thread*) threadPtr;
-    BlockingTcpConnection* connection = thread->connection;
+    BlockingTcpConnection* connection = (BlockingTcpConnection*) thread->connection;
 
     while (thread->running)
         connection->getNewClient();
@@ -15,10 +15,10 @@ void* mainThread(void* threadPtr)
     pthread_exit(NULL);
 }
 
-void* clientSendThread(void* threadPtr)
+static void* clientSendThread(void* threadPtr)
 {
     Thread* thread = (Thread*) threadPtr;
-    BlockingTcpConnection* connection = thread->connection;
+    BlockingTcpConnection* connection = (BlockingTcpConnection*) thread->connection;
     Socket* socket = thread->socket;
     int bytesWritten = 0;
 
@@ -33,7 +33,7 @@ void* clientSendThread(void* threadPtr)
         else if (bytesWritten < 0)
         {
             warning("ERROR on send");
-            connection->disconnectClientAndKillThread(thread, true);
+            connection->disconnectClientAndKillThread(thread);
         }
         socket->updateOutBuffer(bytesWritten);
         pthread_mutex_unlock(&thread->mutex);
@@ -42,10 +42,10 @@ void* clientSendThread(void* threadPtr)
     pthread_exit(NULL);
 }
 
-void* clientRecvThread(void* threadPtr)
+static void* clientRecvThread(void* threadPtr)
 {
     Thread* thread = (Thread*) threadPtr;
-    BlockingTcpConnection* connection = thread->connection;
+    BlockingTcpConnection* connection = (BlockingTcpConnection*) thread->connection;
     Socket* socket = thread->socket;
     int bytesRead = 0;
 
@@ -63,7 +63,7 @@ void* clientRecvThread(void* threadPtr)
                 debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
             else
                 warning("ERROR on recv");
-            connection->disconnectClientAndKillThread(thread, false);
+            connection->disconnectClientAndKillThread(thread);
         }
         socket->updateInBuffer(bytesRead);
         pthread_mutex_unlock(&thread->mutex);
@@ -160,7 +160,7 @@ void BlockingTcpConnection::getNewClient()
 	debug("New connection from %s", inet_ntoa(address.sin_addr));
 }
 
-void BlockingTcpConnection::disconnectClientAndKillThread(Thread* thread, bool sendThread)
+void BlockingTcpConnection::disconnectClientAndKillThread(Thread* thread)
 {
     Socket* socket = thread->socket;
 

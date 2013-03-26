@@ -49,3 +49,7 @@ void Connection::init(int port)
     listen(serverFd, MAX_CONNECTIONS);
 }
 
+Socket* Connection::getServerSocket()
+{
+    return serverSocket;
+}

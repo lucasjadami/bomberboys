@@ -18,8 +18,9 @@ public:
 
                     Connection(void (*)(int, Socket*));
     virtual        ~Connection();
-            void    init(int port);
+    void            init(int port);
 	virtual	void    process() {};
+    Socket*         getServerSocket();
 
 protected:
 

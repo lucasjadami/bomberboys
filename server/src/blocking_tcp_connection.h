@@ -2,19 +2,8 @@
 #define BLOCKING_TCP_CONNECTION_H
 
 #include "connection.h"
-#include <pthread.h>
+#include "connection_thread.h"
 #include <map>
-
-class BlockingTcpConnection;
-
-struct Thread
-{
-        Socket*                 socket;
-        pthread_t               pthreadAccept, pthreadRecv, pthreadSend;
-        BlockingTcpConnection*  connection;
-        bool                    running;
-        pthread_mutex_t         mutex;
-};
 
 class BlockingTcpConnection : public Connection
 {
@@ -24,7 +13,7 @@ public:
          ~BlockingTcpConnection();
 	void  process();
 	void  getNewClient();
-	void  disconnectClientAndKillThread(Thread*, bool);
+	void  disconnectClientAndKillThread(Thread*);
 
 protected:
 

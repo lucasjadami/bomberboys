@@ -15,7 +15,7 @@ Game::Game()
     world = NULL;
     srand(time(NULL));
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_init(&mutex, NULL);
 #endif
 }
@@ -29,7 +29,7 @@ Game::~Game()
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_destroy(&mutex, NULL);
 #endif
 }
@@ -42,7 +42,7 @@ void Game::createWorld()
 
 void Game::connectionHandler(int eventId, Socket* socket)
 {
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_lock(&mutex);
 #endif
 
@@ -83,14 +83,14 @@ void Game::connectionHandler(int eventId, Socket* socket)
         }
     }
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_unlock(&mutex);
 #endif
 }
 
 void Game::update(float time, float velocityIterations, float positionIterations)
 {
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_lock(&mutex);
 #endif
 
@@ -121,7 +121,7 @@ void Game::update(float time, float velocityIterations, float positionIterations
             ++it;
     }
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_unlock(&mutex);
 #endif
 }

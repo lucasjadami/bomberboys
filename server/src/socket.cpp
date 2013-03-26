@@ -12,7 +12,7 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     memset(inBuffer, 0, sizeof(inBuffer));
     memset(outBuffer, 0, sizeof(outBuffer));
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_init(&inMutex, NULL);
     pthread_mutex_init(&outMutex, NULL);
 #endif
@@ -25,7 +25,7 @@ Socket::~Socket()
     for (unsigned int i = 0; i < outPackets.size(); ++i)
         delete outPackets[i];
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_destroy(&inMutex, NULL);
     pthread_mutex_destroy(&outMutex, NULL);
 #endif
@@ -89,11 +89,11 @@ void Socket::updateInBuffer(int bytesRead)
             char* data = new char[size];
             memcpy(data, inBuffer + 1, sizeof(char) * size);
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
             pthread_mutex_lock(&inMutex);
 #endif
             inPackets.push_back(new Packet(packetId, data));
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
             pthread_mutex_unlock(&inMutex);
 #endif
 
@@ -117,7 +117,7 @@ void Socket::updateOutBuffer(int bytesWritten)
         memcpy(outBuffer, auxBuffer, sizeof(auxBuffer));
     }
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_lock(&outMutex);
 #endif
 
@@ -153,20 +153,18 @@ void Socket::updateOutBuffer(int bytesWritten)
         }
     }
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_unlock(&outMutex);
 #endif
 }
 
 void Socket::addOutPacket(Packet* packet)
 {
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_lock(&outMutex);
 #endif
-
     outPackets.push_back(packet);
-
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_unlock(&outMutex);
 #endif
 }
@@ -175,7 +173,7 @@ Packet* Socket::getInPacket()
 {
     Packet* packet = NULL;
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_lock(&inMutex);
 #endif
 
@@ -185,7 +183,7 @@ Packet* Socket::getInPacket()
         inPackets.erase(inPackets.begin());
     }
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_unlock(&outMutex);
 #endif
 
