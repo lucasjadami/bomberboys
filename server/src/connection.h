@@ -17,15 +17,16 @@ class Connection
 public:
 
                     Connection(void (*)(int, Socket*));
-                   ~Connection();
-            void    init(int port);
+    virtual        ~Connection();
+    void            init(int port);
 	virtual	void    process() {};
+    Socket*         getServerSocket();
 
 protected:
 
-    Socket*                 serverSocket;
-	std::map<int, Socket*> 	clientSockets;
-	unsigned int            idCount;
+    Socket*                         serverSocket;
+	std::map<int, Socket*> 	        clientSockets;
+	int                             idCount;
 
 	virtual int     create() { return -1; };
 	void            (*connectionHandler)(int, Socket*);

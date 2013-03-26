@@ -8,6 +8,10 @@
 #include <map>
 #include <Box2D/Dynamics/b2World.h>
 
+#ifdef BLOCKING_TCP_CONNECTION
+#include <pthread.h>
+#endif
+
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
@@ -27,6 +31,10 @@ private:
     std::vector<Player*> players;
     std::map<int, Bomb*> bombs;
     b2World*             world;
+
+#ifdef BLOCKING_TCP_CONNECTION
+    pthread_mutex_t      mutex;
+#endif
 
     void    updatePlayerPackets(Player*);
     void    updatePlayerMovement(Player*);

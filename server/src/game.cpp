@@ -14,6 +14,10 @@ Game::Game()
 {
     world = NULL;
     srand(time(NULL));
+
+#ifdef BLOCKING_MODE
+    pthread_mutex_init(&mutex, NULL);
+#endif
 }
 
 Game::~Game()
@@ -24,6 +28,10 @@ Game::~Game()
         delete players[i];
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
+
+#ifdef BLOCKING_MODE
+    pthread_mutex_destroy(&mutex, NULL);
+#endif
 }
 
 void Game::createWorld()
@@ -34,6 +42,10 @@ void Game::createWorld()
 
 void Game::connectionHandler(int eventId, Socket* socket)
 {
+#ifdef BLOCKING_MODE
+    pthread_mutex_lock(&mutex);
+#endif
+
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
@@ -70,10 +82,18 @@ void Game::connectionHandler(int eventId, Socket* socket)
             }
         }
     }
+
+#ifdef BLOCKING_MODE
+    pthread_mutex_unlock(&mutex);
+#endif
 }
 
 void Game::update(float time, float velocityIterations, float positionIterations)
 {
+#ifdef BLOCKING_MODE
+    pthread_mutex_lock(&mutex);
+#endif
+
     world->Step(time, velocityIterations, positionIterations);
 
     for (unsigned int i = 0; i < players.size(); ++i)
@@ -100,6 +120,10 @@ void Game::update(float time, float velocityIterations, float positionIterations
         else
             ++it;
     }
+
+#ifdef BLOCKING_MODE
+    pthread_mutex_unlock(&mutex);
+#endif
 }
 
 b2World* Game::getWorld()
@@ -112,12 +136,18 @@ void Game::updatePlayerPackets(Player* player)
     Packet* packet;
     while ((packet = player->getSocket()->getInPacket()) != NULL)
     {
-        if (packet->getId() == PACKET_LOGIN)
-            parseLoginPacket(packet, player);
-        else if (packet->getId() == PACKET_MOVE_ME)
-            parseMoveMePacket(packet, player);
-        else if (packet->getId() == PACKET_PLANT_BOMB)
-            parsePlantBombPacket(packet, player);
+        if (!player->isPlaying())
+        {
+            if (packet->getId() == PACKET_LOGIN)
+                parseLoginPacket(packet, player);
+        }
+        else
+        {
+            if (packet->getId() == PACKET_MOVE_ME)
+                parseMoveMePacket(packet, player);
+            else if (packet->getId() == PACKET_PLANT_BOMB)
+                parsePlantBombPacket(packet, player);
+        }
         delete packet;
     }
 }

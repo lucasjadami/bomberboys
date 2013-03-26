@@ -14,7 +14,6 @@ Connection::~Connection()
     std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
-        shutdown(it->second->getFd(), SHUT_RDWR);
         close(it->second->getFd());
         delete it->second;
         it++;
@@ -50,3 +49,7 @@ void Connection::init(int port)
     listen(serverFd, MAX_CONNECTIONS);
 }
 
+Socket* Connection::getServerSocket()
+{
+    return serverSocket;
+}
