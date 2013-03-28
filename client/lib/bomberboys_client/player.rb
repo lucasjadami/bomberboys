@@ -1,7 +1,7 @@
 module BomberboysClient
   class Player
     attr_reader :name, :id
-    attr_reader :local
+    attr_reader :local, :x, :y
 
     def initialize(id, name)
       @x = @y = 0
