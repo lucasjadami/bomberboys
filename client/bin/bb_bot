@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'socket'
+
+require_relative '../lib/bomberboys_client'
+include BomberboysClient
+
+
+address = ARGV[0] || 'localhost'
+port = ARGV[1] || 10011
+
+begin
+  socket = TCPSocket.open(address, port)
+rescue
+  raise "No server listening on #{address}:#{port}"
+end
+
+connection = Connection.new(socket)
+game = Game.new
+connection.register(game)
+
+Thread.new do
+  connection.start
+  socket.close
+end
+
+name = ARGV[0] || "not_a_bot_#{(rand*10000000000).to_i}"
+bot = DummyBot.new(name, game.board, connection)
+bot.play
+
+socket.close
