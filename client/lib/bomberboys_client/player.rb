@@ -1,6 +1,6 @@
 module BomberboysClient
   class Player
-    attr_reader :name, :id
+    attr_reader :name, :id, :position
     attr_reader :local, :x, :y
 
     def initialize(id, name)
@@ -11,11 +11,7 @@ module BomberboysClient
     end
 
     def move(x, y)
-      @x, @y = x, y
-    end
-
-    def position
-      [@x, @y]
+      @position = [x, y]
     end
 
     def kill

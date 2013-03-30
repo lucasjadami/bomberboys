@@ -19,13 +19,15 @@ connection = Connection.new(socket)
 game = Game.new
 connection.register(game)
 
+
+
 Thread.new do
   connection.start
   socket.close
 end
 
 name = ARGV[0] || "not_a_bot_#{(rand*10000000000).to_i}"
-bot = DummyBot.new(name, game.board, connection)
+bot = DummyBot.new(name, game, connection)
 bot.play
 
 socket.close
