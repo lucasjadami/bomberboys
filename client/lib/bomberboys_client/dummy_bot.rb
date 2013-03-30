@@ -11,29 +11,39 @@ module BomberboysClient
     def play
       login
 
-      10.times { |t| puts t; move_me(DIRECTIONS.sample) }
-      plant_bomb
-
       loop do
-        bombs = @board.dangerous_bombs
-        if bombs.empty?
+        puts local.x
+        # if local.x > 550
+        #   move_me :w
+        # elsif local.x < 50
+        #   move_me :e
+        # elsif local.y > 370
+        #   move_me :s
+        # elsif local.y < 50
+        #   move_me :n
+        # elsif bomb = @board.dangerous_bombs.first
+        if bomb = @board.dangerous_bombs.first
+          move_me opposite_direction(bomb)
+        elsif @board.attackable_players.any?
           plant_bomb
-        else
-          move_me opposite_direction(bombs.first)
+          move_me(DIRECTIONS.sample)
+        elsif player = @board.nearest_players.first
+          move_me direction(player)
         end
       end
     end
 
     private
     def opposite_direction(bomb)
-      if local.y == bomb.y 
-        DIRECTIONS.sample
-      else 
-        opposite_angle = Math.atan2(bomb.y - local.y, bomb.x - local.x) + Math::PI
-        direction_index = (4*opposite_angle/Math::PI - 0.5).ceil - 1
+      cardinal_direction(Math.atan2(bomb.y - local.y, bomb.x - local.x) + Math::PI)
+    end
 
-        DIRECTIONS[direction_index]
-      end
+    def direction(obj)
+      cardinal_direction(Math.atan2(obj.y - local.y, obj.x - local.x))
+    end
+
+    def cardinal_direction(angle)
+      DIRECTIONS[(4*angle/Math::PI - 0.5).ceil - 1]
     end
 
     def move_me(direction)
@@ -50,7 +60,7 @@ module BomberboysClient
     end
 
     def local
-      @board.local_player
+      @board.local
     end
   end
 end
