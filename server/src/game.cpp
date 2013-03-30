@@ -184,6 +184,9 @@ void Game::fallPlayer(Player* player)
 
         for (unsigned int i = 0; i < players.size(); ++i)
         {
+            if (!players[i]->isPlaying())
+                continue;
+
             Packet* newPacket = createFallPlayerPacket(player);
             players[i]->getSocket()->addOutPacket(newPacket);
 
@@ -198,6 +201,9 @@ void Game::explodeBomb(Bomb* bomb)
     for (unsigned int i = 0; i < players.size(); ++i)
     {
         Player* player = players[i];
+
+        if (!player->isPlaying())
+                continue;
 
         Packet* newPacket = createExplodeBombPacket(bomb);
         player->getSocket()->addOutPacket(newPacket);
@@ -338,6 +344,9 @@ void Game::parsePlantBombPacket(Packet* packet, Player* player)
 
         for (unsigned int i = 0; i < players.size(); ++i)
         {
+            if (!players[i]->isPlaying())
+                continue;
+
             Packet* newPacket = createAddBombPacket(bomb);
             players[i]->getSocket()->addOutPacket(newPacket);
         }
