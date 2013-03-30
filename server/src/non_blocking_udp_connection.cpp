@@ -25,7 +25,7 @@ void NonBlockingUdpConnection::process()
     writeFdSet = readFdSet;
 
     if (select(serverSocket->getFd() + 1, &readFdSet, &writeFdSet, NULL, &selectTimeout) < 0)
-		error("ERROR on select");
+		error("ERROR on select %s", strerror(errno));
 
 	if (FD_ISSET(serverSocket->getFd(), &readFdSet))
         readFromClient();
@@ -37,7 +37,7 @@ int NonBlockingUdpConnection::create()
 {
 	int serverFd = socket(AF_INET, SOCK_DGRAM, 0);
     if (serverFd < 0)
-        error("ERROR opening socket");
+        error("ERROR opening socket %s", strerror(errno));
 
     fcntl(serverFd, F_SETFL, O_NONBLOCK);
 
@@ -54,7 +54,7 @@ void NonBlockingUdpConnection::readFromClient()
     if ((bytesRead = recvfrom(serverSocket->getFd(), buffer, sizeof(buffer), 0,
                               (sockaddr*) &address, &addressLen)) < 0)
     {
-        warning("ERROR on UDP accept");
+        warning("ERROR on UDP accept %s", strerror(errno));
         return;
     }
 
@@ -117,7 +117,10 @@ void NonBlockingUdpConnection::writeToClients()
         if ((bytesWritten = sendto(serverSocket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0,
                                    (sockaddr*) &address, addressLen)) < 0)
         {
-            warning("ERROR on send %s", strerror(errno));
+            if (errno == ERRNO_CONNECTION_RESET)
+                debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
+            else
+                warning("ERROR on send %s", strerror(errno));
             removeIt = true;
             close(socket->getFd());
         }

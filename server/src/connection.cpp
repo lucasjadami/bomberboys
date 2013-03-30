@@ -32,7 +32,7 @@ void Connection::init(int port)
 
     int yes = 1;
     if (setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-        error("ERROR on set SO_REUSEADDR");
+        error("ERROR on set SO_REUSEADDR %s", strerror(errno));
 
     sockaddr_in address;
 
@@ -42,7 +42,7 @@ void Connection::init(int port)
 	address.sin_addr.s_addr = INADDR_ANY;
 
 	if (bind(serverFd, (sockaddr*) &address, sizeof(address)) < 0)
-  		error("ERROR on binding");
+  		error("ERROR on binding %s", strerror(errno));
 
     serverSocket = new Socket(-1, serverFd, address);
 
