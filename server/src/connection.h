@@ -12,6 +12,13 @@
 #define EVENT_CLIENT_CONNECTED      0
 #define EVENT_CLIENT_DISCONNECTED   1
 
+// MSG_NOSIGNAL does not exists on OS X.
+#ifdef MAC_OS
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
+#endif
+
 class Connection
 {
 public:
