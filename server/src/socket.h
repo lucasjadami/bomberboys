@@ -25,8 +25,8 @@ public:
     int         getInBufferSize();
     char*       getOutBuffer();
     int         getOutBufferSize();
-    void        updateInBuffer(int);
-    void        updateOutBuffer(int);
+    bool        updateInBuffer(int&);
+    bool        updateOutBuffer(int&);
     void        addOutPacket(Packet*);
     Packet*     getInPacket();
     void        appendInBuffer(char*, int);

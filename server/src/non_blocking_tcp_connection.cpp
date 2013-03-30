@@ -85,7 +85,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
             }
             else
             {
-                socket->updateInBuffer(bytesRead);
+                while (socket->updateInBuffer(bytesRead));
             }
         }
 
@@ -100,7 +100,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
             }
             else
             {
-                socket->updateOutBuffer(bytesWritten);
+                while (socket->updateOutBuffer(bytesWritten));
             }
         }
 
