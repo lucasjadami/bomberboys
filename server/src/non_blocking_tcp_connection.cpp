@@ -23,7 +23,7 @@ void NonBlockingTcpConnection::process()
     writeFdSet = readFdSet;
 
     if (select(maxFd + 1, &readFdSet, &writeFdSet, NULL, &selectTimeout) < 0)
-		error("ERROR on select");
+		error("ERROR on select, %s", strerror(errno));
 
 	processClients(readFdSet, writeFdSet);
 
@@ -35,7 +35,7 @@ int NonBlockingTcpConnection::create()
 {
 	int serverFd = socket(AF_INET, SOCK_STREAM, 0);
     if (serverFd < 0)
-        error("ERROR opening socket");
+        error("ERROR opening socket, %s", strerror(errno));
 
     maxFd = serverFd;
 
@@ -50,7 +50,7 @@ void NonBlockingTcpConnection::getNewClient()
 	socklen_t addressLen = sizeof(address);
 	int clientFd = accept(serverSocket->getFd(), (sockaddr*) &address, &addressLen);
 	if (clientFd < 0)
-		error("ERROR on accept");
+		error("ERROR on accept, %s", strerror(errno));
 
 	maxFd = clientFd > maxFd ? clientFd : maxFd;
 
@@ -79,13 +79,13 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
                 if (bytesRead == 0)
                     debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
                 else
-                    warning("ERROR on recv");
+                    warning("ERROR on recv, %s", strerror(errno));
                 removeIt = true;
                 close(socket->getFd());
             }
             else
             {
-                socket->updateInBuffer(bytesRead);
+                while (socket->updateInBuffer(bytesRead));
             }
         }
 
@@ -94,13 +94,16 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
             int bytesWritten;
             if ((bytesWritten = send(socket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0)) < 0)
             {
-                warning("ERROR on send");
+                if (errno == ERRNO_CONNECTION_RESET)
+                    debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
+                else
+                    warning("ERROR on send, %s", strerror(errno));
                 removeIt = true;
                 close(socket->getFd());
             }
             else
             {
-                socket->updateOutBuffer(bytesWritten);
+                while (socket->updateOutBuffer(bytesWritten));
             }
         }
 

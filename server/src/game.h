@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "connection_config.h"
 #include "player.h"
 #include "socket.h"
 #include "bomb.h"
@@ -8,7 +9,7 @@
 #include <map>
 #include <Box2D/Dynamics/b2World.h>
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
 #include <pthread.h>
 #endif
 
@@ -32,7 +33,7 @@ private:
     std::map<int, Bomb*> bombs;
     b2World*             world;
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_t      mutex;
 #endif
 

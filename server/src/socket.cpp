@@ -1,4 +1,5 @@
 #include "socket.h"
+#include "output.h"
 #include <cstring>
 #include <climits>
 
@@ -26,8 +27,8 @@ Socket::~Socket()
         delete outPackets[i];
 
 #ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&inMutex, NULL);
-    pthread_mutex_destroy(&outMutex, NULL);
+    pthread_mutex_destroy(&inMutex);
+    pthread_mutex_destroy(&outMutex);
 #endif
 }
 
@@ -66,9 +67,11 @@ int Socket::getOutBufferSize()
     return sizeof(char) * outPointer;
 }
 
-void Socket::updateInBuffer(int bytesRead)
+bool Socket::updateInBuffer(int& bytesRead)
 {
     inPointer += bytesRead;
+
+    bytesRead = 0;
 
     if (inPointer > 0)
     {
@@ -102,13 +105,16 @@ void Socket::updateInBuffer(int bytesRead)
 
             inPointer -= size + 1;
 
-            updateInBuffer(0);
+            return true;
         }
     }
+    return false;
 }
 
-void Socket::updateOutBuffer(int bytesWritten)
+bool Socket::updateOutBuffer(int& bytesWritten)
 {
+    bool retValue = false;
+
     if (bytesWritten > 0)
     {
         outPointer -= bytesWritten;
@@ -116,6 +122,8 @@ void Socket::updateOutBuffer(int bytesWritten)
         memcpy(auxBuffer, outBuffer + outPointer, sizeof(char) * (BUFFER_SIZE -  outPointer));
         memcpy(outBuffer, auxBuffer, sizeof(auxBuffer));
     }
+
+    bytesWritten = 0;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_lock(&outMutex);
@@ -150,12 +158,16 @@ void Socket::updateOutBuffer(int bytesWritten)
 
             delete packet;
             outPackets.erase(outPackets.begin());
+
+            retValue = true;
         }
     }
 
 #ifdef BLOCKING_MODE
     pthread_mutex_unlock(&outMutex);
 #endif
+
+    return retValue;
 }
 
 void Socket::addOutPacket(Packet* packet)
@@ -184,7 +196,7 @@ Packet* Socket::getInPacket()
     }
 
 #ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&outMutex);
+    pthread_mutex_unlock(&inMutex);
 #endif
 
     return packet;

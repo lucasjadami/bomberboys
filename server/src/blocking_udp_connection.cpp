@@ -38,11 +38,14 @@ static void* clientSendThread(void* threadPtr)
             continue;
         else if (bytesWritten < 0)
         {
-            warning("ERROR on send");
+            if (errno == ERRNO_CONNECTION_RESET)
+                debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
+            else
+                warning("ERROR on send, %s", strerror(errno));
             connection->disconnectClientAndStopThread(thread);
             pthread_exit(NULL);
         }
-        socket->updateOutBuffer(bytesWritten);
+        while (socket->updateOutBuffer(bytesWritten));
         pthread_mutex_unlock(&thread->mutex);
     }
 
@@ -86,7 +89,7 @@ void BlockingUdpConnection::process()
         serverThread.connection = this;
 
         if (pthread_create(&serverThread.pthreadAccept, NULL, mainThread, &serverThread) != 0)
-            error("ERROR creating thread");
+            error("ERROR creating thread, %s", strerror(errno));
     }
 }
 
@@ -94,7 +97,7 @@ int BlockingUdpConnection::create()
 {
 	int serverFd = socket(AF_INET, SOCK_DGRAM, 0);
     if (serverFd < 0)
-        error("ERROR opening socket");
+        error("ERROR opening socket, %s", strerror(errno));
 
     return serverFd;
 }
@@ -109,7 +112,7 @@ void BlockingUdpConnection::readFromClient()
     if ((bytesRead = recvfrom(serverSocket->getFd(), buffer, sizeof(buffer), MSG_NOSIGNAL,
                               (sockaddr*) &address, &addressLen)) < 0)
     {
-        warning("ERROR on UDP accept");
+        warning("ERROR on UDP accept, %s", strerror(errno));
         return;
     }
 
@@ -139,7 +142,7 @@ void BlockingUdpConnection::readFromClient()
         clientThreads.insert(std::make_pair(socket->getId(), thread));
 
         if (pthread_create(&thread->pthreadSend, NULL, clientSendThread, thread) != 0)
-            error("ERROR creating thread");
+            error("ERROR creating thread, %s", strerror(errno));
 
         connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
@@ -164,7 +167,7 @@ void BlockingUdpConnection::readFromClient()
         else
         {
             socket->appendInBuffer(buffer, bytesRead);
-            socket->updateInBuffer(bytesRead);
+            while (socket->updateInBuffer(bytesRead));
         }
     }
     pthread_mutex_unlock(&thread->mutex);

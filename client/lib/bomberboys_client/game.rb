@@ -7,9 +7,10 @@ module BomberboysClient
     end
 
     def add_player(id, x, y, name)
-      player = Player.new(id, name, @board.players.empty?)
+      player = Player.new(id, name)
       player.move(x, y)
-      @board.players[id] = player
+
+      @board.add_player(player)
     end
 
     def remove_player(id)
@@ -25,11 +26,11 @@ module BomberboysClient
     end
 
     def add_bomb(id, x, y)
-      @board.bombs[id] = Bomb.new(id, x, y)
+      @board.add_bomb(Bomb.new(id, x, y))
     end
 
     def explode_bomb(id)
-      @board.bombs[id].explode
+      @board.bomb(id).explode
     end
   end
 end

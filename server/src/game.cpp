@@ -30,7 +30,7 @@ Game::~Game()
         delete it->second;
 
 #ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&mutex, NULL);
+    pthread_mutex_destroy(&mutex);
 #endif
 }
 

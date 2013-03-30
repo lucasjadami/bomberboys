@@ -23,7 +23,7 @@ inline void getTime(struct timespec *time)
     time->tv_nsec = mts.tv_nsec;
 #else
     if (clock_gettime(CLOCK_REALTIME, time) == -1)
-        error("ERROR on gettime");
+        error("ERROR on gettime %s", strerror(errno));
 #endif
 }
 
