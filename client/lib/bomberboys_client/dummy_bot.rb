@@ -12,7 +12,7 @@ module BomberboysClient
       login
 
       loop do
-        puts local.x
+        # puts local.x
         # if local.x > 550
         #   move_me :w
         # elsif local.x < 50
