@@ -38,7 +38,7 @@ static void* clientSendThread(void* threadPtr)
                 warning("ERROR on send, %s", strerror(errno));
             connection->disconnectClientAndKillThread(thread);
         }
-        socket->updateOutBuffer(bytesWritten);
+        while (socket->updateOutBuffer(bytesWritten));
         pthread_mutex_unlock(&thread->mutex);
     }
 
@@ -68,7 +68,7 @@ static void* clientRecvThread(void* threadPtr)
                 warning("ERROR on recv, %s", strerror(errno));
             connection->disconnectClientAndKillThread(thread);
         }
-        socket->updateInBuffer(bytesRead);
+        while (socket->updateInBuffer(bytesRead));
         pthread_mutex_unlock(&thread->mutex);
     }
 

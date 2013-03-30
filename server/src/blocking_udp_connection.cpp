@@ -45,7 +45,7 @@ static void* clientSendThread(void* threadPtr)
             connection->disconnectClientAndStopThread(thread);
             pthread_exit(NULL);
         }
-        socket->updateOutBuffer(bytesWritten);
+        while (socket->updateOutBuffer(bytesWritten));
         pthread_mutex_unlock(&thread->mutex);
     }
 
@@ -167,7 +167,7 @@ void BlockingUdpConnection::readFromClient()
         else
         {
             socket->appendInBuffer(buffer, bytesRead);
-            socket->updateInBuffer(bytesRead);
+            while (socket->updateInBuffer(bytesRead));
         }
     }
     pthread_mutex_unlock(&thread->mutex);

@@ -98,7 +98,7 @@ void NonBlockingUdpConnection::readFromClient()
     else
     {
         socket->appendInBuffer(buffer, bytesRead);
-        socket->updateInBuffer(bytesRead);
+        while (socket->updateInBuffer(bytesRead));
     }
 }
 
@@ -126,7 +126,7 @@ void NonBlockingUdpConnection::writeToClients()
         }
         else
         {
-            socket->updateOutBuffer(bytesWritten);
+            while (socket->updateOutBuffer(bytesWritten));
         }
 
         if (removeIt)
