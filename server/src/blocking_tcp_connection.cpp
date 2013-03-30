@@ -134,7 +134,7 @@ void BlockingTcpConnection::getNewClient()
 	int clientFd = accept(serverSocket->getFd(), (sockaddr*) &address, &addressLen);
 	if (clientFd < 0)
 	{
-        if (!serverThread.running)
+        if (!serverThread.running || errno == EINTR)
             return;
         else
             error("ERROR on accept, %s", strerror(errno));
