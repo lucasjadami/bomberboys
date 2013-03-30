@@ -8,6 +8,11 @@ module BomberboysClient
     end
 
     def add_player(id, x, y, name)
+      if x.nil? || y.nil?
+        puts "ERROR: incomplete parameters => add_player #{id}, #{x}, #{y}, #{name}."
+        return
+      end
+
       @players_mutex.synchronize do
         player = Player.new(id, name)
         player.move(x, y)
@@ -24,9 +29,24 @@ module BomberboysClient
     end
 
     def move_player(id, x, y)
+      if x.nil? || y.nil?
+        puts "ERROR: incomplete parameters => move_player #{id}, #{x}, #{y}."
+        return
+      end
+
       @players_mutex.synchronize do
         @players[id].move(x, y)
       end
+    end
+
+    def nearest_players
+      players = @players_mutex.synchronize { @players.values - [local] }
+
+      players.sort { |a, b| distance(local.position, a.position) <=> distance(local.position, b.position) }
+    end
+
+    def attackable_players
+      nearest_players.select { |b| distance(b.position, local.position) < Bomb::RADIUS/10 }
     end
 
     def fall_player(id)
@@ -54,7 +74,11 @@ module BomberboysClient
     end
 
     def dangerous_bombs
-      self.bombs.select { |b| distance(b.position, local_position) < b.explosion_radius }
+      self.bombs.select { |b| distance(b.position, local.position) < Bomb::RADIUS }
+    end
+
+    def local
+      @players[@local_id]
     end
 
     private
@@ -63,12 +87,6 @@ module BomberboysClient
       sum = pairs.reduce(0) { |sum, el| sum + (el[0] - el[1])**2 }
 
       Math.sqrt(sum)
-    end
-
-    def local_position
-      @players_mutex.synchronize do
-        @players[@local_id].position
-      end
     end
   end
 end
