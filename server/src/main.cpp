@@ -26,15 +26,6 @@ b2Profile           totalProfile;
 int                 stepCount;
 #endif
 
-#define NON_BLOCKING_TCP_CONNECTION
-//#define NON_BLOCKING_UDP_CONNECTION
-//#define BLOCKING_TCP_CONNECTION
-//#define BLOCKING_UDP_CONNECTION
-
-#if defined(BLOCKING_UDP_CONNECTION) || defined(BLOCKING_TCP_CONNECTION)
-#define BLOCKING_MODE
-#endif
-
 void exitHandler(int s)
 {
 	info("Server closed");

@@ -2,11 +2,12 @@
 #define SOCKET_H
 
 #include "packet.h"
+#include "connection_config.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <vector>
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
 #include <pthread.h>
 #endif
 
@@ -44,7 +45,7 @@ private:
     std::vector<Packet*>    inPackets;
     std::vector<Packet*>    outPackets;
 
-#ifdef BLOCKING_TCP_CONNECTION
+#ifdef BLOCKING_MODE
     pthread_mutex_t         inMutex;
     pthread_mutex_t         outMutex;
 #endif

@@ -1,4 +1,5 @@
 #include "socket.h"
+#include "output.h"
 #include <cstring>
 #include <climits>
 
@@ -26,8 +27,8 @@ Socket::~Socket()
         delete outPackets[i];
 
 #ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&inMutex, NULL);
-    pthread_mutex_destroy(&outMutex, NULL);
+    pthread_mutex_destroy(&inMutex);
+    pthread_mutex_destroy(&outMutex);
 #endif
 }
 
@@ -195,7 +196,7 @@ Packet* Socket::getInPacket()
     }
 
 #ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&outMutex);
+    pthread_mutex_unlock(&inMutex);
 #endif
 
     return packet;
