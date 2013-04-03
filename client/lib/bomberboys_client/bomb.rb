@@ -1,6 +1,6 @@
 module BomberboysClient
   class Bomb
-    RADIUS = 150
+    RADIUS = 30
     attr_reader :id, :x, :y
 
     def initialize(id, x = 0, y = 0)
