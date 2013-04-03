@@ -5,7 +5,7 @@ module BomberboysClient
       :plant_bomb => 5, :add_bomb => 6, :explode_bomb => 7, :fall_player => 8
     }
     MASK = {
-      0 => 'A*', 1 => 'SSSA*', 2 => 'S', 3 => 'C', 4 => 'SSS', 5 => '', 6 => 'SSS', 7 => 'S', 8 => 'S'
+      0 => 'A*', 1 => 'nnnA*', 2 => 'S', 3 => 'C', 4 => 'nnn', 5 => '', 6 => 'nnn', 7 => 'n', 8 => 'n'
     }
 
     attr_reader :params
