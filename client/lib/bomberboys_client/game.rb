@@ -1,5 +1,7 @@
 module BomberboysClient
   class Game
+    attr_reader :players
+    attr_reader :bombs
     def initialize
       @players = {}
       @bombs   = {}
@@ -46,7 +48,7 @@ module BomberboysClient
     end
 
     def attackable_players
-      nearest_players.select { |b| distance(b.position, local.position) < Bomb::RADIUS/10 }
+      nearest_players.select { |b| distance(b.position, local.position) < Bomb::RADIUS }
     end
 
     def fall_player(id)
