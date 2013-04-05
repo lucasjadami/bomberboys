@@ -3,8 +3,8 @@ module BomberboysClient
     attr_reader :name, :id
     attr_reader :local, :x, :y
 
-    def initialize(id, name)
-      @x = @y = 0
+    def initialize(id, name, x = 0, y = 0)
+      @x, @y = x, y
       @dead = false
       @name = name
       @id = id

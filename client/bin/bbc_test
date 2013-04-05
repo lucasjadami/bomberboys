@@ -42,7 +42,8 @@ while option != '4'
   when '?'
     help
   when '0'
-    puts game.board
+    puts game.players
+    puts game.bombs
   when '1'
     print 'name: '
     connection.login($stdin.gets.chomp[0..19])

@@ -11,49 +11,39 @@ module BomberboysClient
     def play
       login
 
-      10.times { |t| puts t; move_me(DIRECTIONS.sample) }
+      10.times { move_me DIRECTIONS.sample }
       plant_bomb
-
-      # loop do
-      #   bombs = dangerous_bombs
-      #   if bombs.empty?
-      #     plant_bomb
-      #   else
-      #     move_me opposite_direction(bombs.first)
-      #   end
-      # end
+      loop do
+        if local.x > 550
+          move_me :w
+        elsif local.x < 50
+          move_me :e
+        elsif local.y > 370
+          move_me :s
+        elsif local.y < 50
+          move_me :n
+        elsif bomb = @board.dangerous_bombs.first
+          move_me opposite_direction(bomb)
+        elsif @board.attackable_players.any?
+          plant_bomb
+          move_me(DIRECTIONS.sample)
+        elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
+          move_me direction(player)
+        end
+      end
     end
 
     private
-    def most_dangerous_bomb(bombs)
-    end
-
-    def dangerous_bombs
-      sorted_bombs = @board.bombs.sort do |b1, b2|
-        distance(local.position, b1.position) <=> distance(local.position, b2.position)
-      end
-
-      sorted_bombs.select do |b|
-        distance(b.position, local.position) < b.explosion_radius
-      end
-    end
-
     def opposite_direction(bomb)
-      if local.y == bomb.y 
-        DIRECTIONS.sample
-      else 
-        opposite_angle = Math.atan2(bomb.y - local.y, bomb.x - local.x) + Math::PI
-        direction_index = (4*opposite_angle/Math::PI - 0.5).ceil - 1
-
-        DIRECTIONS[direction_index]
-      end
+      cardinal_direction(Math.atan2(bomb.y - local.y, bomb.x - local.x) + Math::PI)
     end
 
-    def distance(obj1, obj2)
-      pairs = obj1.zip(obj2)
-      sum = pairs.reduce(0) { |sum, el| sum + (el[0] - el[1])**2 }
+    def direction(obj)
+      cardinal_direction(Math.atan2(obj.y - local.y, obj.x - local.x))
+    end
 
-      Math.sqrt(sum)
+    def cardinal_direction(angle)
+      DIRECTIONS[(4*angle/Math::PI - 0.5).ceil - 1]
     end
 
     def move_me(direction)
@@ -70,7 +60,11 @@ module BomberboysClient
     end
 
     def local
+<<<<<<< HEAD
       @board.local_player
+=======
+      @board.local
+>>>>>>> feature/bot
     end
   end
 end
