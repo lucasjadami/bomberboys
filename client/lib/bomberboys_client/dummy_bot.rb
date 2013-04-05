@@ -60,11 +60,7 @@ module BomberboysClient
     end
 
     def local
-<<<<<<< HEAD
-      @board.local_player
-=======
       @board.local
->>>>>>> feature/bot
     end
   end
 end
