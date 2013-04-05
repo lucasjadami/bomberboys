@@ -11,23 +11,23 @@ module BomberboysClient
     def play
       login
 
+      10.times { move_me DIRECTIONS.sample }
+      plant_bomb
       loop do
-        # puts local.x
-        # if local.x > 550
-        #   move_me :w
-        # elsif local.x < 50
-        #   move_me :e
-        # elsif local.y > 370
-        #   move_me :s
-        # elsif local.y < 50
-        #   move_me :n
-        # elsif bomb = @board.dangerous_bombs.first
-        if bomb = @board.dangerous_bombs.first
+        if local.x > 550
+          move_me :w
+        elsif local.x < 50
+          move_me :e
+        elsif local.y > 370
+          move_me :s
+        elsif local.y < 50
+          move_me :n
+        elsif bomb = @board.dangerous_bombs.first
           move_me opposite_direction(bomb)
         elsif @board.attackable_players.any?
           plant_bomb
           move_me(DIRECTIONS.sample)
-        elsif player = @board.nearest_players.first
+        elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
           move_me direction(player)
         end
       end

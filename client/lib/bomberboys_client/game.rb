@@ -2,6 +2,7 @@ module BomberboysClient
   class Game
     attr_reader :players
     attr_reader :bombs
+    attr_reader :local_id
     def initialize
       @players = {}
       @bombs   = {}
@@ -63,6 +64,10 @@ module BomberboysClient
       end
     end
 
+    def local_bomb
+      @bombs[@local_id]
+    end
+
     def explode_bomb(id)
       @bombs_mutex.synchronize do
         @bombs[id].explode
@@ -76,7 +81,9 @@ module BomberboysClient
     end
 
     def dangerous_bombs
-      self.bombs.select { |b| distance(b.position, local.position) < Bomb::RADIUS }
+      self.bombs.select do |b|
+        distance(b.position, local.position) < Bomb::RADIUS && !b.exploded?
+      end
     end
 
     def local
