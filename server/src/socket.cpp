@@ -91,15 +91,13 @@ bool Socket::updateInBuffer(int& bytesRead)
 
         if (inPointer > PACKET_UID_SIZE + size)
         {
-            char* uid = new char[PACKET_UID_SIZE];
             char* data = new char[size];
-            memcpy(uid, inBuffer, sizeof(char) * PACKET_UID_SIZE);
             memcpy(data, inBuffer + PACKET_UID_SIZE + 1, sizeof(char) * size);
 
 #ifdef BLOCKING_MODE
             pthread_mutex_lock(&inMutex);
 #endif
-            inPackets.push_back(new Packet(Packet::getInt(uid), packetId, data));
+            inPackets.push_back(new Packet(Packet::getInt(inBuffer), packetId, data));
 #ifdef BLOCKING_MODE
             pthread_mutex_unlock(&inMutex);
 #endif

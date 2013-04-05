@@ -26,12 +26,11 @@ static void* clientSendThread(void* threadPtr)
     {
         // Send is blocking but it can write 0 bytes at every loop iteration.
         usleep(1000);
-
         bytesWritten = send(socket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), MSG_NOSIGNAL);
 
         pthread_mutex_lock(&thread->mutex);
 
-        // This is not the best place to check this. 'send' can block when the output buffer is full.
+        // The server waits til the output buffer is empty to disconnect the client.
         if (socket->isDisconnectForced())
         {
             debug("Forced connection shutdown from %s", inet_ntoa(socket->getAddress().sin_addr));

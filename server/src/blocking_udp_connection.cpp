@@ -29,11 +29,21 @@ static void* clientSendThread(void* threadPtr)
 
     while (thread->running)
     {
+        // Send is blocking but it can write 0 bytes at every loop iteration.
         usleep(1000);
         bytesWritten = sendto(connection->getServerSocket()->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), MSG_NOSIGNAL,
                               (sockaddr*) &address, addressLen);
 
         pthread_mutex_lock(&thread->mutex);
+
+        // The server waits til the output buffer is empty to disconnect the client.
+        if (socket->isDisconnectForced())
+        {
+            debug("Forced connection shutdown from %s", inet_ntoa(socket->getAddress().sin_addr));
+            connection->disconnectClientAndStopThread(thread);
+            pthread_exit(NULL);
+        }
+
         if (!thread->running)
             continue;
         else if (bytesWritten < 0)

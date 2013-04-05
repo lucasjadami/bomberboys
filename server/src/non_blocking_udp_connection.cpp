@@ -31,6 +31,23 @@ void NonBlockingUdpConnection::process()
         readFromClient();
     if (FD_ISSET(serverSocket->getFd(), &writeFdSet))
         writeToClients();
+
+    for (std::map<int, Socket*>::iterator it = clientSockets.begin(); it != clientSockets.end();)
+    {
+        Socket* socket = it->second;
+        if (socket->isDisconnectForced())
+        {
+            debug("Forced connection shutdown from %s", inet_ntoa(socket->getAddress().sin_addr));
+
+            connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
+
+            clientSockets.erase(it++);
+            clientDescriptors.erase(socket->getFd());
+            delete socket;
+        }
+        else
+            it++;
+    }
 }
 
 int NonBlockingUdpConnection::create()
@@ -113,9 +130,9 @@ void NonBlockingUdpConnection::writeToClients()
         sockaddr_in address = socket->getAddress();
         socklen_t addressLen = sizeof(address);
 
-        int bytesWritten;
-        if ((bytesWritten = sendto(serverSocket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0,
-                                   (sockaddr*) &address, addressLen)) < 0)
+        int bytesWritten = 0;
+        if (socket->getOutBufferSize() > 0 && (bytesWritten = sendto(serverSocket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0,
+                                                                     (sockaddr*) &address, addressLen)) < 0)
         {
             if (errno == ERRNO_CONNECTION_RESET)
                 debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
