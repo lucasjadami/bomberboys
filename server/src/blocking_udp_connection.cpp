@@ -31,8 +31,12 @@ static void* clientSendThread(void* threadPtr)
     {
         // Send is blocking but it can write 0 bytes at every loop iteration.
         usleep(1000);
-        bytesWritten = sendto(connection->getServerSocket()->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), MSG_NOSIGNAL,
-                              (sockaddr*) &address, addressLen);
+
+        if (socket->getOutBufferSize() > 0)
+        {
+            bytesWritten = sendto(connection->getServerSocket()->getFd(), socket->getOutBuffer(),
+                                  socket->getOutBufferSize(), MSG_NOSIGNAL, (sockaddr*) &address, addressLen);
+        }
 
         pthread_mutex_lock(&thread->mutex);
 
