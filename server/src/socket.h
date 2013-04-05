@@ -31,6 +31,8 @@ public:
     void        addOutPacket(Packet*);
     Packet*     getInPacket();
     void        appendInBuffer(char*, int);
+    bool        isDisconnectForced();
+    void        setDisconnectForced(bool);
 
 private:
 
@@ -45,6 +47,7 @@ private:
     std::vector<Packet*>    inPackets;
     std::vector<Packet*>    outPackets;
     int                     packetUId;
+    bool                    disconnectForced;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_t         inMutex;

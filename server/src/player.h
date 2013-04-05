@@ -22,6 +22,8 @@ public:
    void     saveLastPosition();
    bool     isLastPositionDifferent();
    void     applyImpulse(b2Vec2&);
+   bool     isIdle();
+   void     updateLastAck();
 
 private:
 
@@ -30,6 +32,7 @@ private:
     b2Body*     body;
     int         lastX;
     int         lastY;
+    long long   lastAck;
     long long   lastImpulse;
 
 };

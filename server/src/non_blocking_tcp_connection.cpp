@@ -71,7 +71,14 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
         bool removeIt = false;
         Socket* socket = it->second;
 
-        if (FD_ISSET(socket->getFd(), &readFdSet))
+        if (socket->isDisconnectForced())
+        {
+            debug("Forced connection shutdown from %s", inet_ntoa(socket->getAddress().sin_addr));
+            removeIt = true;
+            close(socket->getFd());
+        }
+
+        if (!removeIt && FD_ISSET(socket->getFd(), &readFdSet))
         {
             int bytesRead;
             if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), socket->getInBufferSize(), 0)) <= 0)

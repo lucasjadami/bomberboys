@@ -14,6 +14,9 @@
 #define PACKET_ADD_BOMB         6
 #define PACKET_EXPLODE_BOMB     7
 #define PACKET_FALL_PLAYER      8
+#define PACKET_ACK              9
+#define PACKET_PING             10
+#define PACKET_PONG             11
 
 #define PACKET_LOGIN_SIZE           NAME_SIZE + TRASH_SIZE
 #define PACKET_ADD_PLAYER_SIZE      2 + 2 + 2 + NAME_SIZE + TRASH_SIZE
@@ -24,6 +27,9 @@
 #define PACKET_ADD_BOMB_SIZE        2 + 2 + 2 + TRASH_SIZE
 #define PACKET_EXPLODE_BOMB_SIZE    2 + TRASH_SIZE
 #define PACKET_FALL_PLAYER_SIZE     2 + TRASH_SIZE
+#define PACKET_ACK_SIZE             0 + TRASH_SIZE
+#define PACKET_PING_SIZE            0 + TRASH_SIZE
+#define PACKET_PONG_SIZE            0 + TRASH_SIZE
 
 class Packet
 {

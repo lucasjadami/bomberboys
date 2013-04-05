@@ -8,6 +8,11 @@ Player::Player(Socket* socket)
     body = NULL;
     name = NULL;
     lastImpulse = 0;
+
+    timespec time;
+    getTime(&time);
+
+    lastAck = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
 }
 
 Player::~Player()
@@ -68,4 +73,20 @@ void Player::applyImpulse(b2Vec2& impulse)
         lastImpulse = now;
         body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
     }
+}
+
+bool Player::isIdle()
+{
+    timespec time;
+    getTime(&time);
+    long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+
+    return now - lastAck > 10000;
+}
+
+void Player::updateLastAck()
+{
+    timespec time;
+    getTime(&time);
+    lastAck = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
 }

@@ -101,11 +101,15 @@ void Game::update(float time, float velocityIterations, float positionIterations
         Player* player = players[i];
 
         updatePlayerPackets(player);
+
         if (player->isPlaying())
         {
             fallPlayer(player);
             updatePlayerMovement(player);
         }
+
+        if (player->isIdle())
+            player->getSocket()->setDisconnectForced(true);
     }
 
     std::map<int, Bomb*>::iterator it = bombs.begin();
@@ -147,6 +151,10 @@ void Game::updatePlayerPackets(Player* player)
                 parseMoveMePacket(packet, player);
             else if (packet->getId() == PACKET_PLANT_BOMB)
                 parsePlantBombPacket(packet, player);
+            else if (packet->getId() == PACKET_ACK)
+                parseAckPacket(packet, player);
+            else if (packet->getId() == PACKET_PING)
+                parsePingPacket(packet, player);
         }
         delete packet;
     }
@@ -353,6 +361,17 @@ void Game::parsePlantBombPacket(Packet* packet, Player* player)
     }
 }
 
+void Game::parseAckPacket(Packet* packet, Player* player)
+{
+    player->updateLastAck();
+}
+
+void Game::parsePingPacket(Packet* packet, Player* player)
+{
+    Packet* newPacket = createPongPacket();
+    player->getSocket()->addOutPacket(newPacket);
+}
+
 Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
@@ -407,4 +426,10 @@ Packet* Game::createFallPlayerPacket(Player* player)
     memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
     Packet::putBytes(data, player->getSocket()->getId(), 2);
     return new Packet(PACKET_FALL_PLAYER, data);
+}
+
+Packet* Game::createPongPacket()
+{
+    char* data = new char[PACKET_PONG_SIZE];
+    return new Packet(PACKET_PONG, data);
 }

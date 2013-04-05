@@ -13,6 +13,7 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     memset(inBuffer, 0, sizeof(inBuffer));
     memset(outBuffer, 0, sizeof(outBuffer));
     packetUId = 0;
+    disconnectForced = false;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_init(&inMutex, NULL);
@@ -212,4 +213,14 @@ void Socket::appendInBuffer(char* buffer, int size)
 {
     if (size + inPointer <= BUFFER_SIZE)
         memcpy(inBuffer, buffer, sizeof(char) * size);
+}
+
+bool Socket::isDisconnectForced()
+{
+    return disconnectForced;
+}
+
+void Socket::setDisconnectForced(bool disconnectForced)
+{
+    this->disconnectForced = disconnectForced;
 }

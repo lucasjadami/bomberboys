@@ -46,12 +46,15 @@ private:
     void    parseLoginPacket(Packet*, Player*);
     void    parseMoveMePacket(Packet*, Player*);
     void    parsePlantBombPacket(Packet*, Player*);
+    void    parseAckPacket(Packet*, Player*);
+    void    parsePingPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
     Packet* createMovePlayerPacket(Player*);
     Packet* createAddBombPacket(Bomb*);
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
+    Packet* createPongPacket();
 
 };
 
