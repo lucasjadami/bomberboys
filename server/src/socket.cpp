@@ -12,7 +12,7 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     outPointer = 0;
     memset(inBuffer, 0, sizeof(inBuffer));
     memset(outBuffer, 0, sizeof(outBuffer));
-    packetUId = -1;
+    packetUId = 0;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_init(&inMutex, NULL);

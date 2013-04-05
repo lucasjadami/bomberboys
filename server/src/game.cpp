@@ -274,7 +274,7 @@ void Game::createBombBody(Bomb* bomb, Player* player)
 void Game::parseLoginPacket(Packet* packet, Player* player)
 {
     char* name = new char[NAME_SIZE];
-    memcpy(name, packet->getData(), sizeof(char) * PACKET_LOGIN_SIZE);
+    memcpy(name, packet->getData(), sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
     player->setName(name);
 

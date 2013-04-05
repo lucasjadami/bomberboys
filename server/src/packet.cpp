@@ -51,7 +51,6 @@ int Packet::getUId()
 
 void Packet::setUId(int uId)
 {
-
     this->uId = uId;
 }
 
