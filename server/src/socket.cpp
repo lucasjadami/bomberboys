@@ -12,6 +12,7 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     outPointer = 0;
     memset(inBuffer, 0, sizeof(inBuffer));
     memset(outBuffer, 0, sizeof(outBuffer));
+    packetUId = -1;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_init(&inMutex, NULL);
@@ -73,9 +74,9 @@ bool Socket::updateInBuffer(int& bytesRead)
 
     bytesRead = 0;
 
-    if (inPointer > 0)
+    if (inPointer > PACKET_UID_SIZE)
     {
-        int packetId = inBuffer[0];
+        int packetId = inBuffer[PACKET_UID_SIZE];
         int size = INT_MAX / 2;
         switch (packetId)
         {
@@ -87,23 +88,25 @@ bool Socket::updateInBuffer(int& bytesRead)
                 size = PACKET_PLANT_BOMB_SIZE; break;
         }
 
-        if (inPointer > size)
+        if (inPointer > PACKET_UID_SIZE + size)
         {
+            char* uid = new char[PACKET_UID_SIZE];
             char* data = new char[size];
-            memcpy(data, inBuffer + 1, sizeof(char) * size);
+            memcpy(uid, inBuffer, sizeof(char) * PACKET_UID_SIZE);
+            memcpy(data, inBuffer + PACKET_UID_SIZE + 1, sizeof(char) * size);
 
 #ifdef BLOCKING_MODE
             pthread_mutex_lock(&inMutex);
 #endif
-            inPackets.push_back(new Packet(packetId, data));
+            inPackets.push_back(new Packet(Packet::getInt(uid), packetId, data));
 #ifdef BLOCKING_MODE
             pthread_mutex_unlock(&inMutex);
 #endif
 
-            memcpy(auxBuffer, inBuffer + size + 1, sizeof(char) * (BUFFER_SIZE - (size + 1)));
+            memcpy(auxBuffer, inBuffer + size + PACKET_UID_SIZE + 1, sizeof(char) * (BUFFER_SIZE - (size + PACKET_UID_SIZE + 1)));
             memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
 
-            inPointer -= size + 1;
+            inPointer -= size + PACKET_UID_SIZE + 1;
 
             return true;
         }
@@ -149,12 +152,13 @@ bool Socket::updateOutBuffer(int& bytesWritten)
                 size = PACKET_FALL_PLAYER_SIZE; break;
         }
 
-        if (outPointer + size + 1 <= BUFFER_SIZE)
+        if (outPointer + size + PACKET_UID_SIZE + 1 <= BUFFER_SIZE)
         {
-            outBuffer[outPointer] = packet->getId();
-            memcpy(outBuffer + outPointer + 1, packet->getData(), sizeof(char) * size);
+            Packet::putBytes(outBuffer + outPointer, packet->getUId(), 4);
+            outBuffer[outPointer + PACKET_UID_SIZE] = packet->getId();
+            memcpy(outBuffer + outPointer + PACKET_UID_SIZE + 1, packet->getData(), sizeof(char) * size);
 
-            outPointer += 1 + size;
+            outPointer += 1 + PACKET_UID_SIZE + size;
 
             delete packet;
             outPackets.erase(outPackets.begin());
@@ -175,6 +179,8 @@ void Socket::addOutPacket(Packet* packet)
 #ifdef BLOCKING_MODE
     pthread_mutex_lock(&outMutex);
 #endif
+    if (packet->getUId() == 0)
+        packet->setUId(packetUId++);
     outPackets.push_back(packet);
 #ifdef BLOCKING_MODE
     pthread_mutex_unlock(&outMutex);

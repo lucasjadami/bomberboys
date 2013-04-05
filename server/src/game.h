@@ -52,7 +52,6 @@ private:
     Packet* createAddBombPacket(Bomb*);
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
-    void    putBytes(char*, int, int);
 
 };
 

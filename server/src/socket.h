@@ -11,7 +11,7 @@
 #include <pthread.h>
 #endif
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 1024
 
 class Socket
 {
@@ -44,6 +44,7 @@ private:
     int                     outPointer;
     std::vector<Packet*>    inPackets;
     std::vector<Packet*>    outPackets;
+    int                     packetUId;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_t         inMutex;

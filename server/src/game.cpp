@@ -357,9 +357,9 @@ Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    putBytes(data, player->getSocket()->getId(), 2);
-    putBytes(data + 2, player->getBody()->GetPosition().x, 2);
-    putBytes(data + 4, player->getBody()->GetPosition().y, 2);
+    Packet::putBytes(data, player->getSocket()->getId(), 2);
+    Packet::putBytes(data + 2, player->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + 4, player->getBody()->GetPosition().y, 2);
     memcpy(data + 6, player->getName(), sizeof(char) * NAME_SIZE);
     Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
     return packet;
@@ -369,7 +369,7 @@ Packet* Game::createRemovePlayerPacket(int id)
 {
     char* data = new char[PACKET_REMOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_REMOVE_PLAYER_SIZE);
-    putBytes(data, id, 2);
+    Packet::putBytes(data, id, 2);
     return new Packet(PACKET_REMOVE_PLAYER, data);
 }
 
@@ -377,9 +377,9 @@ Packet* Game::createMovePlayerPacket(Player* player)
 {
     char* data = new char[PACKET_MOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_MOVE_PLAYER_SIZE);
-    putBytes(data, player->getSocket()->getId(), 2);
-    putBytes(data + 2, (int) player->getBody()->GetPosition().x, 2);
-    putBytes(data + 4, (int) player->getBody()->GetPosition().y, 2);
+    Packet::putBytes(data, player->getSocket()->getId(), 2);
+    Packet::putBytes(data + 2, (int) player->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + 4, (int) player->getBody()->GetPosition().y, 2);
     return new Packet(PACKET_MOVE_PLAYER, data);
 }
 
@@ -387,9 +387,9 @@ Packet* Game::createAddBombPacket(Bomb* bomb)
 {
     char* data = new char[PACKET_ADD_BOMB_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_BOMB_SIZE);
-    putBytes(data, bomb->getId(), 2);
-    putBytes(data + 2, (int) bomb->getBody()->GetPosition().x, 2);
-    putBytes(data + 4, (int) bomb->getBody()->GetPosition().y, 2);
+    Packet::putBytes(data, bomb->getId(), 2);
+    Packet::putBytes(data + 2, (int) bomb->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + 4, (int) bomb->getBody()->GetPosition().y, 2);
     return new Packet(PACKET_ADD_BOMB, data);
 }
 
@@ -397,7 +397,7 @@ Packet* Game::createExplodeBombPacket(Bomb* bomb)
 {
     char* data = new char[PACKET_EXPLODE_BOMB_SIZE];
     memset(data, 0, sizeof(char) * PACKET_EXPLODE_BOMB_SIZE);
-    putBytes(data, bomb->getId(), 2);
+    Packet::putBytes(data, bomb->getId(), 2);
     return new Packet(PACKET_EXPLODE_BOMB, data);
 }
 
@@ -405,17 +405,6 @@ Packet* Game::createFallPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_FALL_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
-    putBytes(data, player->getSocket()->getId(), 2);
+    Packet::putBytes(data, player->getSocket()->getId(), 2);
     return new Packet(PACKET_FALL_PLAYER, data);
-}
-
-void Game::putBytes(char* data, int value, int bytes)
-{
-    int mask = 0xFF;
-
-    for (int i = 0; i < bytes; ++i)
-    {
-        data[bytes - i - 1] = (value & mask) >> (8 * i);
-        mask = mask << 8;
-    }
 }
