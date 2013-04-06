@@ -11,12 +11,6 @@ module BomberboysClient
     end
 
     def add_player(id, x, y, name)
-<<<<<<< HEAD
-      player = Player.new(id, name)
-      player.move(x, y)
-
-      @board.add_player(player)
-=======
       if x.nil? || y.nil?
         puts "ERROR: incomplete parameters => add_player #{id}, #{x}, #{y}, #{name}."
         return
@@ -29,7 +23,6 @@ module BomberboysClient
         @local_id = id if @players.empty?
         @players[player.id] = player
       end
->>>>>>> feature/bot
     end
 
     def remove_player(id)
