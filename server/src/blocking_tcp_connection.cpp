@@ -51,6 +51,8 @@ static void* clientSendThread(void* threadPtr)
         pthread_mutex_unlock(&thread->mutex);
     }
 
+    connection->destroyClient(socket->getId());
+
     pthread_exit(NULL);
 }
 
@@ -80,6 +82,8 @@ static void* clientRecvThread(void* threadPtr)
         pthread_mutex_unlock(&thread->mutex);
     }
 
+    connection->destroyClient(socket->getId());
+
     pthread_exit(NULL);
 }
 
@@ -87,6 +91,7 @@ BlockingTcpConnection::BlockingTcpConnection(void (*connectionHandler)(int, Sock
     : Connection(connectionHandler)
 {
     connectionLaunched = false;
+    pthread_mutex_init(&mapsMutex, NULL);
 }
 
 BlockingTcpConnection::~BlockingTcpConnection()
@@ -98,17 +103,20 @@ BlockingTcpConnection::~BlockingTcpConnection()
 
     pthread_join(serverThread.pthreadAccept, NULL);
 
+    pthread_mutex_lock(&mapsMutex);
     for (std::map<int, Thread*>::iterator it = clientThreads.begin(); it != clientThreads.end(); ++it)
     {
         Thread* thread = it->second;
         Socket* socket = thread->socket;
-
         shutdown(socket->getFd(), SHUT_RDWR);
-        pthread_join(thread->pthreadRecv, NULL);
-        pthread_join(thread->pthreadSend, NULL);
-        pthread_mutex_destroy(&thread->mutex);
-        delete thread;
     }
+    pthread_mutex_unlock(&mapsMutex);
+
+    // Must wait all threads.
+    while (!clientThreads.empty() && !clientSockets.empty())
+        usleep(1000);
+
+    pthread_mutex_destroy(&mapsMutex);
 }
 
 void BlockingTcpConnection::process()
@@ -148,6 +156,8 @@ void BlockingTcpConnection::getNewClient()
             error("ERROR on accept, %s", strerror(errno));
 	}
 
+    pthread_mutex_lock(&mapsMutex);
+
 	Socket* socket = new Socket(idCount, clientFd, address);
 	clientSockets.insert(std::make_pair(idCount, socket));
 	idCount++;
@@ -166,6 +176,8 @@ void BlockingTcpConnection::getNewClient()
     if (pthread_create(&thread->pthreadRecv, NULL, clientRecvThread, thread) != 0)
         error("ERROR creating thread, %s", strerror(errno));
 
+    pthread_mutex_unlock(&mapsMutex);
+
     connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
 	debug("New connection from %s", inet_ntoa(address.sin_addr));
@@ -180,4 +192,21 @@ void BlockingTcpConnection::disconnectClientAndKillThread(Thread* thread)
     thread->running = false;
     pthread_mutex_unlock(&thread->mutex);
     pthread_exit(NULL);
+}
+
+void BlockingTcpConnection::destroyClient(int id)
+{
+    pthread_mutex_lock(&mapsMutex);
+
+    std::map<int, Thread*>::iterator threadIt = clientThreads.find(id);
+    std::map<int, Socket*>::iterator socketIt = clientSockets.find(id);
+
+    pthread_mutex_destroy(&threadIt->second->mutex);
+    delete socketIt->second;
+    delete threadIt->second;
+
+    clientThreads.erase(threadIt);
+    clientSockets.erase(socketIt);
+
+    pthread_mutex_unlock(&mapsMutex);
 }

@@ -4,6 +4,7 @@
 #include "connection.h"
 #include "connection_thread.h"
 #include <map>
+#include <pthread.h>
 
 class BlockingTcpConnection : public Connection
 {
@@ -14,6 +15,7 @@ public:
 	void  process();
 	void  getNewClient();
 	void  disconnectClientAndKillThread(Thread*);
+	void  destroyClient(int);
 
 protected:
 
@@ -21,6 +23,7 @@ protected:
 
 private:
 
+    pthread_mutex_t         mapsMutex;
     std::map<int, Thread*>  clientThreads;
     Thread                  serverThread;
     bool                    connectionLaunched;
