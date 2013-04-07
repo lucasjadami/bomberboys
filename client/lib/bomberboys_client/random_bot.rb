@@ -8,10 +8,16 @@ module BomberboysClient
     end
 
     def play
-      loop do
-        10.times { move_me DIRECTIONS.sample }
-        plant_bomb
+      @thread = Thread.new do
+        loop do
+          plant_frequency.times { move_me DIRECTIONS.sample }
+          plant_bomb
+        end
       end
+    end
+
+    def join
+      @thread.join
     end
 
     private
@@ -22,6 +28,10 @@ module BomberboysClient
 
     def plant_bomb
       @connection.plant_bomb
+    end
+
+    def plant_frequency
+      10 + rand(20)
     end
   end
 end
