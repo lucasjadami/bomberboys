@@ -20,8 +20,7 @@ module BomberboysClient
     end
 
     def pack
-      message = @params.unshift(@action)
-
+      message = [@action] + @params
       message.pack('C' << MASK[@action])
     end
 
@@ -34,6 +33,10 @@ module BomberboysClient
       params = str_params.unpack(MASK[action])
 
       Message.new(ACTION.key(action), params)
+    end
+
+    def ==(obj)
+      self.params == obj.params && self.action == obj.action
     end
   end
 end
