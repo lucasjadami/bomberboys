@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe ServerInterface do
   it 'receive message from source' do
-    message = Message.new(:login, ['asdf'])
+    message = Message.new(:login, ['asdfg123451234512345'])
     socket = double('Socket')
-    socket.stub(:recv).and_return(message.pack)
+    socket.stub(:recv).and_return("\x00" * 5, 'asdfg123451234512345', '')
 
-    server = ServerInterface.new(socket)
+    server = ServerInterface.new(socket, 0)
 
     new_message = server.receive
 
@@ -14,13 +14,16 @@ describe ServerInterface do
   end
 
   it 'receive delayed message' do
-    m1 = Message.new(:login, ['asdf'], 0, 40)
-    m2 = Message.new(:login, ['asdf'], 0, 30)
-    m3 = Message.new(:login, ['asdf'], 0, 41)
-    m4 = Message.new(:login, ['asdf'], 0, 31)
+    m1 = Message.new(:login, ['asdfg123451234512345'], 5)
+    m2 = Message.new(:login, ['asdfg123451234512345'], 3)
+    m3 = Message.new(:login, ['asdfg123451234512345'], 6)
+    m4 = Message.new(:login, ['asdfg123451234512345'], 4)
 
     socket = double('Socket')
-    socket.stub(:recv).and_return(m1.pack, m2.pack, m3.pack, m4.pack)
+    socket.stub(:recv).and_return("\x00\x00\x00\x05\x00", 'asdfg123451234512345', '',
+                                  "\x00\x00\x00\x03\x00", 'asdfg123451234512345', '',
+                                  "\x00\x00\x00\x06\x00", 'asdfg123451234512345', '',
+                                  "\x00\x00\x00\x04\x00", 'asdfg123451234512345', '')
 
     server = ServerInterface.new(socket)
 
@@ -31,12 +34,14 @@ describe ServerInterface do
   end
 
   it 'calculate lost packages' do
-    m1 = Message.new(:login, ['asdf'], 0, 2)
-    m2 = Message.new(:login, ['asdf'], 0, 1)
-    m3 = Message.new(:login, ['asdf'], 0, 4)
+    m1 = Message.new(:login, ['asdfg123451234512345'], 2)
+    m2 = Message.new(:login, ['asdfg123451234512345'], 1)
+    m3 = Message.new(:login, ['asdfg123451234512345'], 4)
 
     socket = double('Socket')
-    socket.stub(:recv).and_return(m1.pack, m2.pack, m3.pack)
+    socket.stub(:recv).and_return("\x00\x00\x00\x02\x00", 'asdfg123451234512345', '',
+                                  "\x00\x00\x00\x01\x00", 'asdfg123451234512345', '',
+                                  "\x00\x00\x00\x04\x00", 'asdfg123451234512345', '')
 
     server = ServerInterface.new(socket)
 
