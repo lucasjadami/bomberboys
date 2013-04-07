@@ -45,7 +45,7 @@ module BomberboysClient
 
       raise "Malformed params for #{ACTION.key(action)}: #{params}" if params.include?(nil)
 
-      params[0] = params[0][0..19]
+      params[0] = params[0][0..19] if ACTION.key(action) == :login
       Message.new(ACTION.key(action), params, 0, uid)
     end
 
