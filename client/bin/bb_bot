@@ -15,7 +15,7 @@ rescue
   raise "No server listening on #{address}:#{port}"
 end
 
-connection = Connection.new(socket)
+connection = Connection.new(ServerInterface.new(socket))
 game = Game.new
 connection.register(game)
 
