@@ -30,9 +30,15 @@ module BomberboysClient
 
     def self.unpack(str)
       action, str_params = str.unpack('CA*')
+
+      raise "Unknown action #{action}" unless ACTION.kas_value?(action)
+
+      action = ACTION.key(action)
       params = str_params.unpack(MASK[action])
 
-      Message.new(ACTION.key(action), params)
+      raise "Malformed params for #{action}: #{params}" if params.include?(nil)
+
+      Message.new(action, params)
     end
 
     def ==(obj)
