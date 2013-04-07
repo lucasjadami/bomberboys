@@ -2,18 +2,15 @@ module BomberboysClient
   class DummyBot
     DIRECTIONS = [:ne, :n, :nw, :w, :sw, :s, :se, :e] 
 
-    def initialize(name, board, connection)
+    def initialize(board, connection)
       @board = board
       @connection = connection
-      @name = name
     end
 
     def play
-      login
-
       10.times { move_me DIRECTIONS.sample }
       plant_bomb
-      sleep 10
+
       loop do
         if local.x > 550
           move_me :w
@@ -49,15 +46,11 @@ module BomberboysClient
 
     def move_me(direction)
       @connection.move_me(direction)
-      sleep 0.1
+      sleep 0.5
     end
 
     def plant_bomb
       @connection.plant_bomb
-    end
-
-    def login
-      @connection.login(@name)
     end
 
     def local
