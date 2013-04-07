@@ -8,7 +8,8 @@ module BomberboysClient
       0 => 'A*', 1 => 'nnnA*', 2 => 'S', 3 => 'C', 4 => 'nnn', 5 => '', 6 => 'nnn', 7 => 'n', 8 => 'n'
     }
 
-    attr_reader :params, :uid
+    attr_reader :params
+    attr_accessor :uid
 
     def initialize(action, params = [], trash_size = 0, uid = 0)
       @action     = ACTION[action]
@@ -49,7 +50,7 @@ module BomberboysClient
     end
 
     def ==(obj)
-      self.params == obj.params && self.action == obj.action
+      self.params == obj.params && self.action == obj.action && @uid == obj.uid
     end
   end
 end
