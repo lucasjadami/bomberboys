@@ -13,6 +13,7 @@ module BomberboysClient
 
       10.times { move_me DIRECTIONS.sample }
       plant_bomb
+      sleep 10
       loop do
         if local.x > 550
           move_me :w

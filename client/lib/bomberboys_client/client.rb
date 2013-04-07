@@ -1,5 +1,5 @@
 module BomberboysClient
-  class Connection 
+  class Client
     def initialize(server)
       @server = server 
     end
@@ -9,11 +9,13 @@ module BomberboysClient
     end
 
     def start
-      while message = @server.receive
-        if @listener.respond_to?(message.action)
-          @listener.send(message.action, *message.params)
-        else
-          puts "ERROR: Listener doesn't respond to #{message.action}."
+      Thread.new do
+        while message = @server.receive
+          if @listener.respond_to?(message.action)
+            @listener.send(message.action, *message.params)
+          else
+            puts "ERROR: Listener doesn't respond to #{message.action}."
+          end
         end
       end
     end

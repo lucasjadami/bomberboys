@@ -5,7 +5,6 @@ require 'socket'
 require_relative '../lib/bomberboys_client'
 include BomberboysClient
 
-
 address = ARGV[0] || 'localhost'
 port = ARGV[1] || 10011
 
@@ -15,17 +14,14 @@ rescue
   raise "No server listening on #{address}:#{port}"
 end
 
-connection = Connection.new(ServerInterface.new(socket))
+client = Client.new(ServerInterface.new(socket))
 game = Game.new
-connection.register(game)
+client.register(game)
 
-Thread.new do
-  connection.start
-  socket.close
-end
+client.start
 
 name = ARGV[0] || "not_a_bot_#{(rand*10000000000).to_i}"
-bot = DummyBot.new(name, game, connection)
+bot = DummyBot.new(name, game, client)
 bot.play
 
 socket.close

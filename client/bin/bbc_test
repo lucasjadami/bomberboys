@@ -24,14 +24,11 @@ rescue
   raise "No server listening on #{address}:#{port}"
 end
 
-connection = Connection.new(ServerInterface.new(socket))
+client = Client.new(ServerInterface.new(socket))
 game = Game.new
-connection.register(game)
+client.register(game)
 
-Thread.new do
-  connection.start
-  socket.close
-end
+client.start
 
 help
 
@@ -46,12 +43,12 @@ while option != '4'
     puts game.bombs
   when '1'
     print 'name: '
-    connection.login($stdin.gets.chomp[0..19])
+    client.login($stdin.gets.chomp[0..19])
   when '2'
     print 'direction (n, s, e, w, ne, nw, se, sw): '
-    connection.move_me($stdin.gets.chomp.to_sym)
+    client.move_me($stdin.gets.chomp.to_sym)
   when '3'
-    connection.plant_bomb
+    client.plant_bomb
   end
 
   print "> "
