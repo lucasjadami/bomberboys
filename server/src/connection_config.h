@@ -1,9 +1,9 @@
 #ifndef CONNECTION_CONFIG_H
 #define CONNECTION_CONFIG_H
 
-//#define NON_BLOCKING_TCP_CONNECTION
+#define NON_BLOCKING_TCP_CONNECTION
 //#define NON_BLOCKING_UDP_CONNECTION
-#define BLOCKING_TCP_CONNECTION
+//#define BLOCKING_TCP_CONNECTION
 //#define BLOCKING_UDP_CONNECTION
 
 // Important note: in blocking modes, the sockets and thread maps don't have elements removed when a client

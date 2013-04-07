@@ -2,35 +2,39 @@ module BomberboysClient
   class DummyBot
     DIRECTIONS = [:ne, :n, :nw, :w, :sw, :s, :se, :e] 
 
-    def initialize(name, board, connection)
+    def initialize(board, connection)
       @board = board
       @connection = connection
-      @name = name
     end
 
     def play
-      login
+      @thread = Thread.new do
+        10.times { move_me DIRECTIONS.sample }
+        plant_bomb
 
-      10.times { move_me DIRECTIONS.sample }
-      plant_bomb
-      loop do
-        if local.x > 550
-          move_me :w
-        elsif local.x < 50
-          move_me :e
-        elsif local.y > 370
-          move_me :s
-        elsif local.y < 50
-          move_me :n
-        elsif bomb = @board.dangerous_bombs.first
-          move_me opposite_direction(bomb)
-        elsif @board.attackable_players.any?
-          plant_bomb
-          move_me(DIRECTIONS.sample)
-        elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
-          move_me direction(player)
+        loop do
+          if local.x > 550
+            move_me :w
+          elsif local.x < 50
+            move_me :e
+          elsif local.y > 370
+            move_me :s
+          elsif local.y < 50
+            move_me :n
+          elsif bomb = @board.dangerous_bombs.first
+            move_me opposite_direction(bomb)
+          elsif @board.attackable_players.any?
+            plant_bomb
+            move_me(DIRECTIONS.sample)
+          elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
+            move_me direction(player)
+          end
         end
       end
+    end
+
+    def join
+      @thread.join
     end
 
     private
@@ -48,15 +52,11 @@ module BomberboysClient
 
     def move_me(direction)
       @connection.move_me(direction)
-      sleep 0.1
+      sleep 0.5
     end
 
     def plant_bomb
       @connection.plant_bomb
-    end
-
-    def login
-      @connection.login(@name)
     end
 
     def local

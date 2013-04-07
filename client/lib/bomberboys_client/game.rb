@@ -38,7 +38,7 @@ module BomberboysClient
       end
 
       @players_mutex.synchronize do
-        @players[id].move(x, y)
+        @players[id].move(x, y) unless @players[id].nil?
       end
     end
 
@@ -54,7 +54,7 @@ module BomberboysClient
 
     def fall_player(id)
       @players_mutex.synchronize do
-        @board.players[id].kill
+        @players[id].kill unless @players[id].nil?
       end
     end
 

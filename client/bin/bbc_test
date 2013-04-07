@@ -9,10 +9,9 @@ def help
   puts 'Choose a action:'
   puts '? to see this menu'
   puts '0 to see context'
-  puts '1 to login'
-  puts '2 to move_me'
-  puts '3 to plant_bomb'
-  puts '4 to exit'
+  puts '1 to move_me'
+  puts '2 to plant_bomb'
+  puts '3 to exit'
 end
 
 address = ARGV[0] || 'localhost'
@@ -24,20 +23,22 @@ rescue
   raise "No server listening on #{address}:#{port}"
 end
 
-connection = Connection.new(socket)
-game = Game.new
-connection.register(game)
-
-Thread.new do
-  connection.start
-  socket.close
-end
-
 help
 
-print "> "
-option = $stdin.gets.chomp
-while option != '4'
+print 'login name: '
+client.login($stdin.gets.chomp)
+
+client = Client.new(ServerInterface.new(socket))
+game = Game.new
+client.register(game)
+
+client.connect
+client.start
+
+begin
+  print "> "
+  option = $stdin.gets.chomp
+
   case option
   when '?'
     help
@@ -45,17 +46,11 @@ while option != '4'
     puts game.players
     puts game.bombs
   when '1'
-    print 'name: '
-    connection.login($stdin.gets.chomp[0..19])
-  when '2'
     print 'direction (n, s, e, w, ne, nw, se, sw): '
-    connection.move_me($stdin.gets.chomp.to_sym)
-  when '3'
-    connection.plant_bomb
+    client.move_me($stdin.gets.chomp.to_sym)
+  when '2'
+    client.plant_bomb
   end
-
-  print "> "
-  option = $stdin.gets.chomp
-end
+end while option != '3'
 
 socket.close
