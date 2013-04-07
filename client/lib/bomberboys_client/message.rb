@@ -4,7 +4,7 @@ module BomberboysClient
       :login         => 0, :add_player    => 1,  :remove_player => 2,
       :move_me       => 3, :move_player   => 4,  :plant_bomb    => 5,
       :add_bomb      => 6, :explode_bomb  => 7,  :fall_player   => 8,
-      :acknowledge   => 9, :ping          => 10, :pong          => 11
+      :ack           => 9, :ping          => 10, :pong          => 11
     }
 
     MASK = {
@@ -45,7 +45,7 @@ module BomberboysClient
     def self.unpack(str)
       uid, action, str_params = str.unpack('NCA*')
 
-      raise "Unknown action #{action}" unless ACTION.has_value?(action)
+      raise "Unknown action" unless ACTION.has_value?(action)
 
       params = str_params.unpack(MASK[action])
 
