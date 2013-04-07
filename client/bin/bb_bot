@@ -7,6 +7,7 @@ include BomberboysClient
 
 address = ARGV[0] || 'localhost'
 port = ARGV[1] || 10011
+name = ARGV[2] || "not_a_bot_#{(rand*10000000000).to_i}"
 
 begin
   socket = TCPSocket.open(address, port)
@@ -14,14 +15,13 @@ rescue
   raise "No server listening on #{address}:#{port}"
 end
 
-client = Client.new(ServerInterface.new(socket))
+client = Client.new(ServerInterface.new(socket), name)
 game = Game.new
-client.register(game)
 
+client.register(game)
+client.connect
 client.start
 
-name = ARGV[0] || "not_a_bot_#{(rand*10000000000).to_i}"
-bot = DummyBot.new(name, game, client)
-bot.play
+RandomBot.new(game, client).play
 
 socket.close
