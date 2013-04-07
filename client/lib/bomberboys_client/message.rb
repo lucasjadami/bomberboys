@@ -1,11 +1,17 @@
 module BomberboysClient
   class Message
     ACTION = {
-      :login => 0, :add_player => 1, :remove_player => 2, :move_me => 3, :move_player => 4,
-      :plant_bomb => 5, :add_bomb => 6, :explode_bomb => 7, :fall_player => 8
+      :login         => 0, :add_player    => 1,  :remove_player => 2,
+      :move_me       => 3, :move_player   => 4,  :plant_bomb    => 5,
+      :add_bomb      => 6, :explode_bomb  => 7,  :fall_player   => 8,
+      :acknowledge   => 9, :ping          => 10, :pong          => 11
     }
+
     MASK = {
-      0 => 'A*', 1 => 'nnnA*', 2 => 'S', 3 => 'C', 4 => 'nnn', 5 => '', 6 => 'nnn', 7 => 'n', 8 => 'n'
+      0 => 'A*',  1 => 'nnnA*', 2 => 'S',
+      3 => 'C',   4 => 'nnn',   5 => '',
+      6 => 'nnn', 7 => 'n',     8 => 'n',
+      9 => '',    10 => '',     11 => ''
     }
 
     attr_reader :params
