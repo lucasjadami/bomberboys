@@ -2,11 +2,12 @@ module BomberboysClient
   class ServerInterface 
     attr_reader :packet_loss
 
-    def initialize(socket)
+    def initialize(socket, trash_size = 0)
       @socket = socket
       @client_uid_count = 0
       @server_uid_count = -1
       @packet_loss = 0
+      @trash_size  = trash_size
 
       @receive_mutex = Mutex.new
       @send_mutex = Mutex.new
@@ -15,15 +16,11 @@ module BomberboysClient
     def receive
       @receive_mutex.synchronize do
         begin
-          str = @socket.recv(100)
-          unless str.empty?
-            message = Message.unpack(str)
-          else
-            raise 'empty string'
-          end
-        rescue Exception => ex
-          puts ex 
-          retry
+          uid, action = @socket.recv(5).unpack('NC')
+          str_params  = @socket.recv(Message::BODY_SIZE[action])
+          @socket.recv(@trash_size)
+
+          message = Message.new(action, str_params, uid)
         end while message.uid < @server_uid_count
 
         @packet_loss += message.uid - @server_uid_count - 1
@@ -36,10 +33,16 @@ module BomberboysClient
     def send(message)
       @send_mutex.synchronize do
         message.uid = @client_uid_count
-        @socket.print(message.pack)
+
+        @socket.print(append_trash(message.pack))
 
         @client_uid_count += 1
       end
+    end
+
+    private
+    def append_trash(str)
+      str << '*' * @trash_size
     end
   end
 end
