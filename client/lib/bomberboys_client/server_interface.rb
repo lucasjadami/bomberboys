@@ -15,7 +15,15 @@ module BomberboysClient
     def receive
       @receive_mutex.synchronize do
         begin
-          message = Message.unpack(@socket.recv(150))
+          str = @socket.recv(100)
+          unless str.empty?
+            message = Message.unpack(str)
+          else
+            raise 'empty string'
+          end
+        rescue Exception => ex
+          puts ex 
+          retry
         end while message.uid < @server_uid_count
 
         @packet_loss += message.uid - @server_uid_count - 1
