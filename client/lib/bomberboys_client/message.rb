@@ -14,16 +14,20 @@ module BomberboysClient
       9 => '',    10 => '',     11 => ''
     }
 
+    BODY_SIZE = {
+      0 => 20,  1 => 26,  2 => 2,
+      3 => 1,   4 => 6,   5 => 0,
+      6 => 6,   7 => 2,   8 => 2,
+      9 => 0,  10 => 0,  11 => 0
+    }
+
     attr_reader :params
     attr_accessor :uid
 
-    def initialize(action, params = [], trash_size = 0, uid = 0)
-      @action     = ACTION[action]
-      @uid        = uid
-      @trash_size = trash_size
-
-      @params     = params
-      @params[0]  = @params[0].ljust(20) if action == :login
+    def initialize(action, params = [], uid = 0)
+      @uid    = uid
+      @action = action.kind_of?(Symbol) ? ACTION[action] : action
+      @params = params.kind_of?(Array) ? params : unpack_body(@action, params)
     end
 
     def action
@@ -34,29 +38,25 @@ module BomberboysClient
       message = [@uid, @action] + @params
 
       str_message = message.pack('NC' << MASK[@action])
-
-      str_message << '*' * @trash_size
     end
 
     def to_s
-      "#{self.action}: #{@params.join(" ")}"
+      "#{@uid}:#{self.action}:#{@params.join(" ")}"
     end
 
     def self.unpack(str)
       uid, action, str_params = str.unpack('NCA*')
 
-      raise "Unknown action" unless ACTION.has_value?(action)
-
-      params = str_params.unpack(MASK[action])
-
-      raise "Malformed params for #{ACTION.key(action)}: #{params}" if params.include?(nil)
-
-      params[0] = params[0][0..19] if ACTION.key(action) == :login
-      Message.new(ACTION.key(action), params, 0, uid)
+      Message.new(ACTION.key(action), str_params, uid)
     end
 
     def ==(obj)
       self.params == obj.params && self.action == obj.action && @uid == obj.uid
+    end
+
+    private
+    def unpack_body(action, params)
+      params.unpack(MASK[action])
     end
   end
 end
