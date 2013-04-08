@@ -6,7 +6,7 @@ require_relative '../lib/bomberboys_client'
 include BomberboysClient
 
 n_bots      = (ARGV.shift || 1).to_i
-socket_type = ARGV.shift == 'udp' ? UDPSocket : TCPSocket 
+socket_type = (ARGV.shift || :tcp).to_sym
 bot_type    = ARGV.shift == 'random' ? RandomBot : DummyBot
 address     = ARGV.shift || 'localhost'
 port        = (ARGV.shift || 10011).to_i
@@ -22,7 +22,12 @@ clients = []
 
 n_bots.times do
   begin
-    socket = socket_type.open(address, port)
+    if socket_type == :udp
+      socket = UDPSocket.new
+      socket.connect(address, port)
+    else
+      socket = TCPSocket.open(address, port)
+    end
   rescue
     raise "No server listening on #{address}:#{port}"
   end
