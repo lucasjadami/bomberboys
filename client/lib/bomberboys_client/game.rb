@@ -11,11 +11,6 @@ module BomberboysClient
     end
 
     def add_player(id, x, y, name)
-      if x.nil? || y.nil?
-        puts "ERROR: incomplete parameters => add_player #{id}, #{x}, #{y}, #{name}."
-        return
-      end
-
       @players_mutex.synchronize do
         player = Player.new(id, name)
         player.move(x, y)
@@ -32,11 +27,6 @@ module BomberboysClient
     end
 
     def move_player(id, x, y)
-      if x.nil? || y.nil?
-        puts "ERROR: incomplete parameters => move_player #{id}, #{x}, #{y}."
-        return
-      end
-
       @players_mutex.synchronize do
         @players[id].move(x, y) unless @players[id].nil?
       end
