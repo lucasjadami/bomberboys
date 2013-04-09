@@ -8,12 +8,12 @@ module BomberboysClient
     end
 
     def play
-      @thread = Thread.new do
-        loop do
-          plant_frequency.times { move_me DIRECTIONS.sample }
-          plant_bomb
-        end
-      end
+      @thread = Thread.new { loop { react @board } }
+    end
+
+    def react(world)
+      plant_frequency.times { move_me DIRECTIONS.sample }
+      plant_bomb
     end
 
     def join

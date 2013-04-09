@@ -8,28 +8,25 @@ module BomberboysClient
     end
 
     def play
-      @thread = Thread.new do
-        10.times { move_me DIRECTIONS.sample }
-        plant_bomb
+      @thread = Thread.new { loop { react(world) }
+    end
 
-        loop do
-          if local.x > 550
-            move_me :w
-          elsif local.x < 50
-            move_me :e
-          elsif local.y > 370
-            move_me :s
-          elsif local.y < 50
-            move_me :n
-          elsif bomb = @board.dangerous_bombs.first
-            move_me opposite_direction(bomb)
-          elsif @board.attackable_players.any?
-            plant_bomb
-            move_me(DIRECTIONS.sample)
-          elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
-            move_me direction(player)
-          end
-        end
+    def react(world)
+      if world.local.x > 550
+        move_me :w
+      elsif world.local.x < 50
+        move_me :e
+      elsif world.local.y > 370
+        move_me :s
+      elsif world.local.y < 50
+        move_me :n
+      elsif bomb = world.dangerous_bombs.first
+        move_me opposite_direction(bomb)
+      elsif world.attackable_players.any?
+        plant_bomb
+        move_me(DIRECTIONS.sample)
+      elsif (player = world.nearest_players.first) && world.local_bomb && world.local_bomb.exploded?
+        move_me direction(player)
       end
     end
 
