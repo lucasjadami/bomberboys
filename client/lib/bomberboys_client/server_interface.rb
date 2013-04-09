@@ -8,6 +8,7 @@ module BomberboysClient
       @server_uid_count = -1
       @packet_loss = 0
       @trash_size  = trash_size
+      @buffer      = ""
 
       @receive_mutex = Mutex.new
       @send_mutex = Mutex.new
@@ -16,9 +17,10 @@ module BomberboysClient
     def receive
       @receive_mutex.synchronize do
         begin
-          uid, action = @socket.recv(5).unpack('NC')
-          str_params  = @socket.recv(Message::BODY_SIZE[action])
-          @socket.recv(@trash_size)
+          @buffer << @socket.recv(1024)
+          uid, action = @buffer.slice!(0..4).unpack('NC')
+          str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
+          @buffer.slice!(0...@trash_size)
 
           message = Message.new(action, str_params, uid)
         end while message.uid < @server_uid_count
