@@ -30,6 +30,8 @@ n_bots.times do
   clients << Client.new(RandomBot.new(ServerInterface.new(socket, trash), name))
 end
 
+clients.first.informer = true
+
 Thread.abort_on_exception = true
 
 clients.map(&:connect)

@@ -1,11 +1,14 @@
 module BomberboysClient
   class Client
+    attr_accessor :informer
+
     def initialize(player)
       @world = World.new
       @player = player
       @server = @player.socket
       @times  = []
       @shutdown = false
+      @informer = false
     end
 
     def connect
@@ -51,7 +54,7 @@ module BomberboysClient
         when :pong
           @times << (Time.now - @start_time)
         when :shutdown
-          send_info
+          send_info if @informer
           @shutdown = true
         else
           modify_world(message)
