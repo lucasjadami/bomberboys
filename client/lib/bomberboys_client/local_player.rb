@@ -2,19 +2,14 @@ module BomberboysClient
   class LocalPlayer 
     DIRECTIONS = [:ne, :n, :nw, :w, :sw, :s, :se, :e] 
 
-    def initialize(server)
-      @server = server
-    end
+    attr_reader :name
 
-    def play
-      @thread = Thread.new { loop { react @board } }
+    def initialize(server, name)
+      @server = server
+      @name = name
     end
 
     def react(world); end
-
-    def join
-      @thread.join
-    end
 
     protected
     def move_me(direction)

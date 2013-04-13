@@ -1,9 +1,9 @@
 module BomberboysClient
   class Client
-    def initialize(server, login_name)
+    def initialize(server, player)
       @server = server 
-      @login_name = login_name
       @world = World.new
+      @player = player
     end
 
     def connect
@@ -12,11 +12,16 @@ module BomberboysClient
     end
 
     def start
-      Thread.new do
+      @thread = Thread.new do
         while message = @server.receive
           modify_world(message)
+          @player.react(@world)
         end
       end
+    end
+
+    def join
+      @thread.join
     end
 
     def modify_world(message)
@@ -29,7 +34,7 @@ module BomberboysClient
 
     private
     def login
-      @server.send(Message.new(:login, [@login_name]))
+      @server.send(Message.new(:login, [@player.name]))
     end
   end
 end

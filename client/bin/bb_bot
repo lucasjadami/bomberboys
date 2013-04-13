@@ -31,8 +31,7 @@ n_bots.times do
   end
 
   server = ServerInterface.new(socket)
-  bots << RandomBot.new(server)
-  clients << Client.new(server, "not_a_bot_#{(rand*10000000000).to_i}")
+  clients << Client.new(server, RandomBot.new(server, "not_a_bot_#{(rand*10000000000).to_i}"))
 end
 
 Thread.abort_on_exception = true
@@ -48,6 +47,6 @@ Thread.new do
   end
 end
 
-bots.map(&:play)
 puts 'All bots playing'
-bots.map(&:join)
+
+clients.map(&:join)

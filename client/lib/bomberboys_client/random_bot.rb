@@ -1,7 +1,7 @@
 module BomberboysClient
   class RandomBot < LocalPlayer
-    def initialize(server)
-      super(server)
+    def initialize(server, name)
+      super(server, name)
     end
 
     def react(world)
