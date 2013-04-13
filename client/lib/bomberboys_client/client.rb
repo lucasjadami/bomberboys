@@ -12,9 +12,13 @@ module BomberboysClient
 
     def start
       @thread = Thread.new do
-        while message = @server.receive
-          modify_world(message)
-          @player.react(@world)
+        begin
+          while message = @server.receive
+            modify_world(message)
+            @player.react(@world)
+          end
+        rescue Exception => ex
+          puts "Shutting down client #{@player.name}."
         end
       end
     end
