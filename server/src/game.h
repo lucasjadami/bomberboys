@@ -16,7 +16,7 @@
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
-#define SHUTDOWN_TIME 80000
+#define SHUTDOWN_TIME 12000
 
 class Game
 {

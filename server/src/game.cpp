@@ -403,7 +403,7 @@ void Game::parsePingPacket(Packet* packet, Player* player)
 void Game::parseInfoPacket(Packet* packet, Player* player)
 {
     double average = Packet::getDouble(packet->getData());
-    double deviation = Packet::getDouble(packet->getData() + 12);
+    double deviation = Packet::getDouble(packet->getData() + 16);
     info("Player info (id, avg, dev): %d %lf %lf", player->getSocket()->getId(), average, deviation);
 }
 
