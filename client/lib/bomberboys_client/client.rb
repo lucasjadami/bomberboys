@@ -1,9 +1,9 @@
 module BomberboysClient
   class Client
-    def initialize(server, player)
-      @server = server 
+    def initialize(player)
       @world = World.new
       @player = player
+      @server = @player.socket
     end
 
     def connect

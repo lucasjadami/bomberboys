@@ -10,14 +10,9 @@ socket_type = (ARGV.shift || :tcp).to_sym
 address     = (ARGV.shift || 'localhost')
 port        = (ARGV.shift || 10011).to_i
 
-puts "Usage (all optional params): bb_bot n_bots [tcp|udp] address port"
-puts
-puts "setup:"
-puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
+puts "Usage (all optional params): bb_bot n_bots [tcp|udp] address port\n"
 
-bots    = []
 clients = []
-
 n_bots.times do
   begin
     if socket_type == :udp
@@ -30,15 +25,14 @@ n_bots.times do
     raise "No server listening on #{address}:#{port}"
   end
 
-  server = ServerInterface.new(socket)
-  clients << Client.new(server, RandomBot.new(server, "not_a_bot_#{(rand*10000000000).to_i}"))
+  name = "not_a_bot_#{(rand*10000000000).to_i}"
+  clients << Client.new(RandomBot.new(ServerInterface.new(socket), name))
 end
 
 Thread.abort_on_exception = true
 
 clients.map(&:connect)
 clients.map(&:start)
-puts 'All clients initialized'
 
 Thread.new do
   loop do
@@ -47,6 +41,6 @@ Thread.new do
   end
 end
 
-puts 'All bots playing'
+puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
 
 clients.map(&:join)
