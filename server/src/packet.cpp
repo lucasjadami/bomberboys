@@ -18,11 +18,38 @@ int Packet::getInt(char* data)
 
     for (int i = 3; i > -1; --i)
     {
-        value |= data[i] << mask;
-        mask = mask << 8;
+        int buffer = (unsigned char) data[i];
+        value |= buffer << mask;
+        mask += 8;
     }
 
     return value;
+}
+
+double Packet::getDouble(char* data)
+{
+    long long numerator = 0;
+    int mask = 0;
+
+    for (int i = 0; i < 8; ++i)
+    {
+        long long value = (unsigned char) data[i];
+        numerator |= value << mask;
+        mask += 8;
+    }
+
+    long long denominator = 0;
+    mask = 0;
+    data += 8;
+
+    for (int i = 0; i < 8; ++i)
+    {
+        long long value = (unsigned char) data[i];
+        denominator |= value << mask;
+        mask += 8;
+    }
+
+    return (double) numerator / denominator;
 }
 
 Packet::Packet(int id, char* data)

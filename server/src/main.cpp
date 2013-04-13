@@ -173,7 +173,7 @@ void gameUpdateHandler(Settings* settings)
 
 int main(int argc, char** argv)
 {
-	sigIntHandler.sa_handler = exitHandler;
+    sigIntHandler.sa_handler = exitHandler;
    	sigemptyset(&sigIntHandler.sa_mask);
    	sigIntHandler.sa_flags = 0;
    	sigaction(SIGINT, &sigIntHandler, NULL);

@@ -16,6 +16,8 @@
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
+#define SHUTDOWN_TIME 12000
+
 class Game
 {
 public:
@@ -32,11 +34,13 @@ private:
     std::vector<Player*> players;
     std::map<int, Bomb*> bombs;
     b2World*             world;
+    long long            startupTime;
 
 #ifdef BLOCKING_MODE
     pthread_mutex_t      mutex;
 #endif
 
+    void    updateShutdown();
     void    updatePlayerPackets(Player*);
     void    updatePlayerMovement(Player*);
     void    fallPlayer(Player*);
@@ -48,6 +52,7 @@ private:
     void    parsePlantBombPacket(Packet*, Player*);
     void    parseAckPacket(Packet*, Player*);
     void    parsePingPacket(Packet*, Player*);
+    void    parseInfoPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
     Packet* createMovePlayerPacket(Player*);
@@ -55,6 +60,7 @@ private:
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
     Packet* createPongPacket();
+    Packet* createShutdownPacket();
 
 };
 

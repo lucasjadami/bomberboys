@@ -11,7 +11,7 @@
 #include <mach/mach.h>
 #endif
 
-inline void getTime(struct timespec *time)
+inline timespec* getTime(timespec* time)
 {
 #ifdef MAC_OS // OS X does not have clock_gettime, use clock_get_time.
     clock_serv_t cclock;
@@ -25,6 +25,12 @@ inline void getTime(struct timespec *time)
     if (clock_gettime(CLOCK_REALTIME, time) == -1)
         error("ERROR on gettime %s", strerror(errno));
 #endif
+    return time;
+}
+
+inline long long getTimeLL(struct timespec *time)
+{
+    return time->tv_sec * 1000LL + time->tv_nsec / 1000000;
 }
 
 #endif
