@@ -28,10 +28,9 @@ module BomberboysClient
               else
                 modify_world(message)
                 @player.react(@world)
-              end
             end
           end
-        rescue Exception => ex
+        rescue
           puts "Shutting down client #{@player.name}."
         end
       end
