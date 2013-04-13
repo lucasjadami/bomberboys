@@ -30,13 +30,13 @@ double Packet::getDouble(char* data)
     long long value = 0;
     int mask = 0;
 
-    for (int i = 7; i > -1; --i)
+    for (int i = 3; i > -1; --i)
     {
         value |= data[i] << mask;
         mask = mask << 8;
     }
 
-    int denominator = getInt(data + 8);
+    int denominator = getInt(data + 4);
 
     return (double) value / denominator;
 }
