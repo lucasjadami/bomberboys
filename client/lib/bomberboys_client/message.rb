@@ -13,7 +13,7 @@ module BomberboysClient
       3 => 'C',   4 => 'nnn',   5 => '',
       6 => 'nnn', 7 => 'n',     8 => 'n',
       9 => '',    10 => '',     11 => '',
-      12 => 'qqqq',   13 => ''
+      12 => 'qqqql',   13 => ''
     }
 
     BODY_SIZE = {

@@ -61,8 +61,9 @@ module BomberboysClient
     def send_info
       m = time_mean.to_r
       d = time_dev.to_r
+      l = @server.packet_loss
 
-      @server.send(Message.new(:info, [m.numerator, m.denominator, d.numerator, d.denominator]))
+      @server.send(Message.new(:info, [m.numerator, m.denominator, d.numerator, d.denominator, l]))
     end
 
     def time_mean
