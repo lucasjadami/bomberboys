@@ -79,7 +79,6 @@ bool Socket::updateInBuffer(int& bytesRead)
     {
         int packetId = inBuffer[PACKET_UID_SIZE];
         int size = INT_MAX / 2;
-        debug("%d", packetId);
         switch (packetId)
         {
             case PACKET_LOGIN:
