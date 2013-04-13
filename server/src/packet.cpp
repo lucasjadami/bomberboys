@@ -25,6 +25,22 @@ int Packet::getInt(char* data)
     return value;
 }
 
+double Packet::getDouble(char* data)
+{
+    long long value = 0;
+    int mask = 0;
+
+    for (int i = 7; i > -1; --i)
+    {
+        value |= data[i] << mask;
+        mask = mask << 8;
+    }
+
+    int denominator = getInt(data + 8);
+
+    return (double) value / denominator;
+}
+
 Packet::Packet(int id, char* data)
 {
     uId = 0;

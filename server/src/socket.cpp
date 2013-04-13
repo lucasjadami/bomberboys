@@ -92,6 +92,8 @@ bool Socket::updateInBuffer(int& bytesRead)
                 size = PACKET_ACK_SIZE; break;
             case PACKET_PING:
                 size = PACKET_PING_SIZE; break;
+            case PACKET_INFO:
+                size = PACKET_INFO_SIZE; break;
         }
 
         if (inPointer > PACKET_UID_SIZE + size)
@@ -156,6 +158,8 @@ bool Socket::updateOutBuffer(int& bytesWritten)
                 size = PACKET_FALL_PLAYER_SIZE; break;
             case PACKET_PONG:
                 size = PACKET_PONG_SIZE; break;
+            case PACKET_SHUTDOWN:
+                size = PACKET_SHUTDOWN_SIZE; break;
         }
 
         if (outPointer + size + PACKET_UID_SIZE + 1 <= BUFFER_SIZE)

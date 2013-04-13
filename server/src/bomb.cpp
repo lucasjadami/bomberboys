@@ -6,9 +6,7 @@ Bomb::Bomb(int id)
     this->id = id;
 
     timespec time;
-    getTime(&time);
-
-    plantedTime = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    plantedTime = getTimeLL(getTime(&time));
 }
 
 b2Body* Bomb::getBody()
@@ -24,9 +22,7 @@ void Bomb::setBody(b2Body* body)
 bool Bomb::explode()
 {
     timespec time;
-    getTime(&time);
-
-    long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    long long now = getTimeLL(getTime(&time));
     return now - plantedTime > BOMB_TIME;
 }
 
