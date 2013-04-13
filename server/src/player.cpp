@@ -10,9 +10,7 @@ Player::Player(Socket* socket)
     lastImpulse = 0;
 
     timespec time;
-    getTime(&time);
-
-    lastAck = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    lastAck = getTimeLL(getTime(&time));
 }
 
 Player::~Player()
@@ -65,9 +63,7 @@ bool Player::isLastPositionDifferent()
 void Player::applyImpulse(b2Vec2& impulse)
 {
     timespec time;
-    getTime(&time);
-
-    long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    long long now = getTimeLL(getTime(&time));
     if (now - lastImpulse > 50)
     {
         lastImpulse = now;
@@ -78,8 +74,7 @@ void Player::applyImpulse(b2Vec2& impulse)
 bool Player::isIdle()
 {
     timespec time;
-    getTime(&time);
-    long long now = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    long long now = getTimeLL(getTime(&time));
 
     return now - lastAck > 10000;
 }
@@ -87,6 +82,5 @@ bool Player::isIdle()
 void Player::updateLastAck()
 {
     timespec time;
-    getTime(&time);
-    lastAck = time.tv_sec * 1000LL + time.tv_nsec / 1000000;
+    lastAck = getTimeLL(getTime(&time));
 }

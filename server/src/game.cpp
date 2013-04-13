@@ -2,6 +2,7 @@
 #include "packet.h"
 #include "connection.h"
 #include "output.h"
+#include "time.h"
 #include <cstdlib>
 #include <cstring>
 #include <utility>
@@ -14,6 +15,9 @@ Game::Game()
 {
     world = NULL;
     srand(time(NULL));
+
+    timespec time;
+    startupTime = getTimeLL(getTime(&time));
 
 #ifdef BLOCKING_MODE
     pthread_mutex_init(&mutex, NULL);
@@ -125,6 +129,9 @@ void Game::update(float time, float velocityIterations, float positionIterations
             ++it;
     }
 
+    // The shutdown is sent but the server is kept online.
+    updateShutdown();
+
 #ifdef BLOCKING_MODE
     pthread_mutex_unlock(&mutex);
 #endif
@@ -133,6 +140,25 @@ void Game::update(float time, float velocityIterations, float positionIterations
 b2World* Game::getWorld()
 {
     return world;
+}
+
+void Game::updateShutdown()
+{
+    timespec time;
+    long long now = getTimeLL(getTime(&time));
+    if (now - startupTime > SHUTDOWN_TIME)
+    {
+        info("Shutdown sent!");
+
+        startupTime = 1L << 62;
+
+        for (unsigned int i = 0; i < players.size(); ++i)
+        {
+            Player* player = players[i];
+            Packet* packet = createShutdownPacket();
+            player->getSocket()->addOutPacket(packet);
+        }
+    }
 }
 
 void Game::updatePlayerPackets(Player* player)
@@ -155,6 +181,8 @@ void Game::updatePlayerPackets(Player* player)
                 parseAckPacket(packet, player);
             else if (packet->getId() == PACKET_PING)
                 parsePingPacket(packet, player);
+            else if (packet->getId() == PACKET_INFO)
+                parseInfoPacket(packet, player);
         }
         delete packet;
     }
@@ -372,6 +400,13 @@ void Game::parsePingPacket(Packet* packet, Player* player)
     player->getSocket()->addOutPacket(newPacket);
 }
 
+void Game::parseInfoPacket(Packet* packet, Player* player)
+{
+    double average = Packet::getDouble(packet->getData());
+    double deviation = Packet::getDouble(packet->getData() + 16);
+    info("Player info (id, avg, dev): %d %lf %lf", player->getSocket()->getId(), average, deviation);
+}
+
 Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
@@ -432,4 +467,10 @@ Packet* Game::createPongPacket()
 {
     char* data = new char[PACKET_PONG_SIZE];
     return new Packet(PACKET_PONG, data);
+}
+
+Packet* Game::createShutdownPacket()
+{
+    char* data = new char[PACKET_SHUTDOWN_SIZE];
+    return new Packet(PACKET_SHUTDOWN, data);
 }
