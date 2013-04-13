@@ -6,11 +6,12 @@ require_relative '../lib/bomberboys_client'
 include BomberboysClient
 
 n_bots      = (ARGV.shift || 1).to_i
+trash       = (ARGV.shift || 0).to_i
 socket_type = (ARGV.shift || :tcp).to_sym
 address     = (ARGV.shift || 'localhost')
 port        = (ARGV.shift || 10011).to_i
 
-puts "Usage (all optional params): bb_bot n_bots [tcp|udp] address port\n"
+puts "Usage (all optional params): bb_bot n_bots trash_size [tcp|udp] address port\n"
 
 clients = []
 n_bots.times do
@@ -26,7 +27,7 @@ n_bots.times do
   end
 
   name = "not_a_bot_#{(rand*10000000000).to_i}"
-  clients << Client.new(RandomBot.new(ServerInterface.new(socket), name))
+  clients << Client.new(RandomBot.new(ServerInterface.new(socket, trash), name))
 end
 
 Thread.abort_on_exception = true
