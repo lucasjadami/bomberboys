@@ -7,19 +7,12 @@ include BomberboysClient
 
 n_bots      = (ARGV.shift || 1).to_i
 socket_type = (ARGV.shift || :tcp).to_sym
-bot_type    = ARGV.shift == 'random' ? RandomBot : DummyBot
-address     = ARGV.shift || 'localhost'
+address     = (ARGV.shift || 'localhost')
 port        = (ARGV.shift || 10011).to_i
-name        = ARGV.shift || "not_a_bot_#{(rand*10000000000).to_i}"
 
-puts "Usage (all optional params): bb_bot n_bots [tcp|udp] [random|dummy] address port login_name"
-puts
-puts "setup:"
-puts "#{n_bots} bot(s) of #{bot_type} type. Each client connecting with server by #{address}:#{port} (#{socket_type})"
+puts "Usage (all optional params): bb_bot n_bots [tcp|udp] address port\n"
 
-bots    = []
 clients = []
-
 n_bots.times do
   begin
     if socket_type == :udp
@@ -32,18 +25,22 @@ n_bots.times do
     raise "No server listening on #{address}:#{port}"
   end
 
-  client = Client.new(ServerInterface.new(socket), name)
-  game = Game.new
-  client.register(game)
-  clients << client
-  bots << bot_type.new(game, client)
+  name = "not_a_bot_#{(rand*10000000000).to_i}"
+  clients << Client.new(RandomBot.new(ServerInterface.new(socket), name))
 end
 
 Thread.abort_on_exception = true
 
 clients.map(&:connect)
 clients.map(&:start)
-puts 'All clients initialized'
-bots.map(&:play)
-puts 'All bots playing'
-bots.map(&:join)
+
+Thread.new do
+  loop do
+    sleep(5)
+    clients.each { |c| c.ack }
+  end
+end
+
+puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
+
+clients.map(&:join)

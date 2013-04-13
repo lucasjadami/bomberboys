@@ -1,66 +1,41 @@
 module BomberboysClient
-  class DummyBot
-    DIRECTIONS = [:ne, :n, :nw, :w, :sw, :s, :se, :e] 
-
-    def initialize(board, connection)
-      @board = board
-      @connection = connection
+  class DummyBot < LocalPlayer
+    def initialize(server)
+      super(server)
     end
 
-    def play
-      @thread = Thread.new do
-        10.times { move_me DIRECTIONS.sample }
-        plant_bomb
+    def react(world)
+      local = world.local
 
-        loop do
-          if local.x > 550
-            move_me :w
-          elsif local.x < 50
-            move_me :e
-          elsif local.y > 370
-            move_me :s
-          elsif local.y < 50
-            move_me :n
-          elsif bomb = @board.dangerous_bombs.first
-            move_me opposite_direction(bomb)
-          elsif @board.attackable_players.any?
-            plant_bomb
-            move_me(DIRECTIONS.sample)
-          elsif (player = @board.nearest_players.first) && @board.local_bomb && @board.local_bomb.exploded?
-            move_me direction(player)
-          end
-        end
+      if local.x > 550
+        move_me :w
+      elsif local.x < 50
+        move_me :e
+      elsif local.y > 370
+        move_me :s
+      elsif local.y < 50
+        move_me :n
+      elsif bomb = world.dangerous_bombs.first
+        move_me opposite_direction(local, bomb)
+      elsif world.attackable_players.any?
+        plant_bomb
+        move_me(DIRECTIONS.sample)
+      elsif (player = world.nearest_players.first) && world.local_bomb && world.local_bomb.exploded?
+        move_me direction(local, player)
       end
     end
 
-    def join
-      @thread.join
-    end
-
     private
-    def opposite_direction(bomb)
+    def opposite_direction(local, bomb)
       cardinal_direction(Math.atan2(bomb.y - local.y, bomb.x - local.x) + Math::PI)
     end
 
-    def direction(obj)
+    def direction(local, obj)
       cardinal_direction(Math.atan2(obj.y - local.y, obj.x - local.x))
     end
 
     def cardinal_direction(angle)
       DIRECTIONS[(4*angle/Math::PI - 0.5).ceil - 1]
-    end
-
-    def move_me(direction)
-      @connection.move_me(direction)
-      sleep 0.5
-    end
-
-    def plant_bomb
-      @connection.plant_bomb
-    end
-
-    def local
-      @board.local
     end
   end
 end
