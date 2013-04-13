@@ -38,6 +38,7 @@ Thread.new do
   loop do
     sleep(5)
     clients.each { |c| c.ack }
+    clients.first.ping
   end
 end
 
