@@ -404,7 +404,8 @@ void Game::parseInfoPacket(Packet* packet, Player* player)
 {
     double average = Packet::getDouble(packet->getData());
     double deviation = Packet::getDouble(packet->getData() + 16);
-    info("Player info (id, avg, dev): %d %lf %lf", player->getSocket()->getId(), average, deviation);
+    int packetsLost = Packet::getInt(packet->getData() + 32);
+    info("Player info (id, avg, dev, ploss): %d %lf %lf %d", player->getSocket()->getId(), average, deviation, packetsLost);
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)
