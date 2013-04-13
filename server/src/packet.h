@@ -32,7 +32,7 @@
 #define PACKET_ACK_SIZE             0 + TRASH_SIZE
 #define PACKET_PING_SIZE            0 + TRASH_SIZE
 #define PACKET_PONG_SIZE            0 + TRASH_SIZE
-#define PACKET_INFO_SIZE            4 + 4 + 4 + 4 + TRASH_SIZE
+#define PACKET_INFO_SIZE            8 + 8 + 8 + 8 + TRASH_SIZE
 #define PACKET_SHUTDOWN_SIZE        0 + TRASH_SIZE
 
 class Packet

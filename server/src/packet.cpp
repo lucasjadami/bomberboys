@@ -27,18 +27,25 @@ int Packet::getInt(char* data)
 
 double Packet::getDouble(char* data)
 {
-    long long value = 0;
+    long long numerator = 0;
     int mask = 0;
 
-    for (int i = 3; i > -1; --i)
+    for (int i = 7; i > -1; --i)
     {
-        value |= data[i] << mask;
+        numerator |= data[i] << mask;
         mask = mask << 8;
     }
 
-    int denominator = getInt(data + 4);
+    long long denominator = 0;
+    mask = 0;
 
-    return (double) value / denominator;
+    for (int i = 7; i > -1; --i)
+    {
+        denominator |= data[i] << mask;
+        mask = mask << 8;
+    }
+
+    return (double) numerator / denominator;
 }
 
 Packet::Packet(int id, char* data)
