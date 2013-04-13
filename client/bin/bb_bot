@@ -42,6 +42,14 @@ Thread.abort_on_exception = true
 clients.map(&:connect)
 clients.map(&:start)
 puts 'All clients initialized'
+
+Thread.new do
+  loop do
+    sleep(5)
+    clients.each { |c| c.ack }
+  end
+end
+
 bots.map(&:play)
 puts 'All bots playing'
 bots.map(&:join)

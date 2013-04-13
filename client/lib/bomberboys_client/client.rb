@@ -15,10 +15,6 @@ module BomberboysClient
     end
 
     def start
-      Thread.new do 
-        loop { sleep 5; ack }
-      end
-
       Thread.new do
         while message = @server.receive
           send_to_listeners(message)
@@ -39,14 +35,13 @@ module BomberboysClient
       @server.send(Message.new(:plant_bomb))
     end
 
+    def ack
+      @server.send(Message.new(:ack))
+    end
+
     private
     def login
       @server.send(Message.new(:login, [@login_name]))
-    end
-
-    def ack
-      @server.send(Message.new(:ack))
-      puts 'ack!'
     end
   end
 end

@@ -8,7 +8,7 @@ module BomberboysClient
     end
 
     def play
-      @thread = Thread.new { loop { react(world) }
+      @thread = Thread.new { loop { react(world) } }
     end
 
     def react(world)
