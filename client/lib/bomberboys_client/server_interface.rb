@@ -13,7 +13,11 @@ module BomberboysClient
 
     def receive
       begin
-        @buffer << @socket.recv(1024)
+        begin 
+          @buffer << @socket.recv(100 + @trash_size)
+          uid, action = @buffer.slice(0..4).unpack('NC')
+        end until Message::BODY_SIZE[action] && @buffer.size - 5 >= Message::BODY_SIZE[action] + @trash_size
+
         uid, action = @buffer.slice!(0..4).unpack('NC')
         str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
         @buffer.slice!(0...@trash_size)
