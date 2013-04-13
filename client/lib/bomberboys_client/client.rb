@@ -1,29 +1,26 @@
 module BomberboysClient
   class Client
-    def initialize(server, login)
+    def initialize(server, login_name)
       @server = server 
-      @login_name = login
-    end
-
-    def register(listener)
-      @listener = listener 
+      @login_name = login_name
+      @world = World.new
     end
 
     def connect
       login
-      send_to_listeners(@server.receive)
+      modify_world(@server.receive)
     end
 
     def start
       Thread.new do
         while message = @server.receive
-          send_to_listeners(message)
+          modify_world(message)
         end
       end
     end
 
-    def send_to_listeners(message)
-      @listener.send(message.action, *message.params) if @listener.respond_to?(message.action)
+    def modify_world(message)
+      @world.send(message.action, *message.params) if @world.respond_to?(message.action)
     end
 
     def ack

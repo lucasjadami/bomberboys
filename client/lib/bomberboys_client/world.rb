@@ -1,5 +1,5 @@
 module BomberboysClient
-  class Game
+  class World 
     attr_reader :players
     attr_reader :bombs
     attr_reader :local_id
