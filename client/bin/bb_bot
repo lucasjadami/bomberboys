@@ -7,15 +7,13 @@ include BomberboysClient
 
 n_bots      = (ARGV.shift || 1).to_i
 socket_type = (ARGV.shift || :tcp).to_sym
-bot_type    = ARGV.shift == 'random' ? RandomBot : DummyBot
-address     = ARGV.shift || 'localhost'
+address     = (ARGV.shift || 'localhost')
 port        = (ARGV.shift || 10011).to_i
-name        = ARGV.shift || "not_a_bot_#{(rand*10000000000).to_i}"
 
-puts "Usage (all optional params): bb_bot n_bots [tcp|udp] [random|dummy] address port login_name"
+puts "Usage (all optional params): bb_bot n_bots [tcp|udp] address port"
 puts
 puts "setup:"
-puts "#{n_bots} bot(s) of #{bot_type} type. Each client connecting with server by #{address}:#{port} (#{socket_type})"
+puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
 
 bots    = []
 clients = []
@@ -32,11 +30,11 @@ n_bots.times do
     raise "No server listening on #{address}:#{port}"
   end
 
-  client = Client.new(ServerInterface.new(socket), name)
+  client = Client.new(ServerInterface.new(socket), "not_a_bot_#{(rand*10000000000).to_i}")
   game = Game.new
   client.register(game)
   clients << client
-  bots << bot_type.new(game, client)
+  bots << RandomBot.new(game, client)
 end
 
 Thread.abort_on_exception = true
