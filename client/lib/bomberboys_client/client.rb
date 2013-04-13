@@ -21,7 +21,6 @@ module BomberboysClient
             case message.action
               when :pong
                 @times << (Time.now - @start_time)
-                puts "pong received (intervals = #{@times})"
               when :shutdown
                 send_info
                 @shutdown = true
@@ -76,7 +75,7 @@ module BomberboysClient
 
     def time_variance
       m = time_mean
-      @times.inject(0) { |accum, i| accum + (i - m)**2 } / @times.length.to_f
+      @times.inject(0) { |accum, i| accum + (i - m)**2 } / (@times.length - 1).to_f
     end
   end
 end
