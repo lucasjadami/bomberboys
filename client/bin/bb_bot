@@ -30,11 +30,13 @@ n_bots.times do
     raise "No server listening on #{address}:#{port}"
   end
 
-  client = Client.new(ServerInterface.new(socket), "not_a_bot_#{(rand*10000000000).to_i}")
+  server = ServerInterface.new(socket)
   game = Game.new
+  bots << RandomBot.new(game, server)
+
+  client = Client.new(server, "not_a_bot_#{(rand*10000000000).to_i}")
   client.register(game)
   clients << client
-  bots << RandomBot.new(game, client)
 end
 
 Thread.abort_on_exception = true
