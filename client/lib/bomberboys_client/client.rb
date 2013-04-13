@@ -8,7 +8,6 @@ module BomberboysClient
 
     def connect
       login
-      modify_world(@server.receive)
     end
 
     def start
