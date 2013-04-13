@@ -5,6 +5,7 @@ module BomberboysClient
       @player = player
       @server = @player.socket
       @times  = []
+      @shutdown = false
     end
 
     def connect
@@ -16,15 +17,15 @@ module BomberboysClient
 
       @thread = Thread.new do
         begin
-          while message = @server.receive && !shutdown
+          while (message = @server.receive) && !@shutdown
             case message.action
               when :pong
                 @times << (Time.now - @start_time)
                 puts "pong received (intervals = #{@times})"
               when :shutdown
                 send_info
-                shutdown = true
-                puts "Shutting down client #{@player.name}."
+                @shutdown = true
+                puts "Shutting down client #{@player.name}. (msg received)"
               else
                 modify_world(message)
                 @player.react(@world)
@@ -50,7 +51,7 @@ module BomberboysClient
 
     def ping
       @start_time = Time.now
-      @server.send(Message.new(:ping))
+      @server.send(Message.new(:ping)) unless @shutdown
     end
 
     private
@@ -74,7 +75,7 @@ module BomberboysClient
     end
 
     def time_variance
-      mean = time_mean
+      m = time_mean
       @times.inject(0) { |accum, i| accum + (i - m)**2 } / @times.length.to_f
     end
   end
