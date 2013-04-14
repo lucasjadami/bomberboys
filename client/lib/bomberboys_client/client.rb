@@ -11,11 +11,6 @@ module BomberboysClient
       @informer = false
     end
 
-    def connect
-      login
-      interpret(@server.receive)
-    end
-
     def start
       initialize_receiver
       initialize_player
@@ -64,6 +59,7 @@ module BomberboysClient
 
     def initialize_player
       @player_thread = Thread.new do
+        login
         until @shutdown
           @player.react(@world)
           sleep 0.1
