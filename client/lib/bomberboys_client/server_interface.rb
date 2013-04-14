@@ -14,7 +14,7 @@ module BomberboysClient
 
     def receive
       while @processed_messages.empty?
-        @buffer << @socket.recv(1024)
+        @buffer << @socket.recv(256)
         process_buffer
       end
 
