@@ -19,6 +19,9 @@ module BomberboysClient
     def join
       @receiver_thread.join
       @player_thread.join
+    end
+
+    def close_socket
       @server.close
     end
 

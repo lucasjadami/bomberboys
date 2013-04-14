@@ -47,4 +47,5 @@ end
 puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
 
 clients.map(&:join)
+clients.map(&:close_socket)
 report_thread.kill
