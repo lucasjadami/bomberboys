@@ -36,6 +36,10 @@ module BomberboysClient
       @client_uid_count += 1
     end
 
+    def close
+      @socket.close
+    end
+
     private
     def process_buffer
       uid, action = @buffer.slice(0..4).unpack('NC')

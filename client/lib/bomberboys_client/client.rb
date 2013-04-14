@@ -24,6 +24,7 @@ module BomberboysClient
     def join
       @receiver_thread.join
       @player_thread.join
+      @server.close
     end
 
     def modify_world(message)
