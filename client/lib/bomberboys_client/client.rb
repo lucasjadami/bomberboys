@@ -42,7 +42,7 @@ module BomberboysClient
     private
     def initialize_receiver
       @receiver_thread = Thread.new do
-        while (message = @server.receive) && !@shutdown
+        while !@shutdown && message = @server.receive
           interpret(message)
         end
         puts "Shutting down client #{@player.name}."
