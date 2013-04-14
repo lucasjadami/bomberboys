@@ -150,7 +150,7 @@ void Game::updateShutdown()
     {
         info("Shutdown sent!");
 
-        startupTime = 1L << 62;
+        startupTime = 1LL << 62;
 
         for (unsigned int i = 0; i < players.size(); ++i)
         {
