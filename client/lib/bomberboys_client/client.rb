@@ -1,43 +1,29 @@
 module BomberboysClient
   class Client
+    attr_accessor :informer
+
     def initialize(player)
       @world = World.new
       @player = player
       @server = @player.socket
       @times  = []
       @shutdown = false
+      @informer = false
     end
 
     def connect
       login
+      interpret(@server.receive)
     end
 
     def start
-      shutdown = false
-
-      @thread = Thread.new do
-        begin
-          while (message = @server.receive) && !@shutdown
-            case message.action
-              when :pong
-                @times << (Time.now - @start_time)
-              when :shutdown
-                send_info
-                @shutdown = true
-                puts "Shutting down client #{@player.name}. (msg received)"
-              else
-                modify_world(message)
-                @player.react(@world)
-            end
-          end
-        rescue
-          puts "Shutting down client #{@player.name}."
-        end
-      end
+      initialize_receiver
+      initialize_player
     end
 
     def join
-      @thread.join
+      @receiver_thread.join
+      @player_thread.join
     end
 
     def modify_world(message)
@@ -54,6 +40,36 @@ module BomberboysClient
     end
 
     private
+    def initialize_receiver
+      @receiver_thread = Thread.new do
+        while (message = @server.receive) && !@shutdown
+          interpret(message)
+        end
+        puts "Shutting down client #{@player.name}."
+      end
+    end
+
+    def interpret(message)
+      case message.action
+        when :pong
+          @times << (Time.now - @start_time)
+        when :shutdown
+          send_info if @informer
+          @shutdown = true
+        else
+          modify_world(message)
+      end
+    end
+
+    def initialize_player
+      @player_thread = Thread.new do
+        until @shutdown
+          @player.react(@world)
+          sleep 0.1
+        end
+      end
+    end
+
     def login
       @server.send(Message.new(:login, [@player.name]))
     end
