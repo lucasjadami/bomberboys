@@ -1,3 +1,7 @@
-# Temp files
+# Temp or fuse hidden files
 *~
+.fuse*
 
+# Folders
+bin
+output
