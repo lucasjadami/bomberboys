@@ -9,20 +9,17 @@ module BomberboysClient
       @packet_loss = 0
       @trash_size  = trash_size
       @buffer      = ""
+      @processed_messages = []
     end
 
     def receive
+      while @processed_messages.empty?
+        @buffer << @socket.recv(256)
+        process_buffer
+      end
+
       begin
-        begin 
-          @buffer << @socket.recv(100 + @trash_size)
-          uid, action = @buffer.slice(0..4).unpack('NC')
-        end until Message::BODY_SIZE[action] && @buffer.size - 5 >= Message::BODY_SIZE[action] + @trash_size
-
-        uid, action = @buffer.slice!(0..4).unpack('NC')
-        str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
-        @buffer.slice!(0...@trash_size)
-
-        message = Message.new(action, str_params, uid)
+        message = @processed_messages.shift
       end while message.uid < @server_uid_count
 
       @packet_loss += message.uid - @server_uid_count - 1
@@ -39,7 +36,28 @@ module BomberboysClient
       @client_uid_count += 1
     end
 
+    def close
+      @socket.close
+    end
+
     private
+    def process_buffer
+      uid, action = @buffer.slice(0..4).unpack('NC')
+      while is_ready_to_process(action)
+        uid, action = @buffer.slice!(0..4).unpack('NC')
+        str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
+        @buffer.slice!(0...@trash_size)
+
+        @processed_messages << Message.new(action, str_params, uid)
+
+        uid, action = @buffer.slice(0..4).unpack('NC')
+      end
+    end
+
+    def is_ready_to_process(action)
+      Message::BODY_SIZE[action] && @buffer.size - 5 >= Message::BODY_SIZE[action] + @trash_size
+    end
+
     def append_trash(str)
       str << '*' * @trash_size
     end

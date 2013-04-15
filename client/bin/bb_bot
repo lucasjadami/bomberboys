@@ -34,13 +34,12 @@ clients.first.informer = true
 
 Thread.abort_on_exception = true
 
-clients.map(&:connect)
 clients.map(&:start)
 
-Thread.new do
+report_thread = Thread.new do
   loop do
     sleep(5)
-    clients.each { |c| c.ack }
+    clients.each(&:ack)
     clients.first.ping
   end
 end
@@ -48,3 +47,5 @@ end
 puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
 
 clients.map(&:join)
+clients.map(&:close_socket)
+report_thread.kill

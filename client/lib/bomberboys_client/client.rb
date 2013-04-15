@@ -11,11 +11,6 @@ module BomberboysClient
       @informer = false
     end
 
-    def connect
-      login
-      interpret(@server.receive)
-    end
-
     def start
       initialize_receiver
       initialize_player
@@ -24,6 +19,10 @@ module BomberboysClient
     def join
       @receiver_thread.join
       @player_thread.join
+    end
+
+    def close_socket
+      @server.close
     end
 
     def modify_world(message)
@@ -42,7 +41,7 @@ module BomberboysClient
     private
     def initialize_receiver
       @receiver_thread = Thread.new do
-        while (message = @server.receive) && !@shutdown
+        while !@shutdown && message = @server.receive
           interpret(message)
         end
         puts "Shutting down client #{@player.name}."
@@ -63,6 +62,7 @@ module BomberboysClient
 
     def initialize_player
       @player_thread = Thread.new do
+        login
         until @shutdown
           @player.react(@world)
           sleep 0.1
