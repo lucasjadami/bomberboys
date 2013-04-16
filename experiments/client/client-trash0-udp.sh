@@ -1,3 +1,3 @@
 #!/bin/sh
 
-../../client/bin/bb_bot 10 0 udp vm1-h10
+~/bomberboys/client/bin/bb_bot 10 0 udp vm1-h10
