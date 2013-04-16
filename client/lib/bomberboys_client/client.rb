@@ -9,6 +9,7 @@ module BomberboysClient
       @times  = []
       @shutdown = false
       @informer = false
+      @pongs_received = 0
     end
 
     def start
@@ -51,6 +52,7 @@ module BomberboysClient
     def interpret(message)
       case message.action
         when :pong
+          @pongs_received += 1
           @times << (Time.now - @start_time)
         when :shutdown
           send_info if @informer
@@ -78,6 +80,8 @@ module BomberboysClient
       m = time_mean.to_r
       d = time_dev.to_r
       l = @server.packet_loss
+
+      puts "mean: #{time_mean}, dev: #{time_dev}, loss: #{@server.packet_loss}, pongs: #{@pongs_received}"
 
       @server.send(Message.new(:info, [m.numerator, m.denominator, d.numerator, d.denominator, l]))
     end
