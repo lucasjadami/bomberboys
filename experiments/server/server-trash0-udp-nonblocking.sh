@@ -1,5 +1,6 @@
 #!/bin/sh
 
 ALIAS=server-trash0-udp-nonblocking
-./server.sh $ALIAS
+CLIENT=client-trash0-udp.sh
+./server.sh $ALIAS $CLIENT
 

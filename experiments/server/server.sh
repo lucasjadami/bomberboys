@@ -1,11 +1,15 @@
 #!/bin/bash
-#Params: server executable (a bin folder must be created on the same directory)
+# Params: 
+#	$1: server executable (a bin folder must be created on the same directory)
+#	$2: clients script
 
 if [ ! -d "output" ]; then
 	mkdir output
 fi
 
-runTime=10
+startupTime=5
+runTime=70
+waitTime=30
 
 echo "Running experiment for $1"
 
@@ -18,10 +22,18 @@ for executionId in `seq 1 10`; do
 	./bin/$1 > output/$1-$executionId.server &
 	pId=$!
 	
-	sleep $runTime
+	sleep $startupTime
+	../client/$2 &
+	
+	sleep $runTime - $startupTime
+	# Server sent shutdown, save CPU usage.
+	cat /proc/loadavg > output/$1-$executionId.cpu
+	
+	# Wait for clients to finalize.
+	sleep $waitTime
+	
 	# Send SIGINT (2, CTRL + C) to the server to terminate properly.
 	kill -2 $pId
 	
-	cat /proc/loadavg > output/$1-$executionId.cpu
 done 
 

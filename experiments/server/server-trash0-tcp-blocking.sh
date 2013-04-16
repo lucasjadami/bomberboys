@@ -1,5 +1,6 @@
 #!/bin/sh
 
 ALIAS=server-trash0-tcp-blocking
-./server.sh $ALIAS
+CLIENT=client-trash0-tcp.sh
+./server.sh $ALIAS $CLIENT
 
