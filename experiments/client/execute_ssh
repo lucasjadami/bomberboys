@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'net/ssh'
+
+client_hosts = [
+"vm1-h15", "vm2-h15", "vm3-h15", "vm4-h15", "vm1-h16",
+"vm2-h16", "vm3-h16", "vm4-h16", "vm1-h17", "vm2-h17"
+]
+
+command = ARGV.join(" ")
+username = 'rafael'
+password = 'rafael'
+
+Thread.abort_on_exception = true
+threads = client_hosts.map do |c|
+  Thread.new do
+    begin
+      ssh = Net::SSH.start(c, username, :password => password)
+      res = ssh.exec!(command)
+      ssh.close
+
+      puts "\033[0;32mclient on #{c}\033[0m"
+      puts res
+    rescue
+      puts "Unable to connect to #{@hostname} using with this username/password"
+    end
+  end
+end
+
+threads.each(&:join)
