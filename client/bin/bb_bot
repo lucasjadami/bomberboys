@@ -38,7 +38,7 @@ clients.map(&:start)
 
 report_thread = Thread.new do
   loop do
-    sleep(5)
+    sleep(1)
     clients.each(&:ack)
     clients.first.ping
   end
