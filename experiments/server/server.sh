@@ -8,7 +8,7 @@ if [ ! -d "output" ]; then
 fi
 
 startupTime=5
-runTime=70
+runTime=65
 waitTime=30
 finalizeTime=10
 
@@ -26,7 +26,7 @@ for executionId in `seq 1 10`; do
 	echo "Launching clients"
 	../client/execute_ssh $2 &
 	
-	sleep $runTime - $startupTime
+	sleep $runTime
 	# Server sent shutdown, save CPU usage.
 	echo "Shutdown, saving CPU usage"
 	cat /proc/loadavg > output/$1-$executionId.cpu
