@@ -1,6 +1,6 @@
 #!/bin/sh
 
 ALIAS=server-trash100-udp-blocking
-CLIENT="./client-trash100-udp.sh"
+CLIENT="~/bomberboys/experiments/client/client-trash100-udp.sh"
 ./server.sh $ALIAS $CLIENT
 
