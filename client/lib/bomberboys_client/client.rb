@@ -3,13 +3,13 @@ module BomberboysClient
     attr_accessor :informer
 
     def initialize(player)
+      @pongs_received = 0
       @world = World.new
       @player = player
       @server = @player.socket
       @times  = []
       @shutdown = false
       @informer = false
-      @pongs_received = 0
     end
 
     def start

@@ -18,7 +18,7 @@ module BomberboysClient
           @buffer << @socket.recv(256)
           process_buffer
         rescue
-          puts "Could not receive message. (server closed the pipe)"
+          raise "Could not receive message. (server closed the pipe)"
         end
       end
 
@@ -38,7 +38,7 @@ module BomberboysClient
         @socket.print(append_trash(message.pack))
         @client_uid_count += 1
       rescue
-        puts "Could not send message. (server closed the pipe)"
+        raise "Could not send message. (server closed the pipe)"
       end
     end
 
