@@ -14,8 +14,12 @@ module BomberboysClient
 
     def receive
       while @processed_messages.empty?
-        @buffer << @socket.recv(256)
-        process_buffer
+        begin
+          @buffer << @socket.recv(256)
+          process_buffer
+        rescue
+          puts "Could not receive message. (server closed the pipe)"
+        end
       end
 
       begin
@@ -29,11 +33,13 @@ module BomberboysClient
     end
 
     def send(message)
-      message.uid = @client_uid_count
-
-      @socket.print(append_trash(message.pack))
-
-      @client_uid_count += 1
+      begin
+        message.uid = @client_uid_count
+        @socket.print(append_trash(message.pack))
+        @client_uid_count += 1
+      rescue
+        puts "Could not send message. (server closed the pipe)"
+      end
     end
 
     def close
