@@ -9,8 +9,9 @@ fi
 
 startupTime=5
 runTime=65
+totalTime=70
 waitTime=30
-finalizeTime=10
+finalizeTime=5
 
 echo "Running experiment for $1"
 
@@ -22,21 +23,27 @@ for executionId in `seq 1 10`; do
 	./bin/$1 > output/$1-$executionId.server &
 	pId=$!
 	
+	echo "Launching vmstat"
+	vmstat 2 $totalTime > output/$1-$executionId.cpu &
+	
+	echo "Waiting $startupTime seconds (startup)"
 	sleep $startupTime
 	echo "Launching clients"
 	../client/execute_ssh $2 &
 	
+	echo "Waiting $runTime seconds (run time)"
 	sleep $runTime
-	# Server sent shutdown, save CPU usage.
-	echo "Shutdown, saving CPU usage"
-	cat /proc/loadavg > output/$1-$executionId.cpu
+	# Server sent shutdown.
+	echo "Shutdown sent"
 	
+	echo "Waiting $waitTime seconds (clients finalizing)"
 	# Wait for clients to finalize.
 	sleep $waitTime
 	
 	# Send SIGINT (2, CTRL + C) to the server to terminate properly.
 	echo "Terminating server"
 	kill -2 $pId
+	echo "Waiting $finalizeTime seconds (server finalizing)"
 	sleep $finalizeTime
 	
 done 
