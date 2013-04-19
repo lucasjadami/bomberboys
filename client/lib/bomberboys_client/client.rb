@@ -53,7 +53,7 @@ module BomberboysClient
       case message.action
         when :pong
           @pongs_received += 1
-          @times << (Time.now - @start_time)
+          @times << (Time.now - @start_time) if @start_time
         when :shutdown
           send_info if @informer
           @shutdown = true

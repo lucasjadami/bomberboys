@@ -1,3 +1,5 @@
+require 'thread'
+
 module BomberboysClient
   class ServerInterface 
     attr_reader :packet_loss
@@ -10,20 +12,19 @@ module BomberboysClient
       @trash_size  = trash_size
       @buffer      = ""
       @processed_messages = []
+
+      @send_queue = Queue.new
+      @receive_queue = Queue.new
+    end
+
+    def start
+      start_sender
+      start_receiver
     end
 
     def receive
-      while @processed_messages.empty?
-        begin
-          @buffer << @socket.recv(256)
-          process_buffer
-        rescue
-          raise "Could not receive message. (server closed the pipe)"
-        end
-      end
-
       begin
-        message = @processed_messages.shift
+        message = @receive_queue.pop
       end while message.uid < @server_uid_count
 
       @packet_loss += message.uid - @server_uid_count - 1
@@ -33,30 +34,46 @@ module BomberboysClient
     end
 
     def send(message)
-      begin
-        message.uid = @client_uid_count
-        @socket.print(append_trash(message.pack))
-        @client_uid_count += 1
-      rescue
-        raise "Could not send message. (server closed the pipe)"
-      end
+      @send_queue << message
     end
 
     def close
+      @receive_thread.kill
+      @send_thread.kill
+      @receive_queue.clear
+      @send_queue.clear
+      @socket.shutdown(:SHUT_RDWR)
       @socket.close
     end
 
     private
-    def process_buffer
-      uid, action = @buffer.slice(0..4).unpack('NC')
-      while is_ready_to_process(action)
-        uid, action = @buffer.slice!(0..4).unpack('NC')
-        str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
-        @buffer.slice!(0...@trash_size)
+    def start_sender
+      @send_thread = Thread.new do
+        loop do
+          message = @send_queue.pop
+          message.uid = @client_uid_count
+          @socket.print(append_trash(message.pack))
+          @client_uid_count += 1
+        end
+      end
+    end
 
-        @processed_messages << Message.new(action, str_params, uid)
+    def start_receiver
+      @receive_thread = Thread.new do
+        loop do
+          @buffer << @socket.recv(256)
 
-        uid, action = @buffer.slice(0..4).unpack('NC')
+          uid, action = @buffer.slice(0..4).unpack('NC')
+          while is_ready_to_process(action)
+            uid, action = @buffer.slice!(0..4).unpack('NC')
+            str_params  = @buffer.slice!(0...Message::BODY_SIZE[action])
+            @buffer.slice!(0...@trash_size)
+
+            @receive_queue << Message.new(action, str_params, uid)
+
+            uid, action = @buffer.slice(0..4).unpack('NC')
+          end
+        end
       end
     end
 
