@@ -26,28 +26,18 @@ n_bots.times do
     raise "No server listening on #{address}:#{port}"
   end
 
-  name = "not_a_bot_#{(rand*10000000000).to_i}"
   interface = ServerInterface.new(socket, trash)
   interface.start
-  clients << Client.new(RandomBot.new(interface, name))
+  client = Client.new(RandomBot.new(interface, "not_a_bot_#{(rand*10000000000).to_i}"))
+  client.start
+  clients << client
 end
 
 clients.first.informer = true
 
 Thread.abort_on_exception = true
 
-clients.map(&:start)
-
-report_thread = Thread.new do
-  loop do
-    sleep(0.5)
-    clients.each(&:ack)
-    clients.first.ping
-  end
-end
-
 puts "#{n_bots} bot(s). Each one connected with server on #{address}:#{port} (#{socket_type})"
 
 clients.map(&:join)
 clients.map(&:close_socket)
-report_thread.kill

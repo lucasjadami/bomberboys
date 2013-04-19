@@ -15,11 +15,13 @@ module BomberboysClient
     def start
       initialize_receiver
       initialize_player
+      initialize_control
     end
 
     def join
       @receiver_thread.join
       @player_thread.join
+      @info_thread.join
     end
 
     def close_socket
@@ -72,6 +74,14 @@ module BomberboysClient
       end
     end
 
+    def initialize_control
+      @info_thread = Thread.new do
+        sleep(1)
+        ack
+        ping if @informer
+      end
+    end
+
     def login
       @server.send(Message.new(:login, [@player.name]))
     end
@@ -80,8 +90,6 @@ module BomberboysClient
       m = time_mean.to_r
       d = time_dev.to_r
       l = @server.packet_loss
-
-      puts "mean: #{time_mean}, dev: #{time_dev}, loss: #{@server.packet_loss}, pongs: #{@pongs_received}"
 
       @server.send(Message.new(:info, [m.numerator, m.denominator, d.numerator, d.denominator, l]))
     end
