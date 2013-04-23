@@ -76,9 +76,11 @@ module BomberboysClient
 
     def initialize_control
       @info_thread = Thread.new do
-        sleep(1)
-        ack
-        ping if @informer
+        until @shutdown
+          sleep(1)
+          ack
+          ping if @informer
+        end
       end
     end
 
