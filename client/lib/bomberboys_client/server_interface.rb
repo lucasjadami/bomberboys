@@ -82,7 +82,8 @@ module BomberboysClient
     end
 
     def append_trash(str)
-      str << '*' * @trash_size
+      @trash ||= '*' * @trash_size
+      str << @trash
     end
   end
 end
