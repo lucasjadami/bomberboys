@@ -1,0 +1,16 @@
+project.ext.set("sourceCompatibility", 1.7)
+
+version = '1'
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'application'
+
+mainClassName = "com.bomberboys.main.Main"
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+  options.compilerArgs = ['-Xlint:all']
+}
