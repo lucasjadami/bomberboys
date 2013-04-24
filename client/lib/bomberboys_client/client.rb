@@ -15,7 +15,6 @@ module BomberboysClient
     def start
       initialize_receiver
       initialize_player
-      initialize_control
     end
 
     def join
@@ -44,8 +43,14 @@ module BomberboysClient
     private
     def initialize_receiver
       @receiver_thread = Thread.new do
+        next_ack = Time.now.to_f + 1
         while !@shutdown && message = @server.receive
           interpret(message)
+          if next_ack < Time.now.to_f
+            ack
+            ping if @informer
+            next_ack = Time.now.to_f + 1
+          end
         end
         puts "Shutting down client #{@player.name}."
       end
@@ -70,16 +75,6 @@ module BomberboysClient
         until @shutdown
           @player.react(@world)
           sleep 0.1
-        end
-      end
-    end
-
-    def initialize_control
-      @info_thread = Thread.new do
-        until @shutdown
-          sleep(1)
-          ack
-          ping if @informer
         end
       end
     end
