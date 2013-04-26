@@ -20,6 +20,7 @@ module BomberboysClient
     def join
       @receiver_thread.join
       @player_thread.join
+      @info_thread.join
     end
 
     def close_socket
@@ -42,8 +43,14 @@ module BomberboysClient
     private
     def initialize_receiver
       @receiver_thread = Thread.new do
+        next_ack = Time.now.to_f + 1
         while !@shutdown && message = @server.receive
           interpret(message)
+          if next_ack < Time.now.to_f
+            ack
+            ping if @informer
+            next_ack = Time.now.to_f + 1
+          end
         end
         puts "Shutting down client #{@player.name}."
       end
@@ -80,8 +87,6 @@ module BomberboysClient
       m = time_mean.to_r
       d = time_dev.to_r
       l = @server.packet_loss
-
-      puts "mean: #{time_mean}, dev: #{time_dev}, loss: #{@server.packet_loss}, pongs: #{@pongs_received}"
 
       @server.send(Message.new(:info, [m.numerator, m.denominator, d.numerator, d.denominator, l]))
     end
