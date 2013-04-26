@@ -24,7 +24,7 @@ for executionId in `seq 1 10`; do
 	pId=$!
 	
 	echo "Launching vmstat and nstat"
-	vmstat 2 $totalTime > output/$1-$executionId.cpu &
+	vmstat $totalTime 2 > output/$1-$executionId.cpu &
 	nstat > /dev/null
 	
 	echo "Waiting $startupTime seconds (startup)"
