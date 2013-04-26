@@ -1,3 +1,1 @@
-#!/bin/sh
-
-~/.rvm/bin/ruby ~/bomberboys/client/bin/bb_bot 10 100 tcp vm1-h10
+./bomberboys/experiments/client/bin/jclient 10 100 tcp node6 10011
