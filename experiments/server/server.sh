@@ -23,8 +23,9 @@ for executionId in `seq 1 10`; do
 	./bin/$1 > output/$1-$executionId.server &
 	pId=$!
 	
-	echo "Launching vmstat"
+	echo "Launching vmstat and nstat"
 	vmstat 2 $totalTime > output/$1-$executionId.cpu &
+	nstat > /dev/null
 	
 	echo "Waiting $startupTime seconds (startup)"
 	sleep $startupTime
@@ -45,6 +46,9 @@ for executionId in `seq 1 10`; do
 	kill -2 $pId
 	echo "Waiting $finalizeTime seconds (server finalizing)"
 	sleep $finalizeTime
+	
+	# Save net statistics.
+	nstat > output/$1-$executionId.net
 	
 done 
 
