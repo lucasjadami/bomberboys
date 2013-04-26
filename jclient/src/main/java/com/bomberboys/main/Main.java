@@ -9,20 +9,28 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        for (int i = 0; i < 50; ++i)
+        System.out.println("Usage: n_bots [tcp|udp] address port\n");
+        int nBots = Integer.parseInt(args[0]);
+        String protocol = args[1];
+        String address = args[2];
+        int port = Integer.parseInt(args[3]);
+
+        startGameThread(protocol, address, port, true);
+        for (int i = 1; i < nBots; ++i)
         {
-            startGameThread();
+            startGameThread(protocol, address, port, false);
         }
     }
 
-    private static void startGameThread()
+    private static void startGameThread(final String protocol, final String address,
+                                        final int port, final boolean informer)
     {
         new Thread()
         {
             @Override
             public void run()
             {
-                Game game = new Game();
+                Game game = new Game(protocol, address, port, informer);
                 game.connect();
                 
                 long quitTime = System.currentTimeMillis() + 100 * 1000;
@@ -45,6 +53,10 @@ public class Main
 
                     if (nextAck < now)
                     {
+                        if (game.isInformer())
+                        {
+                            game.sendPing();
+                        }
                         game.sendAcknowledge();
                         nextAck = now + 1000;
                     }

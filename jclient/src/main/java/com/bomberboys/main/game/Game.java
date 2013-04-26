@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
@@ -15,28 +17,42 @@ import java.util.Random;
 public class Game
 {
     private Connection connection;
-    
     private Map<Integer, Player> players;
-    
     private Map<Integer, Bomb> bombs;
-    
     private int packetUId;
+    private String address = "localhost";
+    private int port = 10011;
+    private boolean isInformer = false;
+    private int lostPackets = 0;
+    private int currentRecvPacket = -1;
+
+    private long currentPingTime;
+    private List<Long> pingTimes;
     
-    public Game()
+    public Game(String protocol, String address, int port, boolean informer)
     {
-        connection = new TCPConnection();
+        connection = "tcp".equals(protocol) ? new TCPConnection() : new UDPConnection();
+        this.address = address;
+        this.port = port;
+        isInformer = informer;
         players = new HashMap<>();
         bombs = new HashMap<>();
+        pingTimes = new ArrayList<>();
     }
 
     public void connect()
     {
-        connection.connect("127.0.0.1", 10011);
+        connection.connect(address, port);
         
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());
         
         connection.sendPacket(new Packet(packetUId++, Packet.Id.LOGIN, buffer));
+    }
+
+    public boolean isInformer()
+    {
+        return isInformer;
     }
     
     public void doRandomAction()
@@ -57,12 +73,29 @@ public class Game
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.ACKNOWLEDGE.getSize());
         connection.sendPacket(new Packet(packetUId++, Packet.Id.ACKNOWLEDGE, buffer));
     }
+
+    public void sendPing()
+    {
+        ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.PING.getSize());
+        connection.sendPacket(new Packet(packetUId++, Packet.Id.PING, buffer));
+        currentPingTime = System.currentTimeMillis();
+    }
     
     public void processPackets()
     {
         Packet packet;
         while ((packet = connection.recvPacket()) != null)
         {
+            if (packet.getUId() > currentRecvPacket)
+            {
+                lostPackets += packet.getUId() - currentRecvPacket - 1;
+                currentRecvPacket = packet.getUId();
+            }
+            else
+            {
+                continue;
+            }
+
             switch (packet.getId())
             {
                 case ADD_PLAYER:
@@ -77,6 +110,8 @@ public class Game
                     explodeBomb(packet.getData()); break;
                 case SHUTDOWN:
                     shutdown(packet.getData()); break;
+                case PONG:
+                    pong(packet.getData()); break;
             }
         }
     }
@@ -157,12 +192,47 @@ public class Game
     
     private void shutdown(ByteBuffer buffer)
     {
-        ByteBuffer newBuffer = ByteBuffer.allocate(Packet.Id.INFO.getSize());
-        newBuffer.putLong(1);
-        newBuffer.putLong(100);
-        newBuffer.putLong(1);
-        newBuffer.putLong(100);
-        newBuffer.putInt(1090);
-        connection.sendPacket(new Packet(packetUId++, Packet.Id.INFO, newBuffer));
+        if (isInformer) {
+            ByteBuffer newBuffer = ByteBuffer.allocate(Packet.Id.INFO.getSize());
+            newBuffer.putLong(timeMean());
+            newBuffer.putLong(1L);
+            newBuffer.putLong(timeDev());
+            newBuffer.putLong(1L);
+            newBuffer.putInt(lostPackets);
+            connection.sendPacket(new Packet(packetUId++, Packet.Id.INFO, newBuffer));
+        }
+    }
+
+    private void pong(ByteBuffer buffer)
+    {
+        pingTimes.add(System.currentTimeMillis() - currentPingTime);
+    }
+
+    private long timeMean()
+    {
+        long sum = 0;
+        for (Long time : pingTimes)
+        {
+            sum += time;
+        }
+
+        return sum / pingTimes.size();
+    }
+
+    private long timeDev()
+    {
+        return (long) Math.sqrt(timeVariance());
+    }
+
+    private long timeVariance()
+    {
+        long mean = timeMean();
+        long sum = 0;
+        for (Long time : pingTimes)
+        {
+            sum += Math.pow(time - mean, 2);
+        }
+
+        return sum / (pingTimes.size() - 1);
     }
 }
