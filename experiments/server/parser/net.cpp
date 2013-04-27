@@ -16,14 +16,14 @@ int main()
 		if (strcmp(firstWord, "IpExtInOctets") == 0)
 		{
 			long long packets;
-			sscanf(line, "%*s %lld", &packets);
+			sscanf(line, " %*s %lld ", &packets);
 			inCount++;
 			totalIn += packets;
 		}
 		else if (strcmp(firstWord, "IpExtOutOctets") == 0)
 		{
 			long long packets;
-			sscanf(line, "%*s %lld", &packets);
+			sscanf(line, " %*s %lld ", &packets);
 			outCount++;
 			totalOut += packets;
 		}

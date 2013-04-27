@@ -15,7 +15,7 @@ int main()
 		if (strcmp(firstWord, "Player") == 0)
 		{
 			double average, deviation;
-			sscanf(line, "%*s %*s %*s %*s %*s %*s %*s %lf %lf", &average, &deviation);
+			sscanf(line, " %*s %*s %*s %*s %*s %*s %*s %lf %lf ", &average, &deviation);
 			readCount++;
 			totalAverage += average;
 			totalDeviation += deviation;
