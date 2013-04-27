@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class Packet
 {
     public static final int UID_SIZE = 4;
-    public static final int TRASH_SIZE = 0;
+    public static final int TRASH_SIZE = 100;
     
     public enum Id
     {

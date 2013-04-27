@@ -78,7 +78,7 @@ public class Game
     {
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.PING.getSize());
         connection.sendPacket(new Packet(packetUId++, Packet.Id.PING, buffer));
-        currentPingTime = System.currentTimeMillis();
+        currentPingTime = System.nanoTime();
     }
     
     public void processPackets()
@@ -205,7 +205,7 @@ public class Game
 
     private void pong(ByteBuffer buffer)
     {
-        pingTimes.add(System.currentTimeMillis() - currentPingTime);
+        pingTimes.add((System.nanoTime() - currentPingTime)/1000000L);
     }
 
     private long timeMean()
