@@ -4,7 +4,7 @@ require 'net/ssh'
 
 client_hosts = [
 "vm1-h7", "vm1-h8", "vm1-h9", "vm1-h10", "vm1-h19",
-"vm1-h20", "vm1-h15", "vm1-h16", "vm1-h17", "vm1-h18"
+"vm1-h14", "vm1-h15", "vm1-h16", "vm1-h17", "vm1-h18"
 ]
 
 command = ARGV.join(" ")
