@@ -1,0 +1,15 @@
+task :clean do
+  File.open('.gitignore', 'r') do |f|
+    while (line = f.gets)
+      system("rm -f #{line}")
+    end
+    puts 'Compiled files removed.'
+  end
+end
+
+task :preview do
+  command = RUBY_PLATFORM =~ /linux/ ? 'evince' : 'open'
+  
+  system('pdflatex monografia.tex')
+  system("#{command} monografia.pdf")
+end
