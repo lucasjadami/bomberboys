@@ -31,7 +31,7 @@ double Packet::getDouble(char* data)
     long long numerator = 0;
     int mask = 0;
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 7; i > -1; --i)
     {
         long long value = (unsigned char) data[i];
         numerator |= value << mask;
@@ -42,7 +42,7 @@ double Packet::getDouble(char* data)
     mask = 0;
     data += 8;
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 7; i > -1; --i)
     {
         long long value = (unsigned char) data[i];
         denominator |= value << mask;
