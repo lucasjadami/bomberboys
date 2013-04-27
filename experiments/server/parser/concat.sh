@@ -5,6 +5,6 @@
 
 for executionId in `seq 1 10`; do
 
-	cat ../output/$1-$executionId.$2 > $1.$2.concat
+	cat ../output/$1-$executionId.$2 >> $1.$2.concat
 
 done
