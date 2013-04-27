@@ -3,8 +3,8 @@
 require 'net/ssh'
 
 client_hosts = [
-"vm1-h7", "vm1-h8", "vm1-h9", "vm1-h10", "vm1-h19",
-"vm2-h11", "vm1-h15", "vm1-h16", "vm1-h17", "vm1-h18"
+"node7", "node8", "node9", "node10", "node19",
+"node11", "node15", "node16", "node17", "node18"
 ]
 
 command = ARGV.join(" ")
