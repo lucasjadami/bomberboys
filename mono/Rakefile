@@ -10,6 +10,6 @@ end
 task :preview do
   command = RUBY_PLATFORM =~ /linux/ ? 'evince' : 'open'
   
-  system('pdflatex monografia.tex')
-  system("#{command} monografia.pdf")
+  system('pdflatex document.tex')
+  system("#{command} document.pdf")
 end
