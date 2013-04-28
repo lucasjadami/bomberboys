@@ -24,7 +24,22 @@
 \begin{resumo} % 10 linhas
 \end{resumo}
 
-\section{Introdução} \label{sec:introcao}
+\section{Introdução} \label{sec:introducao}
+
+intro geral de app distrib. sem falar de sockets nem nada especifico.
+
+% Cada protocolo de transporte possui vantagens, desvantagens e contextos em que
+% são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja
+% um requisito, como em aplicações de videoconferência, protocolos como o
+% \emph{UDP} trazem maior eficiência. Por outro lado, aplicações bancárias, que
+% necessitam de total integridade de dados, requerem a utilização de protocolos
+% mais seguros, como o \emph{TCP}.
+
+\section{Fundamentação Teórica} \label{sec:fundamentacao}
+
+Nessa seção, serão abordadas toda a teoria utilizada para o andamento adequado deste projeto de disciplina. Inicialmente serão abordados os protocolos de transporte utilizados (Seção~\ref{sub:protocolos}). Em seguida, são apresentados os modos de execução possíveis através de \textit{sockets} (seção ~\ref{sub:modos}). Por fim, define-se o padrão de aplicação distribuídas utilizado nesse trabalho, o padão cliente-servidor (seção ~\ref{sub:clienteserv}).
+
+\subsection{Protocolos de transporte} \label{sub:protocolos}
 
 No desenvolvimento de aplicações distribuídas, para a comunicação entre os nós
 do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de
@@ -33,11 +48,41 @@ fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por
 meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming
 Interface} - Interface de Programação de Aplicativos) definida.
 
+Na perspectiva de camadas de rede, \textit{sockets} representam a interface
+entre a camada de aplicação e a de transporte. Nesse sentido, \textit{sockets}
+TCP e UDP permitem que softwares na camada de aplicação troquem informações
+entre si em nível de processos. Com isso, é possível desenvolver protocolos na
+camada de aplicação com a semântica apropriada para o domínio da aplicação
+escolhendo o nível de confiabilidade no transporte dos dados.
+
+Quando há necessidade de se estabelecer uma conexão entre os nós para a
+comunicação, a entrega de todos pacotes e na ordem em que foram enviados, é
+comum a utilização de protocolos como o TCP. Além de prover esses serviços,
+esse protocolo oferece ainda controle de congestionamento e de fluxo de dados,
+permitindo um uso mais racional da rede que interliga os nós. O protocolo TCP é
+utilizado, por exemplo, em aplicações que fazem uso do protocolo de aplicação
+HTTP, como navegadores e serviços Web.
+
+Por outro lado, quando não há a necessidade de se ter tais garantias ou quando
+tais garantias prejudicam o desempenho da aplicação, é utilizado o protocolo
+UDP. Tal protocolo não disponibiliza os serviços oferecidos pelo protocolo UDP.
+O que pode parecer uma desvantagem, pode ser útil em situações em que não
+importa ordem de pacotes ou que todos os pacotes cheguem. Além disso, em
+determinados contextos, o controle de congestionamento pode prejudicar o
+desempenho da aplicação.
+
+Com o protocolo UDP, é possível maior controle sobre como os dados são
+transportados pela rede, implementando em camada de aplicação os serviços
+adequandos de forma próxima do necessário para a aplicação em questão. Um
+exemplo de aplicação que usa o protocolo UDP são os aplicativos de
+vídeoconferência, em que a perda de um \textit{frame} da imagem não é algo
+crítico.
+
+\subsection{Modos de Operação de \textit{sockets}} \label{sub:modos}
+
 Dependendo do contexto em que está sendo aplicado, pode-se utilizar diferentes
 modos de operação e protocolos de comunicação. Com relação ao modo de operação,
 existem duas formas de se utilizar \emph{sockets}: bloqueante e não bloqueante.
-Além disso, pode-se utilizar protocolos que mantém ou não a conexão entre os
-nós, como por exemplo os protocolos \emph{TCP} e \emph{UDP}, respectivamente.
 
 Quanto ao modo de operação, ao se realizar uma operação bloqueante, o nó
 envolvido interrompe a execução do programa até que o dado em questão seja
@@ -49,18 +94,13 @@ o \emph{socket}. A aplicação apenas verifica se há dados a serem escritos ou
 lidos antes de realizar um comando nesse modo. Como consequência, é possível
 que a operação não seja executada por completo. 
 
-Cada modo de operação e protocolo de comunicação possui vantagens, desvantagens
-e contextos em que são mais apropriados. Em cenários em que a entrega de todos
-os pacotes não seja um requisito, como em aplicações de videoconferência,
-protocolos como o \emph{UDP} trazem maior eficiência. Por outro lado,
-aplicações bancárias, que necessitam de total integridade de dados, requerem a
-utilização de protocolos mais seguros, como o \emph{TCP}.
-
 Em todos os casos, os diferentes modos de operação de \emph{sockets} podem ser
 utilizados para se aumentar o desempenho de aplicações em geral. Tal recurso
 pode reduzir significativamente o tempo necessário para se finalizar uma
 operação de envio e recebimento de dados, possibilitando melhor utilização de
 recursos computacionais.
+
+\subsection{Arquitetura Cliente-Servidor} \label{sub:clienteserv}
 
 \section{Objetivos} \label{sec:objetivos}
 
@@ -344,6 +384,10 @@ respeito dos mesmos podem ser analisadas em~\ref{sub:discussao}.
 $\ll\ll\ll$ dificuldades encontradas $\gg\gg\gg$
 
 \section{Resultados} \label{sec:resultados}
+
+
+
+
 \subsection{Dados Obtidos} \label{sub:dados}
 
 \begin{table}
