@@ -26,7 +26,46 @@
 
 \section{Introdução} \label{sec:introducao}
 
-intro geral de app distrib. sem falar de sockets nem nada especifico.
+Aplicações distribuídas estão cada dia mais presentes. Diversos domínios de
+problemas exigem cada vez mais recursos computacionais e necessitam que tarefas
+sejam executadas em ambientes distintos. Aplicações numéricas, por exemplo,
+pelo alto grau de computação necessário. Muitas vezes, esse tipo de aplicação é
+viável apenas quando se é possível utilizar vários núcleos, estejam eles em um
+mesmo computador ou em computadores distintos.
+
+Em contextos em que se deve utilizar mais de um computador para realizar
+determinada tarefa, a comunicação necessária para a interação dessas tarefas
+ocorre tipicamente por meio de uma rede. De fato, certas aplicações só fazem
+sentido considerando-se uma rede para a comunicação. Pode-se citar como exemplo
+celulares e redes de telefonia móvel, aplicações de compartilhamento de arquivo
+e jogos cooperativos.
+
+Para todos os tipos de aplicações e, em especial, para aplicações que fazem uso
+intensivo de rede para interação, a eficiência muitas vezes depende de fatores
+como o congestionamento de rede, qualidade do serviço de entrega de pacotes,
+taxa de mensagens trocadas entre os computadores envolvidos, entre outros.Tais
+fatores muitas vezes inviabilizam a utilização da aplicação. Por exemplo, em
+uma aplicação de videoconferência, pequenos atrasos na recepção e envio de
+\textit{frames} e a perda pontual de certas informações é tolerável. Atrasos
+frequentes e contínuos inviabilizam o funcionamento eficaz da mesma.
+
+Em jogos cooperativos \textit{online} ocorre o mesmo. Esse tipo de aplicação
+tolera certos atrasos e perdas de informações. No entanto, atrasos constantes
+podem resultar em inconsistências na jogabilidade, ou seja, jogadores podem
+estar se baseando em um estado desatualizado do jogo para tomar decisões.
+
+Dessa forma, uma das constantes preocupações no desenvolvimento de aplicações
+distribuídas está nos padrões de comunicação entre os pares. Dessa forma,
+procura-se por técnicas de transmissão de mensagens que sejam eficientes, por
+meios de reduzir a taxa de informações transferidas e por protocolos eficientes
+no contexto dessas aplicações.
+
+Este trabalho tem como objetivo investigar cenários favoráveis para aplicações
+distribuídas com enfoque em jogos cooperativos. Nas próximas seções serão
+abordados a fundamentação teórica para o encaminhamento desse trabalho
+(seção~\ref{sec:fundamentacao}), os objetivos (seção~\ref{sec:objetivos}), as
+atividades desenvolvidas (seção~\ref{sec:atividades}) e, por fim, os resultados
+e conclusões obtidos (seção~\ref{sec:resultados} e~\ref{sec:conclusoes}).
 
 % Cada protocolo de transporte possui vantagens, desvantagens e contextos em que
 % são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja
@@ -81,18 +120,19 @@ crítico.
 \subsection{Modos de Operação de \textit{sockets}} \label{sub:modos}
 
 Dependendo do contexto em que está sendo aplicado, pode-se utilizar diferentes
-modos de operação e protocolos de comunicação. Com relação ao modo de operação,
-existem duas formas de se utilizar \emph{sockets}: bloqueante e não bloqueante.
+modos de operação para um determinado \textit{socket}. De fato, existem duas
+formas de se utilizar \emph{sockets}: bloqueante e não bloqueante.
 
-Quanto ao modo de operação, ao se realizar uma operação bloqueante, o nó
-envolvido interrompe a execução do programa até que o dado em questão seja
-enviado ou recebido. Nesse tipo de comunicação, é garantido que todo o pacote
-foi devidamente processado a cada operação de E/S (entrada e saída).
+Ao se realizar uma operação bloqueante, o nó envolvido interrompe a execução do
+programa até que o dado em questão seja enviado ou recebido. Nesse tipo de
+comunicação, é garantido que todo o pacote foi devidamente processado a cada
+operação de E/S (entrada e saída).
 
 Em seu modo não bloqueante, não há o interrompimento da execução ao se utilizar
 o \emph{socket}. A aplicação apenas verifica se há dados a serem escritos ou
 lidos antes de realizar um comando nesse modo. Como consequência, é possível
-que a operação não seja executada por completo. 
+que a operação não seja executada por completo, ou seja, outra operação
+sobrescreva aquela em andamento.
 
 Em todos os casos, os diferentes modos de operação de \emph{sockets} podem ser
 utilizados para se aumentar o desempenho de aplicações em geral. Tal recurso
@@ -100,7 +140,13 @@ pode reduzir significativamente o tempo necessário para se finalizar uma
 operação de envio e recebimento de dados, possibilitando melhor utilização de
 recursos computacionais.
 
-\subsection{Arquitetura Cliente-Servidor} \label{sub:clienteserv}
+\textit{Sockets} não-bloqueantes promovem menor eciosidade do processo em
+questão com o risco de haver problemas de envio de mensagem. \textit{Sockets}
+bloqueantes, por outro lado, asseguram que a mensagem seja totalmente
+processada antes de enviá-la havendo, porém, o custo de se esperar o
+processamento da mensagem.
+
+% \subsection{Arquitetura Cliente-Servidor} \label{sub:clienteserv}
 
 \section{Objetivos} \label{sec:objetivos}
 
@@ -274,6 +320,11 @@ faça medidas do atraso da comunicação. No final, ao receber um pacote
 \textit{shutdown} do servidor, o cliente opcionalmente pode enviar a média e
 desvio padrão dos atrasos e a quantidade de pacotes não recebidos (útil quando
 se utiliza protocolo \emph{UDP} para transporte).
+
+Para tratar a questão da perda de pacotes, utilizou-se um campo UID que rotula
+unicamente cada pacote com um número crescente. Com isso é possível monitorar
+pacotes que chegam no cliente. Caso dois pacotes recebidos tenham a diferença
+de UIDs superior a 1, houve uma perda de pacote.
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
