@@ -237,6 +237,31 @@ se utiliza protocolo UDP para transporte).
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
+O desenvolvimento do jogo foi separado em duas partes: implementação do
+servidor e implementação do cliente. Como linguagens de programação, foram
+utilizadas C++ para a implementação do servidor e Java para a implementação dos
+clientes.  O projeto inteiro foi desenvolvido utilizando-se a ferramenta de
+versionamento Git. O código do projeto, modo de instalação e experimentos podem
+ser encontrados em https://github.com/rafaelregis/bomberboys .
+
+O teste das funcionalidades pôde ser feito por meio do desenvolvimento do modo
+gráfico em conjunto com o servidor. Utilizando-se tal modo foi possível
+verificar a interação entre os clientes (jogadores) por meio do servidor assim
+como a influência das regras do jogo sobre os mesmos. Um exemplo de partida
+utilizando-se 10 jogadores pode ser visualizado na Figura~\ref{fig:partida}. As
+bombas são representadas pelos quadrados menores enquanto os jogadores são
+representados pelos quadrados maiores com circulos internos. A arena está
+contida no retângulo com borda verde.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/partida.png}
+  \caption{Exemplo de partida do jogo desenvolvido}
+  \label{fig:partida}
+\end{figure}
+
+\subsubsection{Desenvolvimento do Servidor de Jogos}
+
 O servidor desenvolvido possui quatro modos de operação. São eles: \emph{TCP}
 bloqueante, \emph{TCP} não bloqueante, \emph{UDP} bloqueante e \emph{UDP} não
 bloqueante. Na Figura~\ref{fig:server}, a maneira como cada modo é implementado
@@ -262,13 +287,38 @@ responsável pela leitura de pacotes de todos os clientes por meio do
 compartilha o \emph{socket} \emph{SS}. 
 
 \begin{figure}[ht]
-\centering
-\includegraphics[width=.8\textwidth]{img/server.png}
-\caption{Modos de operação do servidor}
-\label{fig:server}
+  \centering
+  \includegraphics[width=.8\textwidth]{img/server.png}
+  \caption{Modos de operação do servidor}
+  \label{fig:server}
 \end{figure}
 
-\subsection{Realização de Experimentos e Análise dos Resultados} \label{sub:realizacao}
+\subsubsection{Desenvolvimento dos Clientes}
+
+Para tornar a inicialização de processos clientes prática para fins de
+experimentação, foi implementado um programa que permite a inicialização
+simultânea de um número variável de clientes, de acordo com o experimento sendo
+realizado. Internamente, é inicializado um conjunto de \textit{threads} para
+cada cliente e cada um desses se comunica com o servidor por seu próprio
+\textit{socket}.
+
+Além do número de clientes a serem inicializados, foi possível configurar o
+protocolo de transporte e o tamanho das mensagens a serem enviadas. A questão
+do modo em que os \textit{sockets} operam (bloqueante e não-bloqueante) não foi
+variável nos clientes. De fato, o modo não-bloqueante faz sentido apenas no
+servidor; Clientes devem esperar para receber informações de um (único)
+servidor de modo que, caso fosse implementada a abordagem não bloqueante, seria
+necessária uma espera ocupada o que, no fim, simula o modo bloqueante.
+
+Para que fosse possível a simulação de uma partida do jogo utilizando o
+servidor e os clientes, foi criado um \textit{bot} (jogador artificial) o qual
+joga de forma aleatória. No contexto do experimento, em que temos até 100
+jogadores simultâneos.  A utilização de \textit{bots} com inteligência
+artificial ou de jogadores humanos dificilmente acarretaria em resultados
+diferentes uma vez que o espaço da arena do jogo inviabiliza a utilização de
+estratégias elaboradas com essa quantidade de jogadores.
+
+\subsection{Realização de Experimentos e Análise dos Resultados} \label{sub:realizacao} 
 
 A partir do jogo desenvolvido, cada um dos 16 experimentos foi executado 10
 vezes no \textit{cluster}, como especificado em~\ref{sub:planejamento}. Foram
