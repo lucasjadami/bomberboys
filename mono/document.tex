@@ -27,12 +27,191 @@
 
 \section{Introdução} \label{sec:introcao}
 \section{Objetivos} \label{sec:objetivos}
+
+O objetivo deste trabalho é avaliar o desempenho dos diferentes modos de
+operação e protocolos de comunicação disponíveis para \emph{sockets} em
+aplicações distribuídas. A avaliação será realizada no contexto de jogos
+cooperativos por utilizarem \emph{sockets} para que haja sincronia entre todos
+os clientes (jogadores) por meio de servidores.
+
 \section{Atividades Desenvolvidas} \label{sec:atividades}
+
+Para a realização do experimento, uma série de procedimentos foram realizados.
+Inicialmente foi realizado o planejamento do experimento
+(seção~\ref{sub:planejamento}) a ser executado para análise da eficiência de
+cada configuração proposta. Em seguida, foi especificado o protocolo de
+comunicação entre os clientes e o servidor (seção~\ref{sub:protocolo}) seguido
+do desenvolvimento do jogo em si (seção~\ref{sub:desenvolvimento}). Com o jogo
+criado, houve a realização dos experimentos e a análise dos resultados
+(seção~\ref{sub:realizacao}) para que fosse possível verificar a eficácia de
+cada configuração.
+
 \subsection{Planejamento do Experimento} \label{sub:planejamento}
+
+Nesta etapa, foram decididos itens fundamentais para a realização do
+experimento. Inicialmente, o tipo de jogo (incluindo a natureza das
+comunicações a serem realizadas) foi determinado. O jogo escolhido basea-se no
+popular jogo Bomberman, no qual jogadores podem ativar bombas de modo a
+estrategicamente atingir outros jogadores com a explosão da mesma.
+
+A partir do jogo escolhido, determinou-se as variáveis do experimento e
+cenários que deveriam ser analisados, tais variáveis podem ser analisadas
+abaixo. Com isso, foram planejados os experimentos listados na tabela~\ref{tab:experimentos}.
+
+\begin{itemize}
+  \item \textbf{Protocolo de transporte:} Protocolos TCP e UDP.
+  \item \textbf{Tipo de comunicação:} Sockets bloqueantes e não bloqueantes.
+  \item \textbf{Tamanho dos pacotes transmitidos:} Pacotes com tamanhos na faixa de 0 a 50 e 100 a 150.
+  \item \textbf{Número de jogadores simultâneos:} Cenários com 50 e 100 jogadores simultâneos.
+\end{itemize}
+
+\begin{table}
+  \begin{tabular}{|c|c|c|c|c|}
+      & Protocolo de transporte & Tipo de comunicação & Tamanho do pacote & Número de jogadores \\ \hline
+    1 & TCP & Não-bloqueante & 0 & 50 \\ \hline
+    2 & TCP & Não-bloqueante & 0 & 100 \\ \hline
+    3 & TCP & Não-bloqueante & 100 & 50 \\ \hline
+    4 & TCP & Não-bloqueante & 100 & 100 \\ \hline
+    5 & TCP & Bloqueante & 0 & 50 \\ \hline
+    6 & TCP & Bloqueante & 0 & 100 \\ \hline
+    7 & TCP & Bloqueante & 100 & 50 \\ \hline
+    8 & TCP & Bloqueante & 100 & 100 \\ \hline
+    9 & UDP & Não-bloqueante & 0 & 50 \\ \hline
+    10 & UDP & Não-bloqueante & 0 & 100 \\ \hline
+    11 & UDP & Não-bloqueante & 100 & 50 \\ \hline
+    12 & UDP & Não-bloqueante & 100 & 100 \\ \hline
+    13 & UDP & Bloqueante & 0 & 50 \\ \hline
+    14 & UDP & Bloqueante & 0 & 100 \\ \hline
+    15 & UDP & Bloqueante & 100 & 50 \\ \hline
+    16 & UDP & Bloqueante & 100 & 100 \\ \hline
+  \end{tabular} 
+\caption{Experimentos planejados}
+\label{tab:experimentos}
+\end{table} 
+
+falar do que foi observado
+
+Para a execução dos experimentos, optou-se pela utilização do \textit{cluster}
+disponível no Laboratório de Sistemas Distribuídos e Programação Concorrente
+(LaSDPC). Nesse sentido, planejou-se utilizar até 11 nós: 1 para o servidor do
+jogo e 1 para cada 10 clientes (jogadores). Cada experimento foi planejado para
+ser executado 10 vezes, extraindo-se a média das informações obtidas,
+totalizando 160 execuções de experimentos.
+
 \subsection{Especificação do Protocolo} \label{sub:protocolo}
+
+Para possibilitar a simulação de um ambiente de jogos cooperativos com
+múltiplos jogadores, foi necessário planejar e especificar um possível
+protocolo de aplicação para a interação entre os clientes e o servidor.  Dessa
+forma, foi criado um conjunto de 14 ações (tabela~\ref{tab:protocolo}) que
+envolvem o envio de mensagem do cliente para o servidor e do servidor para o
+cliente.
+
+\begin{table}
+  \begin{tabular}{|c|c|c|c|}
+    Identificador & Nome & Remetente & Campos (seguido do número de bytes) \\ \hline
+    0 & login & Cliente & Nome do jogador(20)  \\ \hline
+    1 & add player & Servidor & Identificador(2), Coordenada X(2), Coordenada Y(2), Nome Jogador(20)\\ \hline
+    2 & remove player & Servidor & Identificador(2) \\ \hline
+    3 & move me & Cliente & Direção(1) (Ex: Norte=0, Leste=2) \\ \hline
+    4 & move player & Servidor & Identificador(2), Coordenada X(2), Coordenada Y(2) \\ \hline
+    5 & plant bomb & Cliente & \\ \hline
+    6 & add bomb & Servidor &  Identificador(2), Coordenada X(2), Coordenada Y(2)  \\ \hline
+    7 & explode bomb & Servidor & Identificador (2) \\ \hline
+    8 & fall player & Servidor & Identificador (2) \\ \hline
+    9 & acknowledge & Cliente & \\ \hline
+   10 & ping & Cliente & \\ \hline
+   11 & pong & Servidor & \\ \hline
+   12 & info & Cliente & Numerador Média(8), Denominador Média(8), Numerador Desvio Padrão(8), Denominador Desvio Padrão(8), Pacotes Perdidos(4)  \\ \hline
+   13 & shutdown & Servidor &\\ \hline
+  \end{tabular} 
+\caption{Protocolo do jogo criado}
+\label{tab:protocolo}
+\end{table} 
+
+Para início de interação, cada cliente deve se apresentar para o cliente
+através da ação \textit{login} especificando, inclusive, o nome que pretende
+utilizar. Como resposta a uma requisição de login, o servidor envia um pacote
+"add player" que contém, entre outros dados, o identificador do cliente
+corrente permitindo que este possa distinguir-se dos demais jogadores.
+
+Para cada jogador que realiza uma ação de login, um pacote de "add player" para
+os demais clientes para que fiquem cientes da presença de um novo jogador. Além
+do identificador, são enviados também o nome do jogador e suas coordenadas X e
+Y para que cada cliente possa representá-los graficamente e considerá-los ao
+realizar suas ações.  Da mesma forma, quando um cliente se desconecta, o
+servidor envia um pacote "remove player" para que o jogador com o identificador
+seja removido localmente.
+
+Quando um jogador desejar se movimentar, deve ser realizada uma ação de "move
+me" com a direção desejada. Como resposta, o servidor envia para todos os
+clientes um pacote "move player" indicando a nova posição do jogador em questão
+ou ainda um pacote "fall player", caso o jogador saia da arena (perdendo o
+jogo).
+
+O mesmo ocorre com as bombas posicionadas na arena do jogo. Ao decidir armar
+uma bomba, o cliente envia um pacote "plant bomb" para o servidor, que atualiza
+os demais jogadores por meio do envio de pacotes "add bomb" e "explode bomb"
+quando a mesma explodir. Por fim, caso o servidor deva ser desligado, o mesmo
+avisa com um pacote "shutdown".
+
+Como pode-se notar, todo o controle sobre o jogo como a física da movimentação
+e as regras do jogo permanecem no servidor, restando aos clientes atualizarem
+suas próprias informações com base nas informações passadas pelo servidor. Este
+cenário é comumente adotado uma vez que reduz a complexidade, permite maior
+sincronia entre os jogadores e evita que jogadores mal-intencionados burlem
+regras do jogo.
+Em contrapartida, há uma grande sobrecarga no servidor, que deve
+lidar potencialmente com centenas de jogadores simultâneos sem que haja grandes
+atrasos na comunicação e faltas de sincronismo entre jogadores.
+
+As ações de 9 a 11 (tabela~\ref{tab:protocolo}) são ações de controle. A ação
+"acknowledge" foi incluída para uniformizar a utilização dos protocolos de
+transporte TCP e UDP.  Uma vez que o protocolo UDP não estabelece uma conexão
+entre os pares, é essencial para o servidor que o cliente avise periodicamente
+que ainda está ativo, com isso, caso não esteja, o servidor pode descartá-lo de
+sua tabela de clientes conectados.
+
+As ações de controle "ping", "pong" e "info" foram incluídas com a finalidade
+de se extrair informações úteis a respeito de pacotes perdidos e atrasos no
+envio de pacotes para fins estatísticos, algo especialmente útil para o projeto
+de redes em questão.
+
+Periodicamente, o cliente envia um pacote "ping" para o servidor, o qual
+imediatamente responde com um pacote "pong" permitindo que o cliente faça
+medidas do atraso da comunicação.  No final, ao receber um pacote "shutdown" do
+servidor, o cliente opcionalmente pode enviar a média e desvio padrão dos
+atrasos e a quantidade de pacotes não recebidos (útil quando se utiliza
+protocolo UDP para transporte).
+
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
-\subsection{Realização de Experimentos} \label{sub:realização}
-\subsection{Análise de Resultados Obtidos} \label{sub:analise}
+
+explicar prog que simula n clientes
+
+\subsection{Realização de Experimentos e Análise dos Resultados} \label{sub:realizacao}
+
+A partir do jogo desenvolvido, cada um dos 16 experimentos foi executado 10
+vezes no \textit{cluster}, como especificado em~\ref{sub:planejamento}. Foram
+criados e distribuídos para os nós do cluster uma série de \textit{scripts}
+com os parâmetros de interesse devidamente especificados (número de clientes a
+serem iniciados na máquina, protocolo de transporte etc).
+
+Com isso, a partir de um determinado nó do \textit{cluster}, o servidor do jogo
+foi criado e, por meio de acessos SSH automatizados, os clientes foram criados
+em outros nós em seguida, todo o processo conforme o especificado para o
+experimento selecionado.
+
+Para cada execução de experimento, foram armazenados dados como a quantidade
+total de pacotes trocados entre o servidor e seus clientes, a carga da CPU
+durante o experimento, a média e desvio padrão do atraso na comunicação e a
+quantidade de pacotes perdidos em disco para análise posterior. Desse total de dados,
+foram extraídas as informações de interesse por meio de \textit{scripts}.
+
+Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a respeito
+dos mesmos podem ser analisadas em~\ref{sub:discussao}.
+
+FALAR DE DIFICULDADES ETC?
+
 \section{Resultados} \label{sec:resultados}
 \subsection{Dados Obtidos} \label{sub:dados}
 \subsection{Discussão dos Resultados} \label{sub:discussao}
@@ -45,14 +224,6 @@
 % \caption{A typical figure}
 % \label{fig:exampleFig1}
 % \end{figure}
-
-% \begin{table}[ht]
-% \centering
-% \caption{Variables to be considered on the evaluation of interaction
-%   techniques}
-% \label{tab:exTable1}
-% \includegraphics[width=.7\textwidth]{table.jpg}
-% \end{table}
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}

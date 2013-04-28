@@ -3,7 +3,7 @@
 require 'net/ssh'
 
 client_hosts = [
-"node7", "node8", "node9", "node10", "node19",
+# "node7", "node8", "node9", "node10", "node19",
 "node11", "node15", "node16", "node17", "node18"
 ]
 
