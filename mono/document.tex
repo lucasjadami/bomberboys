@@ -28,7 +28,7 @@
 
 No desenvolvimento de aplicações distribuídas, para a comunicação entre os nós
 do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de
-computadores, \emph{Sockets} são definidos como interfaces que possibilitam o
+computadores, \emph{sockets} são definidos como interfaces que possibilitam o
 fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por
 meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming
 Interface} - Interface de Programação de Aplicativos) definida.
@@ -95,8 +95,8 @@ cenários que deveriam ser analisados, tais variáveis podem ser analisadas
 abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:experimentos}.
 
 \begin{itemize}
-  \item \textbf{Protocolo de transporte:} Protocolos TCP e UDP.
-  \item \textbf{Tipo de comunicação:} Sockets bloqueantes e não bloqueantes.
+  \item \textbf{Protocolo de transporte:} Protocolos \emph{TCP} e \emph{UDP}.
+  \item \textbf{Tipo de comunicação:} \emph{Sockets} bloqueantes e não bloqueantes.
   \item \textbf{Tamanho dos pacotes transmitidos:} Pacotes com tamanhos na faixa de 0 a 50 e 100 a 150.
   \item \textbf{Número de jogadores simultâneos:} Cenários com 50 e 100 jogadores simultâneos.
 \end{itemize}
@@ -130,9 +130,9 @@ abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:e
 
 Em cada experimentos foram observados e medidos os efeitos das configurações no
 desempenho do servidor e na comunicação entre o mesmo e os clientes. Desse
-modo, o foco do projeto foi em medir a atividade de CPU, a quantidade total de
+modo, o foco do projeto foi em medir a atividade de \emph{CPU}, a quantidade total de
 pacotes trocados, o atraso na troca de mensagens e a quantidade de pacotes
-perdidos no processo. No contexto de jogos com multiplos jogadores simultâneos,
+perdidos no processo. No contexto de jogos com múltiplos jogadores simultâneos,
 a jogabilidade e eficiência do jogo são influenciadas principalmente pelo
 atrasos na troca de mensagens e por pacotes perdidos. Tais experimentos
 permitirão avaliar o quanto protocolos, quantidade de jogadores e tamanho de
@@ -145,7 +145,7 @@ jogo e 1 para cada 10 clientes (jogadores). Cada experimento foi planejado para
 ser executado 10 vezes, extraindo-se a média das informações obtidas,
 totalizando 160 execuções de experimentos.
 
-falar das configuraçoes das maquinas do cluster (servidor é no virtual, clientes são nos fisicos)
+$\ll\ll\ll$ configurações das maquinas utilizadas $\gg\gg\gg$
 
 \subsection{Especificação do Protocolo} \label{sub:protocolo}
 
@@ -182,29 +182,29 @@ cliente.
 \end{table} 
 
 Para início de interação, cada cliente deve se apresentar para o cliente
-através da ação \textit{login} especificando, inclusive, o nome que pretende
+através da ação \emph{login} especificando, inclusive, o nome que pretende
 utilizar. Como resposta a uma requisição de login, o servidor envia um pacote
-"add player" que contém, entre outros dados, o identificador do cliente
+\emph{add player} que contém, entre outros dados, o identificador do cliente
 corrente permitindo que este possa distinguir-se dos demais jogadores.
 
-Para cada jogador que realiza uma ação de login, um pacote de "add player" para
+Para cada jogador que realiza uma ação de \emph{login}, um pacote de \emph{add player} para
 os demais clientes para que fiquem cientes da presença de um novo jogador. Além
 do identificador, são enviados também o nome do jogador e suas coordenadas X e
 Y para que cada cliente possa representá-los graficamente e considerá-los ao
 realizar suas ações. Da mesma forma, quando um cliente se desconecta, o
-servidor envia um pacote "remove player" para que o jogador com o identificador
+servidor envia um pacote \emph{remove player} para que o jogador com o identificador
 seja removido localmente.
 
-Quando um jogador desejar se movimentar, deve ser realizada uma ação de "move
-me" com a direção desejada. Como resposta, o servidor envia para todos os
+Quando um jogador desejar se movimentar, deve ser realizada uma ação de \emph{move
+me} com a direção desejada. Como resposta, o servidor envia para todos os
 clientes um pacote \textit{move player} indicando a nova posição do jogador em
 questão ou ainda um pacote \textit{fall player}, caso o jogador saia da arena
 (perdendo o jogo).
 
 O mesmo ocorre com as bombas posicionadas na arena do jogo. Ao decidir armar
 uma bomba, o cliente envia um pacote \textit{plant bomb} para o servidor, que
-atualiza os demais jogadores por meio do envio de pacotes "add bomb" e "explode
-bomb" quando a mesma explodir. Por fim, caso o servidor deva ser desligado, o
+atualiza os demais jogadores por meio do envio de pacotes \emph{add bomb} e \emph{explode
+bomb} quando a mesma explodir. Por fim, caso o servidor deva ser desligado, o
 mesmo avisa com um pacote \textit{shutdown}.
 
 Como pode-se notar, todo o controle sobre o jogo como a física da movimentação
@@ -218,7 +218,7 @@ grandes atrasos na comunicação e faltas de sincronismo entre jogadores.
 
 As ações de 9 a 11 (Tabela~\ref{tab:protocolo}) são ações de controle. A ação
 \textit{acknowledge} foi incluída para uniformizar a utilização dos protocolos
-de transporte TCP e UDP. Uma vez que o protocolo UDP não estabelece uma
+de transporte \emph{TCP} e \emph{UDP}. Uma vez que o protocolo \emph{UDP} não estabelece uma
 conexão entre os pares, é essencial para o servidor que o cliente avise
 periodicamente que ainda está ativo, com isso, caso não esteja, o servidor pode
 descartá-lo de sua tabela de clientes conectados.
@@ -233,15 +233,15 @@ imediatamente responde com um pacote \textit{pong} permitindo que o cliente
 faça medidas do atraso da comunicação. No final, ao receber um pacote
 \textit{shutdown} do servidor, o cliente opcionalmente pode enviar a média e
 desvio padrão dos atrasos e a quantidade de pacotes não recebidos (útil quando
-se utiliza protocolo UDP para transporte).
+se utiliza protocolo \emph{UDP} para transporte).
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
 O desenvolvimento do jogo foi separado em duas partes: implementação do
 servidor e implementação do cliente. Como linguagens de programação, foram
-utilizadas C++ para a implementação do servidor e Java para a implementação dos
+utilizadas \emph{C++} para a implementação do servidor e \emph{Java} para a implementação dos
 clientes.  O projeto inteiro foi desenvolvido utilizando-se a ferramenta de
-versionamento Git. O código do projeto, modo de instalação e experimentos podem
+versionamento \emph{Git}. O código do projeto, modo de instalação e experimentos podem
 ser encontrados em https://github.com/rafaelregis/bomberboys .
 
 O teste das funcionalidades pôde ser feito por meio do desenvolvimento do modo
@@ -306,7 +306,7 @@ Além do número de clientes a serem inicializados, foi possível configurar o
 protocolo de transporte e o tamanho das mensagens a serem enviadas. A questão
 do modo em que os \textit{sockets} operam (bloqueante e não-bloqueante) não foi
 variável nos clientes. De fato, o modo não-bloqueante faz sentido apenas no
-servidor; Clientes devem esperar para receber informações de um (único)
+servidor. Clientes devem esperar para receber informações de um (único)
 servidor de modo que, caso fosse implementada a abordagem não bloqueante, seria
 necessária uma espera ocupada o que, no fim, simula o modo bloqueante.
 
@@ -327,12 +327,12 @@ com os parâmetros de interesse devidamente especificados (número de clientes a
 serem iniciados na máquina, protocolo de transporte etc).
 
 Com isso, a partir de um determinado nó do \textit{cluster}, o servidor do jogo
-foi criado e, por meio de acessos SSH automatizados, os clientes foram criados
+foi criado e, por meio de acessos \emph{SSH} automatizados, os clientes foram criados
 em outros nós em seguida, todo o processo conforme o especificado para o
 experimento selecionado.
 
 Para cada execução de experimento, foram armazenados dados como a quantidade
-total de pacotes trocados entre o servidor e seus clientes, a carga da CPU
+total de pacotes trocados entre o servidor e seus clientes, a carga da \emph{CPU}
 durante o experimento, a média e desvio padrão do atraso na comunicação e a
 quantidade de pacotes perdidos em disco para análise posterior. Desse total de
 dados, foram extraídas as informações de interesse por meio de
@@ -341,7 +341,7 @@ dados, foram extraídas as informações de interesse por meio de
 Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a
 respeito dos mesmos podem ser analisadas em~\ref{sub:discussao}.
 
-FALAR DE DIFICULDADES ETC?
+$\ll\ll\ll$ dificuldades encontradas $\gg\gg\gg$
 
 \section{Resultados} \label{sec:resultados}
 \subsection{Dados Obtidos} \label{sub:dados}
@@ -349,28 +349,28 @@ FALAR DE DIFICULDADES ETC?
 \begin{table}
   \center
   \footnotesize
-  \begin{tabular}{|c|c|c|c|c|}
+  \begin{tabular}{|c|c|c|c|c|c|}
   \hline
-    \# & \textbf{Atraso Médio ($ms$)} & \textbf{Variância ($ms$)} & \textbf{CPU usuário/kernel/total (\%)} & \textbf{Bytes enviados/recebidos} \\ \hline
-    1 &  &  &  &  \\ \hline
-    2 &  &  &  &  \\ \hline
-    3 &  &  &  &  \\ \hline
-    4 &  &  &  &  \\ \hline
-    5 &  &  &  &  \\ \hline
-    6 &  &  &  &  \\ \hline
-    7 &  &  &  &  \\ \hline
-    8 &  &  &  &  \\ \hline
-    9 &  &  &  &  \\ \hline
-    10 &  &  &  &  \\ \hline
-    11 &  &  &  &  \\ \hline
-    12 &  &  &  &  \\ \hline
-    13 &  &  &  &  \\ \hline
-    14 &  &  &  &  \\ \hline
-    15 &  &  &  &  \\ \hline
-    16 &  &  &  &  \\ \hline
+    \# & \textbf{Atraso ($ms$)} & \textbf{Variância ($ms$)} & \textbf{CPU (\%)} & \textbf{Bytes} & \textbf{Pacotes Perdidos} \\ \hline
+    1 &  &  &  &  & \\ \hline
+    2 &  &  &  &  & \\ \hline
+    3 &  &  &  &  & \\ \hline
+    4 &  &  &  &  & \\ \hline
+    5 &  &  &  &  & \\ \hline
+    6 &  &  &  &  & \\ \hline
+    7 &  &  &  &  & \\ \hline
+    8 &  &  &  &  & \\ \hline
+    9 &  &  &  &  & \\ \hline
+    10 &  &  &  &  & \\ \hline
+    11 &  &  &  &  & \\ \hline
+    12 &  &  &  &  & \\ \hline
+    13 &  &  &  &  & \\ \hline
+    14 &  &  &  &  & \\ \hline
+    15 &  &  &  &  & \\ \hline
+    16 &  &  &  &  & \\ \hline
   \end{tabular} 
-\caption{Experimentos planejados}
-\label{tab:experimentos}
+\caption{Resultados dos experimentos}
+\label{tab:resultados}
 \end{table} 
 
 \subsection{Discussão dos Resultados} \label{sub:discussao}
