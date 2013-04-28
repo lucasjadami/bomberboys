@@ -68,7 +68,7 @@ estrategicamente atingir outros jogadores com a explosão da mesma.
 
 A partir do jogo escolhido, determinou-se as variáveis do experimento e
 cenários que deveriam ser analisados, tais variáveis podem ser analisadas
-abaixo. Com isso, foram planejados os experimentos listados na tabela~\ref{tab:experimentos}.
+abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:experimentos}.
 
 \begin{itemize}
   \item \textbf{Protocolo de transporte:} Protocolos TCP e UDP.
@@ -120,7 +120,7 @@ falar das configuraçoes das maquinas do cluster (servidor é no virtual, client
 Para possibilitar a simulação de um ambiente de jogos cooperativos com
 múltiplos jogadores, foi necessário planejar e especificar um possível
 protocolo de aplicação para a interação entre os clientes e o servidor.  Dessa
-forma, foi criado um conjunto de 14 ações (tabela~\ref{tab:protocolo}) que
+forma, foi criado um conjunto de 14 ações (Tabela~\ref{tab:protocolo}) que
 envolvem o envio de mensagem do cliente para o servidor e do servidor para o
 cliente.
 
@@ -159,50 +159,49 @@ Para cada jogador que realiza uma ação de login, um pacote de "add player" par
 os demais clientes para que fiquem cientes da presença de um novo jogador. Além
 do identificador, são enviados também o nome do jogador e suas coordenadas X e
 Y para que cada cliente possa representá-los graficamente e considerá-los ao
-realizar suas ações.  Da mesma forma, quando um cliente se desconecta, o
+realizar suas ações. Da mesma forma, quando um cliente se desconecta, o
 servidor envia um pacote "remove player" para que o jogador com o identificador
 seja removido localmente.
 
 Quando um jogador desejar se movimentar, deve ser realizada uma ação de "move
 me" com a direção desejada. Como resposta, o servidor envia para todos os
-clientes um pacote "move player" indicando a nova posição do jogador em questão
-ou ainda um pacote "fall player", caso o jogador saia da arena (perdendo o
-jogo).
+clientes um pacote \textit{move player} indicando a nova posição do jogador em
+questão ou ainda um pacote \textit{fall player}, caso o jogador saia da arena
+(perdendo o jogo).
 
 O mesmo ocorre com as bombas posicionadas na arena do jogo. Ao decidir armar
-uma bomba, o cliente envia um pacote "plant bomb" para o servidor, que atualiza
-os demais jogadores por meio do envio de pacotes "add bomb" e "explode bomb"
-quando a mesma explodir. Por fim, caso o servidor deva ser desligado, o mesmo
-avisa com um pacote "shutdown".
+uma bomba, o cliente envia um pacote \textit{plant bomb} para o servidor, que
+atualiza os demais jogadores por meio do envio de pacotes "add bomb" e "explode
+bomb" quando a mesma explodir. Por fim, caso o servidor deva ser desligado, o
+mesmo avisa com um pacote \textit{shutdown}.
 
 Como pode-se notar, todo o controle sobre o jogo como a física da movimentação
 e as regras do jogo permanecem no servidor, restando aos clientes atualizarem
 suas próprias informações com base nas informações passadas pelo servidor. Este
 cenário é comumente adotado uma vez que reduz a complexidade, permite maior
 sincronia entre os jogadores e evita que jogadores mal-intencionados burlem
-regras do jogo.
-Em contrapartida, há uma grande sobrecarga no servidor, que deve
-lidar potencialmente com centenas de jogadores simultâneos sem que haja grandes
-atrasos na comunicação e faltas de sincronismo entre jogadores.
+regras do jogo. Em contrapartida, há uma grande sobrecarga no servidor, que
+deve lidar potencialmente com centenas de jogadores simultâneos sem que haja
+grandes atrasos na comunicação e faltas de sincronismo entre jogadores.
 
-As ações de 9 a 11 (tabela~\ref{tab:protocolo}) são ações de controle. A ação
-"acknowledge" foi incluída para uniformizar a utilização dos protocolos de
-transporte TCP e UDP.  Uma vez que o protocolo UDP não estabelece uma conexão
-entre os pares, é essencial para o servidor que o cliente avise periodicamente
-que ainda está ativo, com isso, caso não esteja, o servidor pode descartá-lo de
-sua tabela de clientes conectados.
+As ações de 9 a 11 (Tabela~\ref{tab:protocolo}) são ações de controle. A ação
+\textit{acknowledge} foi incluída para uniformizar a utilização dos protocolos
+de transporte TCP e UDP. Uma vez que o protocolo UDP não estabelece uma
+conexão entre os pares, é essencial para o servidor que o cliente avise
+periodicamente que ainda está ativo, com isso, caso não esteja, o servidor pode
+descartá-lo de sua tabela de clientes conectados.
 
-As ações de controle "ping", "pong" e "info" foram incluídas com a finalidade
-de se extrair informações úteis a respeito de pacotes perdidos e atrasos no
-envio de pacotes para fins estatísticos, algo especialmente útil para o projeto
-de redes em questão.
+As ações de controle \textit{ping}, \textit{pong} e \textit{info} foram
+incluídas com a finalidade de se extrair informações úteis a respeito de
+pacotes perdidos e atrasos no envio de pacotes para fins estatísticos, algo
+especialmente útil para o projeto de redes em questão.
 
-Periodicamente, o cliente envia um pacote "ping" para o servidor, o qual
-imediatamente responde com um pacote "pong" permitindo que o cliente faça
-medidas do atraso da comunicação.  No final, ao receber um pacote "shutdown" do
-servidor, o cliente opcionalmente pode enviar a média e desvio padrão dos
-atrasos e a quantidade de pacotes não recebidos (útil quando se utiliza
-protocolo UDP para transporte).
+Periodicamente, o cliente envia um pacote \textit{ping} para o servidor, o qual
+imediatamente responde com um pacote \textit{pong} permitindo que o cliente
+faça medidas do atraso da comunicação. No final, ao receber um pacote
+\textit{shutdown} do servidor, o cliente opcionalmente pode enviar a média e
+desvio padrão dos atrasos e a quantidade de pacotes não recebidos (útil quando
+se utiliza protocolo UDP para transporte).
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
@@ -233,11 +232,12 @@ experimento selecionado.
 Para cada execução de experimento, foram armazenados dados como a quantidade
 total de pacotes trocados entre o servidor e seus clientes, a carga da CPU
 durante o experimento, a média e desvio padrão do atraso na comunicação e a
-quantidade de pacotes perdidos em disco para análise posterior. Desse total de dados,
-foram extraídas as informações de interesse por meio de \textit{scripts}.
+quantidade de pacotes perdidos em disco para análise posterior. Desse total de
+dados, foram extraídas as informações de interesse por meio de
+\textit{scripts}.
 
-Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a respeito
-dos mesmos podem ser analisadas em~\ref{sub:discussao}.
+Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a
+respeito dos mesmos podem ser analisadas em~\ref{sub:discussao}.
 
 FALAR DE DIFICULDADES ETC?
 
