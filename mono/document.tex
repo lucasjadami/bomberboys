@@ -128,7 +128,15 @@ abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:e
 \label{tab:experimentos}
 \end{table} 
 
-falar do que foi observado
+Em cada experimentos foram observados e medidos os efeitos das configurações no
+desempenho do servidor e na comunicação entre o mesmo e os clientes. Desse
+modo, o foco do projeto foi em medir a atividade de CPU, a quantidade total de
+pacotes trocados, o atraso na troca de mensagens e a quantidade de pacotes
+perdidos no processo. No contexto de jogos com multiplos jogadores simultâneos,
+a jogabilidade e eficiência do jogo são influenciadas principalmente pelo
+atrasos na troca de mensagens e por pacotes perdidos. Tais experimentos
+permitirão avaliar o quanto protocolos, quantidade de jogadores e tamanho de
+pacotes influenciam nesses fatores.
 
 Para a execução dos experimentos, optou-se pela utilização do \textit{cluster}
 disponível no Laboratório de Sistemas Distribuídos e Programação Concorrente
