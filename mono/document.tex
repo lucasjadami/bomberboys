@@ -237,9 +237,29 @@ se utiliza protocolo UDP para transporte).
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
-explicar prog que simula n clientes
+O servidor desenvolvido possui quatro modos de operação. São eles: \emph{TCP}
+bloqueante, \emph{TCP} não bloqueante, \emph{UDP} bloqueante e \emph{UDP} não
+bloqueante. Na Figura~\ref{fig:server}, a maneira como cada modo é implementado
+é mostrada. Para o \emph{TCP} não bloqueante, há uma única \emph{thread}
+responsável pelo gerenciamento de todos os \emph{sockets}. Nesse modo, há um
+\emph{socket} principal, \emph{SS}, que recebe novas conexões. A cada conexão
+estabelecida, um novo \emph{socket} \emph{Si} é criado para manter a conexão
+com o cliente \emph{i}.
 
-O servidor desenvolvido possui quatro modos de operação. São eles: \emph{TCP} bloqueante, \emph{TCP} não bloqueante, \emph{UDP} bloqueante e \emph{UDP} não bloqueante. Na Figura~\ref{fig:server}, a maneira como cada modo é implementado é mostrada. Para o \emph{TCP} não bloqueante, há uma única \emph{thread} responsável pelo gerenciamento de todos os \emph{sockets}. Nesse modo, há um \emph{socket} principal, \emph{SS}, que recebe novas conexões. A cada conexão estabelecida, um novo \emph{socket} \emph{Si} é criado para manter a conexão com o cliente \emph{i}. No modo \emph{TCP} bloqueante, há uma \emph{thread} responsável pelo recebimento de novas conexões por meio do \emph{socket} \emph{SS} e duas \emph{threads} de leitura e escrita para cada cliente. Ambos os modos que utilizam \emph{TCP} identificam seus clientes por meio do \emph{file descriptor} (\emph{FD}) do \emph{socket} aberto na conexão. Para o \emph{UDP} não bloqueante, o único \emph{socket} utilizado é o \emph{SS}. Há uma única \emph{thread} responsável por processar pacotes recebidos e a serem enviados. Nos modos \emph{UDP}, não há conexão. Portanto, não existe um \emph{FD} para cada cliente. Desta forma, os clientes são identificados pelo par \emph{IP} e porta no servidor. No modo \emph{UDP} bloqueante, há uma \emph{thread} responsável pela leitura de pacotes de todos os clientes por meio do \emph{socket} \emph{SS} e uma \emph{thread} de escrita para cada cliente e que compartilha o \emph{socket} \emph{SS}. 
+No modo \emph{TCP} bloqueante, há uma \emph{thread} responsável pelo
+recebimento de novas conexões por meio do \emph{socket} \emph{SS} e duas
+\emph{threads} de leitura e escrita para cada cliente. Ambos os modos que
+utilizam \emph{TCP} identificam seus clientes por meio do \emph{file
+descriptor} (\emph{FD}) do \emph{socket} aberto na conexão. Para o \emph{UDP}
+não bloqueante, o único \emph{socket} utilizado é o \emph{SS}. Há uma única
+\emph{thread} responsável por processar pacotes recebidos e a serem enviados.
+
+Nos modos \emph{UDP}, não há conexão. Portanto, não existe um \emph{FD} para
+cada cliente. Desta forma, os clientes são identificados pelo par \emph{IP} e
+porta no servidor. No modo \emph{UDP} bloqueante, há uma \emph{thread}
+responsável pela leitura de pacotes de todos os clientes por meio do
+\emph{socket} \emph{SS} e uma \emph{thread} de escrita para cada cliente e que
+compartilha o \emph{socket} \emph{SS}. 
 
 \begin{figure}[ht]
 \centering
