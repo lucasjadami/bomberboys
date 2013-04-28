@@ -26,17 +26,41 @@
 
 \section{Introdução} \label{sec:introcao}
 
-No desenvolvimento de aplicações distribuídas, para a comunicação entre os nós do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de computadores, \emph{Sockets} são definidos como interfaces que possibilitam o fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming Interface} - Interface de Programação de Aplicativos) definida.
+No desenvolvimento de aplicações distribuídas, para a comunicação entre os nós
+do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de
+computadores, \emph{Sockets} são definidos como interfaces que possibilitam o
+fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por
+meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming
+Interface} - Interface de Programação de Aplicativos) definida.
 
-Dependendo do contexto em que está sendo aplicado, pode-se utilizar diferentes modos de operação e protocolos de comunicação. Com relação ao modo de operação, existem duas formas de se utilizar \emph{sockets}: bloqueante e não bloqueante. Além disso, pode-se utilizar protocolos que mantém ou não a conexão entre os nós, como por exemplo os protocolos \emph{TCP} e \emph{UDP}, respectivamente.
+Dependendo do contexto em que está sendo aplicado, pode-se utilizar diferentes
+modos de operação e protocolos de comunicação. Com relação ao modo de operação,
+existem duas formas de se utilizar \emph{sockets}: bloqueante e não bloqueante.
+Além disso, pode-se utilizar protocolos que mantém ou não a conexão entre os
+nós, como por exemplo os protocolos \emph{TCP} e \emph{UDP}, respectivamente.
 
-Quanto ao modo de operação, ao se realizar uma operação bloqueante, o nó envolvido interrompe a execução do programa até que o dado em questão seja enviado ou recebido. Nesse tipo de comunicação, é garantido que todo o pacote foi devidamente processado a cada operação de E/S (entrada e saída).
+Quanto ao modo de operação, ao se realizar uma operação bloqueante, o nó
+envolvido interrompe a execução do programa até que o dado em questão seja
+enviado ou recebido. Nesse tipo de comunicação, é garantido que todo o pacote
+foi devidamente processado a cada operação de E/S (entrada e saída).
 
-Em seu modo não bloqueante, não há o interrompimento da execução ao se utilizar o \emph{socket}. A aplicação apenas verifica se há dados a serem escritos ou lidos antes de realizar um comando nesse modo. Como consequência, é possível que a operação não seja executada por completo. 
+Em seu modo não bloqueante, não há o interrompimento da execução ao se utilizar
+o \emph{socket}. A aplicação apenas verifica se há dados a serem escritos ou
+lidos antes de realizar um comando nesse modo. Como consequência, é possível
+que a operação não seja executada por completo. 
 
-Cada modo de operação e protocolo de comunicação possui vantagens, desvantagens e contextos em que são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja um requisito, como em aplicações de videoconferência, protocolos como o \emph{UDP} trazem maior eficiência. Por outro lado, aplicações bancárias, que necessitam de total integridade de dados, requerem a utilização de protocolos mais seguros, como o \emph{TCP}.
+Cada modo de operação e protocolo de comunicação possui vantagens, desvantagens
+e contextos em que são mais apropriados. Em cenários em que a entrega de todos
+os pacotes não seja um requisito, como em aplicações de videoconferência,
+protocolos como o \emph{UDP} trazem maior eficiência. Por outro lado,
+aplicações bancárias, que necessitam de total integridade de dados, requerem a
+utilização de protocolos mais seguros, como o \emph{TCP}.
 
-Em todos os casos, os diferentes modos de operação de \emph{sockets} podem ser utilizados para se aumentar o desempenho de aplicações em geral. Tal recurso pode reduzir significativamente o tempo necessário para se finalizar uma operação de envio e recebimento de dados, possibilitando melhor utilização de recursos computacionais.
+Em todos os casos, os diferentes modos de operação de \emph{sockets} podem ser
+utilizados para se aumentar o desempenho de aplicações em geral. Tal recurso
+pode reduzir significativamente o tempo necessário para se finalizar uma
+operação de envio e recebimento de dados, possibilitando melhor utilização de
+recursos computacionais.
 
 \section{Objetivos} \label{sec:objetivos}
 
