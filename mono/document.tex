@@ -26,6 +26,19 @@
 \end{resumo}
 
 \section{Introdução} \label{sec:introcao}
+
+No desenvolvimento de aplicações distribuídas, para a comunicação entre os nós do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de computadores, \emph{Sockets} são definidos como interfaces que possibilitam o fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming Interface} - Interface de Programação de Aplicativos) definida.
+
+Dependendo do contexto em que está sendo aplicado, pode-se utilizar diferentes modos de operação e protocolos de comunicação. Com relação ao modo de operação, existem duas formas de se utilizar \emph{sockets}: bloqueante e não bloqueante. Além disso, pode-se utilizar protocolos que mantém ou não a conexão entre os nós, como por exemplo os protocolos \emph{TCP} e \emph{UDP}, respectivamente.
+
+Quanto ao modo de operação, ao se realizar uma operação bloqueante, o nó envolvido interrompe a execução do programa até que o dado em questão seja enviado ou recebido. Nesse tipo de comunicação, é garantido que todo o pacote foi devidamente processado a cada operação de E/S (entrada e saída).
+
+Em seu modo não bloqueante, não há o interrompimento da execução ao se utilizar o \emph{socket}. A aplicação apenas verifica se há dados a serem escritos ou lidos antes de realizar um comando nesse modo. Como consequência, é possível que a operação não seja executada por completo. 
+
+Cada modo de operação e protocolo de comunicação possui vantagens, desvantagens e contextos em que são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja um requisito, como em aplicações de videoconferência, protocolos como o \emph{UDP} trazem maior eficiência. Por outro lado, aplicações bancárias, que necessitam de total integridade de dados, requerem a utilização de protocolos mais seguros, como o \emph{TCP}.
+
+Em todos os casos, os diferentes modos de operação de \emph{sockets} podem ser utilizados para se aumentar o desempenho de aplicações em geral. Tal recurso pode reduzir significativamente o tempo necessário para se finalizar uma operação de envio e recebimento de dados, possibilitando melhor utilização de recursos computacionais.
+
 \section{Objetivos} \label{sec:objetivos}
 
 O objetivo deste trabalho é avaliar o desempenho dos diferentes modos de
@@ -66,8 +79,11 @@ abaixo. Com isso, foram planejados os experimentos listados na tabela~\ref{tab:e
 \end{itemize}
 
 \begin{table}
+  \center
+  \footnotesize
   \begin{tabular}{|c|c|c|c|c|}
-      & Protocolo de transporte & Tipo de comunicação & Tamanho do pacote & Número de jogadores \\ \hline
+  \hline
+      & \textbf{Protocolo de transporte} & \textbf{Tipo de comunicação} & \textbf{Tamanho do pacote} & \textbf{Jogadores} \\ \hline
     1 & TCP & Não-bloqueante & 0 & 50 \\ \hline
     2 & TCP & Não-bloqueante & 0 & 100 \\ \hline
     3 & TCP & Não-bloqueante & 100 & 50 \\ \hline
@@ -98,6 +114,8 @@ jogo e 1 para cada 10 clientes (jogadores). Cada experimento foi planejado para
 ser executado 10 vezes, extraindo-se a média das informações obtidas,
 totalizando 160 execuções de experimentos.
 
+falar das configuraçoes das maquinas do cluster (servidor é no virtual, clientes são nos fisicos)
+
 \subsection{Especificação do Protocolo} \label{sub:protocolo}
 
 Para possibilitar a simulação de um ambiente de jogos cooperativos com
@@ -108,21 +126,24 @@ envolvem o envio de mensagem do cliente para o servidor e do servidor para o
 cliente.
 
 \begin{table}
+  \center
+  \footnotesize
   \begin{tabular}{|c|c|c|c|}
-    Identificador & Nome & Remetente & Campos (seguido do número de bytes) \\ \hline
-    0 & login & Cliente & Nome do jogador(20)  \\ \hline
-    1 & add player & Servidor & Identificador(2), Coordenada X(2), Coordenada Y(2), Nome Jogador(20)\\ \hline
+  \hline
+    \textbf{ID} & \textbf{Nome} & \textbf{Remetente} & \textbf{Campos (seguido do número de bytes)} \\ \hline
+    0 & login & Cliente & Nome Jogador(20)  \\ \hline
+    1 & add player & Servidor & Identificador(2), Coordenadas X e Y(4), Nome Jogador(20)\\ \hline
     2 & remove player & Servidor & Identificador(2) \\ \hline
     3 & move me & Cliente & Direção(1) (Ex: Norte=0, Leste=2) \\ \hline
-    4 & move player & Servidor & Identificador(2), Coordenada X(2), Coordenada Y(2) \\ \hline
+    4 & move player & Servidor & Identificador(2), Coordenadas X e Y(4) \\ \hline
     5 & plant bomb & Cliente & \\ \hline
-    6 & add bomb & Servidor &  Identificador(2), Coordenada X(2), Coordenada Y(2)  \\ \hline
+    6 & add bomb & Servidor &  Identificador(2), Coordenadas X e Y(4)  \\ \hline
     7 & explode bomb & Servidor & Identificador (2) \\ \hline
     8 & fall player & Servidor & Identificador (2) \\ \hline
     9 & acknowledge & Cliente & \\ \hline
    10 & ping & Cliente & \\ \hline
    11 & pong & Servidor & \\ \hline
-   12 & info & Cliente & Numerador Média(8), Denominador Média(8), Numerador Desvio Padrão(8), Denominador Desvio Padrão(8), Pacotes Perdidos(4)  \\ \hline
+   12 & info & Cliente & Média(16), Desvio Padrão(16), Pacotes Perdidos(4)  \\ \hline
    13 & shutdown & Servidor &\\ \hline
   \end{tabular} 
 \caption{Protocolo do jogo criado}
@@ -187,6 +208,15 @@ protocolo UDP para transporte).
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
 explicar prog que simula n clientes
+
+O servidor desenvolvido possui quatro modos de operação. São eles: \emph{TCP} bloqueante, \emph{TCP} não bloqueante, \emph{UDP} bloqueante e \emph{UDP} não bloqueante. Na Figura~\ref{fig:server}, a maneira como cada modo é implementado é mostrada. Para o \emph{TCP} não bloqueante, há uma única \emph{thread} responsável pelo gerenciamento de todos os \emph{sockets}. Nesse modo, há um \emph{socket} principal, \emph{SS}, que recebe novas conexões. A cada conexão estabelecida, um novo \emph{socket} \emph{Si} é criado para manter a conexão com o cliente \emph{i}. No modo \emph{TCP} bloqueante, há uma \emph{thread} responsável pelo recebimento de novas conexões por meio do \emph{socket} \emph{SS} e duas \emph{threads} de leitura e escrita para cada cliente. Ambos os modos que utilizam \emph{TCP} identificam seus clientes por meio do \emph{file descriptor} (\emph{FD}) do \emph{socket} aberto na conexão. Para o \emph{UDP} não bloqueante, o único \emph{socket} utilizado é o \emph{SS}. Há uma única \emph{thread} responsável por processar pacotes recebidos e a serem enviados. Nos modos \emph{UDP}, não há conexão. Portanto, não existe um \emph{FD} para cada cliente. Desta forma, os clientes são identificados pelo par \emph{IP} e porta no servidor. No modo \emph{UDP} bloqueante, há uma \emph{thread} responsável pela leitura de pacotes de todos os clientes por meio do \emph{socket} \emph{SS} e uma \emph{thread} de escrita para cada cliente e que compartilha o \emph{socket} \emph{SS}. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.8\textwidth]{img/server.png}
+\caption{Modos de operação do servidor}
+\label{fig:server}
+\end{figure}
 
 \subsection{Realização de Experimentos e Análise dos Resultados} \label{sub:realizacao}
 
