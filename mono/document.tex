@@ -4,10 +4,9 @@
 
 \usepackage{graphicx,url}
 
-%\usepackage[brazil]{babel}   
+\usepackage[brazil]{babel}   
 \usepackage[utf8]{inputenc}  
-
-     
+   
 \sloppy
 
 \title{Avaliação de desempenho de servidores de jogos cooperativos}
@@ -83,7 +82,7 @@ abaixo. Com isso, foram planejados os experimentos listados na tabela~\ref{tab:e
   \footnotesize
   \begin{tabular}{|c|c|c|c|c|}
   \hline
-      & \textbf{Protocolo de transporte} & \textbf{Tipo de comunicação} & \textbf{Tamanho do pacote} & \textbf{Jogadores} \\ \hline
+    \#  & \textbf{Protocolo de transporte} & \textbf{Tipo de comunicação} & \textbf{Tamanho do pacote} & \textbf{Jogadores} \\ \hline
     1 & TCP & Não-bloqueante & 0 & 50 \\ \hline
     2 & TCP & Não-bloqueante & 0 & 100 \\ \hline
     3 & TCP & Não-bloqueante & 100 & 50 \\ \hline
@@ -244,9 +243,37 @@ FALAR DE DIFICULDADES ETC?
 
 \section{Resultados} \label{sec:resultados}
 \subsection{Dados Obtidos} \label{sub:dados}
+
+\begin{table}
+  \center
+  \footnotesize
+  \begin{tabular}{|c|c|c|c|c|}
+  \hline
+    \# & \textbf{Atraso Médio ($ms$)} & \textbf{Variância ($ms$)} & \textbf{CPU usuário/kernel/total (\%)} & \textbf{Bytes enviados/recebidos} \\ \hline
+    1 &  &  &  &  \\ \hline
+    2 &  &  &  &  \\ \hline
+    3 &  &  &  &  \\ \hline
+    4 &  &  &  &  \\ \hline
+    5 &  &  &  &  \\ \hline
+    6 &  &  &  &  \\ \hline
+    7 &  &  &  &  \\ \hline
+    8 &  &  &  &  \\ \hline
+    9 &  &  &  &  \\ \hline
+    10 &  &  &  &  \\ \hline
+    11 &  &  &  &  \\ \hline
+    12 &  &  &  &  \\ \hline
+    13 &  &  &  &  \\ \hline
+    14 &  &  &  &  \\ \hline
+    15 &  &  &  &  \\ \hline
+    16 &  &  &  &  \\ \hline
+  \end{tabular} 
+\caption{Experimentos planejados}
+\label{tab:experimentos}
+\end{table} 
+
 \subsection{Discussão dos Resultados} \label{sub:discussao}
 \section{Conclusões} \label{sec:conclusoes}
-\section{Referências} \label{sec:referencias}
+% \section{Referências} \label{sec:referencias}
 
 % \begin{figure}[ht]
 % \centering
@@ -256,6 +283,6 @@ FALAR DE DIFICULDADES ETC?
 % \end{figure}
 
 \bibliographystyle{sbc}
-\bibliography{sbc-template}
+\bibliography{bibliography}
 
 \end{document}
