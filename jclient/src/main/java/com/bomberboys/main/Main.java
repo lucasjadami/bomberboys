@@ -33,7 +33,7 @@ public class Main
                 Game game = new Game(protocol, address, port, informer);
                 game.connect();
                 
-                long quitTime = System.currentTimeMillis() + 100 * 1000;
+                long quitTime = System.currentTimeMillis() + 60 * 1000;
                 long nextAck = System.currentTimeMillis() + 1000;
                 long now = 0;
                 
@@ -61,6 +61,7 @@ public class Main
                         nextAck = now + 1000;
                     }
                 }
+                System.out.println("Ended normally.");
             }
         }.start();
     }
