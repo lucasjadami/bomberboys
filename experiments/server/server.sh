@@ -10,7 +10,7 @@ fi
 startupTime=5
 runTime=65
 totalTime=70
-waitTime=30
+waitTime=120
 finalizeTime=5
 
 echo "Running experiment for $1"
