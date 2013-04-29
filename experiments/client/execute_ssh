@@ -15,6 +15,7 @@ Thread.abort_on_exception = true
 threads = client_hosts.map do |c|
   Thread.new do
     begin
+      puts "Starting #{c}"
       ssh = Net::SSH.start(c, username, :password => password)
       res = ssh.exec!(command)
       ssh.close
