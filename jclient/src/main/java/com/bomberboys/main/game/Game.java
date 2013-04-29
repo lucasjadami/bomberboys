@@ -28,6 +28,7 @@ public class Game
 
     private long currentPingTime;
     private List<Long> pingTimes;
+    private boolean isShutdown;
     
     public Game(String protocol, String address, int port, boolean informer)
     {
@@ -38,6 +39,11 @@ public class Game
         players = new HashMap<>();
         bombs = new HashMap<>();
         pingTimes = new ArrayList<>();
+        isShutdown = false;
+    }
+
+    public boolean isShutdown() {
+        return isShutdown;
     }
 
     public void connect()
@@ -201,6 +207,7 @@ public class Game
             newBuffer.putInt(lostPackets);
             connection.sendPacket(new Packet(packetUId++, Packet.Id.INFO, newBuffer));
         }
+        isShutdown = true;
     }
 
     private void pong(ByteBuffer buffer)

@@ -37,7 +37,7 @@ public class Main
                 long nextAck = System.currentTimeMillis() + 1000;
                 long now = 0;
                 
-                while (now < quitTime)
+                while (now < quitTime && !game.isShutdown())
                 {
                     now = System.currentTimeMillis();
                     try
