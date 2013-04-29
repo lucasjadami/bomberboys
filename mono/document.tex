@@ -63,9 +63,9 @@ no contexto dessas aplicações.
 Este trabalho tem como objetivo investigar cenários favoráveis para aplicações
 distribuídas com enfoque em jogos cooperativos. Nas próximas seções serão
 abordados a fundamentação teórica para o encaminhamento desse trabalho
-(seção~\ref{sec:fundamentacao}), os objetivos (seção~\ref{sec:objetivos}), as
-atividades desenvolvidas (seção~\ref{sec:atividades}) e, por fim, os resultados
-e conclusões obtidos (seção~\ref{sec:resultados} e~\ref{sec:conclusoes}).
+(Seção~\ref{sec:fundamentacao}), os objetivos (Seção~\ref{sec:objetivos}), as
+atividades desenvolvidas (Seção~\ref{sec:atividades}) e, por fim, os resultados
+e conclusões obtidos (Seção~\ref{sec:resultados} e~\ref{sec:conclusoes}).
 
 % Cada protocolo de transporte possui vantagens, desvantagens e contextos em que
 % são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja
@@ -76,7 +76,7 @@ e conclusões obtidos (seção~\ref{sec:resultados} e~\ref{sec:conclusoes}).
 
 \section{Fundamentação Teórica} \label{sec:fundamentacao}
 
-Nessa seção, serão abordadas toda a teoria utilizada para o andamento adequado deste projeto de disciplina. Inicialmente serão abordados os protocolos de transporte utilizados (Seção~\ref{sub:protocolos}). Em seguida, são apresentados os modos de execução possíveis através de \textit{sockets} (seção ~\ref{sub:modos}). Por fim, define-se o padrão de aplicação distribuídas utilizado nesse trabalho, o padão cliente-servidor (seção ~\ref{sub:clienteserv}).
+Nessa seção, serão abordadas toda a teoria utilizada para o andamento adequado deste projeto de disciplina. Inicialmente serão abordados os protocolos de transporte utilizados (Seção~\ref{sub:protocolos}). Em seguida, são apresentados os modos de execução possíveis através de \textit{sockets} (Seção ~\ref{sub:modos}). Por fim, define-se o padrão de aplicação distribuídas utilizado nesse trabalho.%, o padão cliente-servidor (Seção ~\ref{sub:clienteserv}).
 
 \subsection{Protocolos de transporte} \label{sub:protocolos}
 
@@ -89,32 +89,32 @@ Interface} - Interface de Programação de Aplicativos) definida.
 
 Na perspectiva de camadas de rede, \textit{sockets} representam a interface
 entre a camada de aplicação e a de transporte. Nesse sentido, \textit{sockets}
-TCP e UDP permitem que softwares na camada de aplicação troquem informações
+\emph{TCP} (\emph{Transmission Control Protocol}) e \emph{UDP} (\emph{User Datagram Protocol}) permitem que softwares na camada de aplicação troquem informações
 entre si em nível de processos. Com isso, é possível desenvolver protocolos na
 camada de aplicação com a semântica apropriada para o domínio da aplicação
 escolhendo o nível de confiabilidade no transporte dos dados.
 
 Quando há necessidade de se estabelecer uma conexão entre os nós para a
 comunicação, a entrega de todos pacotes e na ordem em que foram enviados, é
-comum a utilização de protocolos como o TCP. Além de prover esses serviços,
+comum a utilização de protocolos como o \emph{TCP}. Além de prover esses serviços,
 esse protocolo oferece ainda controle de congestionamento e de fluxo de dados,
-permitindo um uso mais racional da rede que interliga os nós. O protocolo TCP é
+permitindo um uso mais racional da rede que interliga os nós. O protocolo \emph{TCP} é
 utilizado, por exemplo, em aplicações que fazem uso do protocolo de aplicação
-HTTP, como navegadores e serviços Web.
+\emph{Hypertext Transfer Protocol} (\emph{HTTP}), como navegadores e serviços \emph{Web}.
 
 Por outro lado, quando não há a necessidade de se ter tais garantias ou quando
 tais garantias prejudicam o desempenho da aplicação, é utilizado o protocolo
-UDP. Tal protocolo não disponibiliza os serviços oferecidos pelo protocolo UDP.
+\emph{UDP}. Tal protocolo não disponibiliza os serviços oferecidos pelo protocolo \emph{UDP}.
 O que pode parecer uma desvantagem, pode ser útil em situações em que não
 importa ordem de pacotes ou que todos os pacotes cheguem. Além disso, em
 determinados contextos, o controle de congestionamento pode prejudicar o
 desempenho da aplicação.
 
-Com o protocolo UDP, é possível maior controle sobre como os dados são
+Com o protocolo \emph{UDP}, é possível maior controle sobre como os dados são
 transportados pela rede, implementando em camada de aplicação os serviços
-adequandos de forma próxima do necessário para a aplicação em questão. Um
-exemplo de aplicação que usa o protocolo UDP são os aplicativos de
-vídeoconferência, em que a perda de um \textit{frame} da imagem não é algo
+adequados de forma próxima do necessário para a aplicação em questão. Um
+exemplo de aplicação que usa o protocolo \emph{UDP} são os aplicativos de
+vídeo-conferência, em que a perda de um \textit{frame} da imagem não é algo
 crítico.
 
 \subsection{Modos de Operação de \textit{sockets}} \label{sub:modos}
@@ -140,7 +140,7 @@ pode reduzir significativamente o tempo necessário para se finalizar uma
 operação de envio e recebimento de dados, possibilitando melhor utilização de
 recursos computacionais.
 
-\textit{Sockets} não-bloqueantes promovem menor eciosidade do processo em
+\textit{Sockets} não-bloqueantes promovem menor ociosidade do processo em
 questão com o risco de haver problemas de envio de mensagem. \textit{Sockets}
 bloqueantes, por outro lado, asseguram que a mensagem seja totalmente
 processada antes de enviá-la havendo, porém, o custo de se esperar o
@@ -160,12 +160,12 @@ os clientes (jogadores) por meio de servidores.
 
 Para a realização do experimento, uma série de procedimentos foram realizados.
 Inicialmente foi realizado o planejamento do experimento
-(seção~\ref{sub:planejamento}) a ser executado para análise da eficiência de
+(Seção~\ref{sub:planejamento}) a ser executado para análise da eficiência de
 cada configuração proposta. Em seguida, foi especificado o protocolo de
-comunicação entre os clientes e o servidor (seção~\ref{sub:protocolo}) seguido
-do desenvolvimento do jogo em si (seção~\ref{sub:desenvolvimento}). Com o jogo
+comunicação entre os clientes e o servidor (Seção~\ref{sub:protocolo}) seguido
+do desenvolvimento do jogo em si (Seção~\ref{sub:desenvolvimento}). Com o jogo
 criado, houve a realização dos experimentos e a análise dos resultados
-(seção~\ref{sub:realizacao}) para que fosse possível verificar a eficácia de
+(Seção~\ref{sub:realizacao}) para que fosse possível verificar a eficácia de
 cada configuração.
 
 \subsection{Planejamento do Experimento} \label{sub:planejamento}
@@ -173,7 +173,7 @@ cada configuração.
 Nesta etapa, foram decididos itens fundamentais para a realização do
 experimento. Inicialmente, o tipo de jogo (incluindo a natureza das
 comunicações a serem realizadas) foi determinado. O jogo escolhido basea-se no
-popular jogo Bomberman, no qual jogadores podem ativar bombas de modo a
+popular jogo \emph{Bomberman}, no qual jogadores podem ativar bombas de modo a
 estrategicamente atingir outros jogadores com a explosão da mesma.
 
 A partir do jogo escolhido, determinou-se as variáveis do experimento e
