@@ -33,11 +33,10 @@ public class Main
                 Game game = new Game(protocol, address, port, informer);
                 game.connect();
                 
-                long quitTime = System.currentTimeMillis() + 60 * 1000;
                 long nextAck = System.currentTimeMillis() + 1000;
                 long now = 0;
                 
-                while (now < quitTime && !game.isShutdown())
+                while (!game.isShutdown())
                 {
                     now = System.currentTimeMillis();
                     try

@@ -206,6 +206,9 @@ public class Game
             newBuffer.putLong(1L);
             newBuffer.putInt(lostPackets);
             connection.sendPacket(new Packet(packetUId++, Packet.Id.INFO, newBuffer));
+            try {
+                Thread.sleep(10000);
+            } catch(Exception e){ }
         }
         isShutdown = true;
     }
