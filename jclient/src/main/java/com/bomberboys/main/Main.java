@@ -7,6 +7,8 @@ import com.bomberboys.main.game.Game;
  */
 public class Main
 {
+    public static int activeThreads;
+
     public static void main(String[] args) throws Exception
     {
         System.out.println("Usage: n_bots [tcp|udp] address port\n");
@@ -15,6 +17,7 @@ public class Main
         String address = args[2];
         int port = Integer.parseInt(args[3]);
 
+        activeThreads = nBots;
         startGameThread(protocol, address, port, true);
         for (int i = 1; i < nBots; ++i)
         {
@@ -61,6 +64,10 @@ public class Main
                     }
                 }
                 System.out.println("Ended normally.");
+                activeThreads--;
+                if (activeThreads == 0) {
+                    System.exit(0);
+                }
             }
         }.start();
     }
