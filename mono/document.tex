@@ -5,9 +5,13 @@
 \usepackage{graphicx,url}
 
 \usepackage[brazil]{babel}   
-\usepackage[utf8]{inputenc}  
+\usepackage[utf8]{inputenc} 
+
+\usepackage{amsfonts} 
    
 \sloppy
+
+\newcommand{\er}{$\times$}
 
 \title{Avaliação de desempenho de servidores de jogos cooperativos}
 \author{Lucas Junqueira Adami (6792496)\inst{1}, Rafael Regis do Prado (6427132)\inst{1}}
@@ -447,10 +451,11 @@ $\ll\ll\ll$ dificuldades encontradas $\gg\gg\gg$
 
 \section{Resultados} \label{sec:resultados}
 
-
-
+Nessa Seção, os resultados obtidos a partir dos experimentos realizados são mostrados. Ainda, uma discussão desses valores é feita. Uma análise das falhas nos experimentos também é comentada.
 
 \subsection{Dados Obtidos} \label{sub:dados}
+
+Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos.
 
 \begin{table}
   \center
@@ -458,29 +463,31 @@ $\ll\ll\ll$ dificuldades encontradas $\gg\gg\gg$
   \begin{tabular}{|c|c|c|c|c|c|}
   \hline
     \# & \textbf{Atraso ($ms$)} & \textbf{Variância ($ms$)} & \textbf{CPU (\%)} & \textbf{Bytes} & \textbf{Pacotes Perdidos} \\ \hline
-    1 &  &  &  &  & \\ \hline
-    2 &  &  &  &  & \\ \hline
-    3 &  &  &  &  & \\ \hline
-    4 &  &  &  &  & \\ \hline
-    5 &  &  &  &  & \\ \hline
-    6 &  &  &  &  & \\ \hline
-    7 &  &  &  &  & \\ \hline
-    8 &  &  &  &  & \\ \hline
-    9 &  &  &  &  & \\ \hline
-    10 &  &  &  &  & \\ \hline
-    11 &  &  &  &  & \\ \hline
-    12 &  &  &  &  & \\ \hline
-    13 &  &  &  &  & \\ \hline
-    14 &  &  &  &  & \\ \hline
-    15 &  &  &  &  & \\ \hline
-    16 &  &  &  &  & \\ \hline
+    1 & 50.04 & 1.74 & 16.1/9.6/73.6 & 21688636.2/438917162.9 & 0 \\ \hline
+    2 & 309.486667 & 193.74 & 27.75/7.05/64.35 & 18397940.95/357472631.95 & 0 \\ \hline
+    3 & \er & \er & \er & \er & \er \\ \hline
+    4 & \er & \er & \er & \er & \er \\ \hline
+    5 & 50.16 & 3.14 & 31/25.6/43 & 20717318.5/310870796.8 & 0 \\ \hline
+    6 & 53.89 & 12.08 & 33.15/31.5/34.75 & 35965675.65/375906838.45 & 0 \\ \hline
+    7 & 50.02 & 0.53 & 23.4/44.2/32.2 & 66501124.9/2064695664.9 & 0 \\ \hline
+    8 & 54.15 & 9.52 & 23.55/47.35/28.9 & 77556161.35/2327154624.80 & 0 \\ \hline
   \end{tabular} 
 \caption{Resultados dos experimentos}
 \label{tab:resultados}
 \end{table} 
 
+A Figura~\ref{fig:tcp-nonblocking-trash100} representa os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/tcp-nonblocking-trash100.png}
+  \caption{Tempos para o modo \emph{TCP} não bloqueante}
+  \label{fig:tcp-nonblocking-trash100}
+\end{figure}
+
 \subsection{Discussão dos Resultados} \label{sub:discussao}
 \section{Conclusões} \label{sec:conclusoes}
+
 % \section{Referências} \label{sec:referencias}
 
 % \begin{figure}[ht]
