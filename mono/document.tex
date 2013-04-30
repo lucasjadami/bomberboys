@@ -26,7 +26,7 @@
 \maketitle
 
 \begin{resumo} % 10 linhas
-Aplicações distribuídas estão cada dia mais presentes. Em contextos como jogos
+Aplicações distribuídas estão cada dia mais presentes nos sistemas de computação. Em contextos como jogos
 cooperativos, a interação entre jogadores se dá por meio de uma rede de
 computadores a qual os interliga com um ou mais servidores centrais. Nesses
 casos, há o uso intensivo da rede para manter o sincronismo entre os jogadores.
@@ -41,7 +41,7 @@ pacotes.
 
 \section{Introdução} \label{sec:introducao}
 
-Aplicações distribuídas estão cada dia mais presentes. Diversos domínios de
+Aplicações distribuídas estão cada dia mais presentes nos sistemas de computação. Diversos domínios de
 problemas exigem cada vez mais recursos computacionais e necessitam que tarefas
 sejam executadas em ambientes distintos. Aplicações numéricas, por exemplo,
 pelo alto grau de computação necessário. Muitas vezes, esse tipo de aplicação é
@@ -98,7 +98,7 @@ do sistema, utiliza-se como recurso os \emph{sockets}. No contexto de redes de
 computadores, \emph{sockets} são definidos como interfaces que possibilitam o
 fluxo de dados (envio e recebimento de pacotes de dados) entre dois nós por
 meio de uma rede, utilizando uma \emph{API} (\emph{Application Programming
-Interface} - Interface de Programação de Aplicativos) definida.
+Interface} - Interface de Programação de Aplicativos) definida \cite{Tanenbaum}.
 
 Na perspectiva de camadas de rede, \textit{sockets} representam a interface
 entre a camada de aplicação e a de transporte. Nesse sentido, \textit{sockets}
@@ -192,7 +192,7 @@ popular jogo \emph{Bomberman}, no qual jogadores podem ativar bombas de modo a
 estrategicamente atingir outros jogadores com a explosão da mesma.
 
 A partir do jogo escolhido, determinou-se as variáveis do experimento e
-cenários que deveriam ser analisados, tais variáveis podem ser analisadas
+cenários que deveriam ser analisados, tais variáveis podem ser encontradas
 abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:experimentos}.
 
 \begin{itemize}
@@ -247,7 +247,7 @@ obtidas, totalizando 160 execuções de experimentos.
 Para a execução dos experimentos, optou-se pela utilização do \textit{cluster}
 disponível no Laboratório de Sistemas Distribuídos e Programação Concorrente
 (LaSDPC). Desse modo, foi utilizada uma máquina virtual para a execução do
-servidor e 10 nós físicos para os clientes. O uso da máquina virtual ocorreu
+servidor e 10 nós físicos para os clientes, cada nó físico executando 10 clientes simultâneos. O uso da máquina virtual ocorreu
 devido a necessidade de se instalar programas adicionais para medição dos dados
 enviados e recebidos pelo servidor.  As configurações dos nós físicos e máquina
 virtual utilizados podem ser visualizadas abaixo.
@@ -304,19 +304,18 @@ cliente.
 \label{tab:protocolo}
 \end{table} 
 
-Para início de interação, cada cliente deve se apresentar para o cliente
+Para início de interação, cada cliente deve se apresentar para o servidor
 através da ação \emph{login} especificando, inclusive, o nome que pretende
 utilizar. Como resposta a uma requisição de login, o servidor envia um pacote
 \emph{add player} que contém, entre outros dados, o identificador do cliente
 corrente permitindo que este possa distinguir-se dos demais jogadores.
 
-Para cada jogador que realiza uma ação de \emph{login}, um pacote de \emph{add player} para
+Para cada jogador que realiza uma ação de \emph{login}, um pacote de \emph{add player} é enviado para
 os demais clientes para que fiquem cientes da presença de um novo jogador. Além
 do identificador, são enviados também o nome do jogador e suas coordenadas X e
 Y para que cada cliente possa representá-los graficamente e considerá-los ao
 realizar suas ações. Da mesma forma, quando um cliente se desconecta, o
-servidor envia um pacote \emph{remove player} para que o jogador com o identificador
-seja removido localmente.
+servidor envia um pacote \emph{remove player} para que o jogador seja removido localmente.
 
 Quando um jogador desejar se movimentar, deve ser realizada uma ação de \emph{move
 me} com a direção desejada. Como resposta, o servidor envia para todos os
@@ -343,7 +342,7 @@ As ações de 9 a 11 (Tabela~\ref{tab:protocolo}) são ações de controle. A a�
 \textit{acknowledge} foi incluída para uniformizar a utilização dos protocolos
 de transporte \emph{TCP} e \emph{UDP}. Uma vez que o protocolo \emph{UDP} não estabelece uma
 conexão entre os pares, é essencial para o servidor que o cliente avise
-periodicamente que ainda está ativo, com isso, caso não esteja, o servidor pode
+periodicamente que ainda está ativo. Com isso, caso não esteja, o servidor pode
 descartá-lo de sua tabela de clientes conectados.
 
 As ações de controle \textit{ping}, \textit{pong} e \textit{info} foram
@@ -355,13 +354,13 @@ Periodicamente, o cliente envia um pacote \textit{ping} para o servidor, o qual
 imediatamente responde com um pacote \textit{pong} permitindo que o cliente
 faça medidas do atraso da comunicação. No final, ao receber um pacote
 \textit{shutdown} do servidor, o cliente opcionalmente pode enviar a média e
-desvio padrão dos atrasos e a quantidade de pacotes não recebidos (útil quando
+variância dos atrasos e a quantidade de pacotes não recebidos (útil quando
 se utiliza protocolo \emph{UDP} para transporte).
 
 Para tratar a questão da perda de pacotes, utilizou-se um campo UID que rotula
 unicamente cada pacote com um número crescente. Com isso é possível monitorar
 pacotes que chegam no cliente. Caso dois pacotes recebidos tenham a diferença
-de UIDs superior a 1, houve uma perda de pacote.
+de UIDs superior a 1, houve uma perda de pacote. Note que pacotes podem chegar desordenados. Portanto, esse valor obtido pode ser maior que o total real de pacotes perdidos.
 
 \subsection{Desenvolvimento de Jogo Cooperativo} \label{sub:desenvolvimento}
 
@@ -403,13 +402,13 @@ No modo \emph{TCP} bloqueante, há uma \emph{thread} responsável pelo
 recebimento de novas conexões por meio do \emph{socket} \emph{SS} e duas
 \emph{threads} de leitura e escrita para cada cliente. Ambos os modos que
 utilizam \emph{TCP} identificam seus clientes por meio do \emph{file
-descriptor} (\emph{FD}) do \emph{socket} aberto na conexão. Para o \emph{UDP}
-não bloqueante, o único \emph{socket} utilizado é o \emph{SS}. Há uma única
-\emph{thread} responsável por processar pacotes recebidos e a serem enviados.
+descriptor} (\emph{FD}) do \emph{socket} aberto na conexão. 
 
-Nos modos \emph{UDP}, não há conexão. Portanto, não existe um \emph{FD} para
+Para o \emph{UDP} não bloqueante, o único \emph{socket} utilizado é o \emph{SS}. Há uma única \emph{thread} responsável por processar pacotes recebidos e a serem enviados. Nos modos \emph{UDP}, não há conexão. Portanto, não existe um \emph{FD} para
 cada cliente. Desta forma, os clientes são identificados pelo par \emph{IP} e
-porta no servidor. No modo \emph{UDP} bloqueante, há uma \emph{thread}
+porta no servidor. 
+
+No modo \emph{UDP} bloqueante, há uma \emph{thread}
 responsável pela leitura de pacotes de todos os clientes por meio do
 \emph{socket} \emph{SS} e uma \emph{thread} de escrita para cada cliente e que
 compartilha o \emph{socket} \emph{SS}. 
@@ -440,7 +439,7 @@ necessária uma espera ocupada o que, no fim, simula o modo bloqueante.
 
 Para que fosse possível a simulação de uma partida do jogo utilizando o
 servidor e os clientes, foi criado um \textit{bot} (jogador artificial) o qual
-joga de forma aleatória. No contexto do experimento, em que temos até 100
+joga de forma aleatória. No contexto do experimento, há até 100
 jogadores simultâneos.  A utilização de \textit{bots} com inteligência
 artificial ou de jogadores humanos dificilmente acarretaria em resultados
 diferentes uma vez que o espaço da arena do jogo inviabiliza a utilização de
@@ -460,13 +459,13 @@ em outros nós em seguida, todo o processo conforme o especificado para o
 experimento selecionado.
 
 Para cada execução de experimento, foram armazenados dados como a quantidade
-total de pacotes trocados entre o servidor e seus clientes, a carga da \emph{CPU}
-durante o experimento, a média e desvio padrão do atraso na comunicação e a
+total de \emph{bytes} trocados entre o servidor e seus clientes, a carga da \emph{CPU}
+durante o experimento, a média e variância do atraso na comunicação e a
 quantidade de pacotes perdidos em disco para análise posterior. Desse total de
 dados, foram extraídas as informações de interesse por meio de
 \textit{scripts}.
 
-Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho dessa linguagem, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. Por causa desse problema, os clientes foramd esenvolvidos em \emph{Java}.
+Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho dessa linguagem, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. Por causa desse problema, os clientes foram desenvolvidos em \emph{Java}.
 
 Outra resistência encontrada foi a dificuldade da utilização do \emph{cluster}. Inicialmente, os arquivos estavam na pasta do usuário (\emph{home}) e por questões de configuração do sistema de arquivos os experimentos ficavam lentos, resultando em valores errôneos. Ao passar os arquivos para a pasta \emph{opt} das máquinas, as execuções fluíram de maneira normal. 
 
@@ -479,7 +478,7 @@ Nessa Seção, os resultados obtidos a partir dos experimentos realizados são m
 
 \subsection{Dados Obtidos} \label{sub:dados}
 
-Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos. Os dados de \emph{CPU} e \emph{bytes} recebidos e enviados foram obtidos por meio dos programas presentes no \emph{Linux} chamados \emph{vmstat} \cite{Vmstat} e \emph{nstat} \cite{nstat} respectivamente. No segundo programa, os valores foram extraídos a partir dos campos \emph{IpExtInOctets} e \emph{IpExtOutOctets}.
+Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. A segunda e terceira colunas representam as médias do atraso e variância percebidos nos clientes, respectivamente. A quarta coluna \emph{CPU}, mostra a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e a ociosidade da máquina do servidor. A quinta coluna, \emph{bytes}, possui dois valores que equivalem ao número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos. Os dados de \emph{CPU} e \emph{bytes} recebidos e enviados foram obtidos por meio dos programas presentes no \emph{Linux} chamados \emph{vmstat} \cite{Vmstat} e \emph{nstat} \cite{nstat} respectivamente. No segundo programa, os valores foram extraídos a partir dos campos \emph{IpExtInOctets} e \emph{IpExtOutOctets}.
 
 \begin{table}
   \center
@@ -509,7 +508,7 @@ Na Figura~\ref{fig:delay-graph}, os tempos de atraso e suas variâncias para os 
   \label{fig:delay-graph}
 \end{figure}
 
-Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente enquanto o eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
+Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} na máquina do servidor dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente enquanto o eixo $y$ indica a porcentagem dos valores de utilização nos modos usuário, \emph{kernel} e ocioso.
 
 \begin{figure}[ht]
   \centering
@@ -520,14 +519,14 @@ Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimen
 
 A quantidade de \emph{bytes} enviados e recebidos pelo servidor durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indicado. Os valores dessas métricas estão representados no eixo $y$.
 
-\begin{figure}[ht]
+\begin{figure}[ht!]
   \centering
   \includegraphics[width=1\textwidth]{img/net-graph.png}
   \caption{\emph{Bytes} enviados e recebidos}
   \label{fig:net-graph}
 \end{figure}
 
-Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100 estão apresentados. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos. A curva gerada é aproximada por linhas de \emph{Bezier} \cite{Bezier}.
+Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho mínimo 100 estão apresentados. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos. A curva gerada é aproximada por curvas de \emph{Bezier} \cite{Bezier}.
 
 \begin{figure}[ht]
   \centering
