@@ -70,9 +70,9 @@ podem resultar em inconsistências na jogabilidade, ou seja, jogadores podem
 estar se baseando em um estado desatualizado do jogo para tomar decisões.
 
 Dessa forma, uma das constantes preocupações no desenvolvimento de aplicações
-distribuídas está nos padrões de comunicação entre os pares. Dessa forma,
+distribuídas está nos padrões de comunicação entre os pares. Assim,
 procura-se por técnicas de transmissão de mensagens que sejam eficientes, por
-meios de reduzir a taxa de informações transferidas e por protocolos eficientes
+meio da redução da taxa de informações transferidas e por protocolos eficientes
 no contexto dessas aplicações.
 
 Este trabalho tem como objetivo investigar cenários favoráveis para aplicações
@@ -82,16 +82,14 @@ abordados a fundamentação teórica para o encaminhamento desse trabalho
 atividades desenvolvidas (Seção~\ref{sec:atividades}) e, por fim, os resultados
 e conclusões obtidos (Seção~\ref{sec:resultados} e~\ref{sec:conclusoes}).
 
-% Cada protocolo de transporte possui vantagens, desvantagens e contextos em que
-% são mais apropriados. Em cenários em que a entrega de todos os pacotes não seja
-% um requisito, como em aplicações de videoconferência, protocolos como o
-% \emph{UDP} trazem maior eficiência. Por outro lado, aplicações bancárias, que
-% necessitam de total integridade de dados, requerem a utilização de protocolos
-% mais seguros, como o \emph{TCP}.
-
 \section{Fundamentação Teórica} \label{sec:fundamentacao}
 
-Nessa seção, serão abordadas toda a teoria utilizada para o andamento adequado deste projeto de disciplina. Inicialmente serão abordados os protocolos de transporte utilizados (Seção~\ref{sub:protocolos}). Em seguida, são apresentados os modos de execução possíveis através de \textit{sockets} (Seção ~\ref{sub:modos}). Por fim, define-se o padrão de aplicação distribuídas utilizado nesse trabalho.%, o padão cliente-servidor (Seção ~\ref{sub:clienteserv}).
+Nessa seção, serão abordadas toda a teoria utilizada para o andamento adequado
+deste projeto de disciplina. Inicialmente serão abordados os protocolos de
+transporte utilizados (Seção~\ref{sub:protocolos}). Em seguida, são
+apresentados os modos de execução possíveis através de \textit{sockets} (Seção
+~\ref{sub:modos}). Por fim, define-se o padrão de aplicação distribuídas
+utilizado nesse trabalho.
 
 \subsection{Protocolos de transporte} \label{sub:protocolos}
 
@@ -104,10 +102,12 @@ Interface} - Interface de Programação de Aplicativos) definida.
 
 Na perspectiva de camadas de rede, \textit{sockets} representam a interface
 entre a camada de aplicação e a de transporte. Nesse sentido, \textit{sockets}
-\emph{TCP} (\emph{Transmission Control Protocol}) e \emph{UDP} (\emph{User Datagram Protocol}) permitem que softwares na camada de aplicação troquem informações
-entre si em nível de processos. Com isso, é possível desenvolver protocolos na
-camada de aplicação com a semântica apropriada para o domínio da aplicação
-escolhendo o nível de confiabilidade no transporte dos dados.
+\emph{TCP} (\emph{Transmission Control Protocol}) e \emph{UDP} (\emph{User
+Datagram Protocol}) permitem que softwares na camada de aplicação troquem
+informações entre si em nível de processos~\cite{Tanenbaum}. Com isso, é
+possível desenvolver protocolos na camada de aplicação com a semântica
+apropriada para o domínio da aplicação escolhendo o nível de confiabilidade no
+transporte dos dados.
 
 Quando há necessidade de se estabelecer uma conexão entre os nós para a
 comunicação, a entrega de todos pacotes e na ordem em que foram enviados, é
@@ -119,11 +119,11 @@ utilizado, por exemplo, em aplicações que fazem uso do protocolo de aplicaçã
 
 Por outro lado, quando não há a necessidade de se ter tais garantias ou quando
 tais garantias prejudicam o desempenho da aplicação, é utilizado o protocolo
-\emph{UDP}. Tal protocolo não disponibiliza os serviços oferecidos pelo protocolo \emph{UDP}.
+\emph{UDP}. Tal protocolo não disponibiliza os serviços oferecidos pelo protocolo \emph{TCP}.
 O que pode parecer uma desvantagem, pode ser útil em situações em que não
 importa ordem de pacotes ou que todos os pacotes cheguem. Além disso, em
 determinados contextos, o controle de congestionamento pode prejudicar o
-desempenho da aplicação.
+desempenho da aplicação~\cite{Kurose}.
 
 Com o protocolo \emph{UDP}, é possível maior controle sobre como os dados são
 transportados pela rede, implementando em camada de aplicação os serviços
@@ -235,18 +235,40 @@ modo, o foco do projeto foi em medir a atividade de \emph{CPU}, a quantidade tot
 pacotes trocados, o atraso na troca de mensagens e a quantidade de pacotes
 perdidos no processo. No contexto de jogos com múltiplos jogadores simultâneos,
 a jogabilidade e eficiência do jogo são influenciadas principalmente pelo
-atrasos na troca de mensagens e por pacotes perdidos. Tais experimentos
-permitirão avaliar o quanto protocolos, quantidade de jogadores e tamanho de
-pacotes influenciam nesses fatores.
+atrasos na troca de mensagens e por pacotes perdidos.
+
+Tais experimentos permitirão avaliar o quanto protocolos, quantidade de
+jogadores e tamanho de pacotes influenciam nesses fatores. Cada experimento
+foi planejado para ser executado 10 vezes, extraindo-se a média das informações
+obtidas, totalizando 160 execuções de experimentos.
+
+\subsubsection{Configuração de máquinas utilizada}
 
 Para a execução dos experimentos, optou-se pela utilização do \textit{cluster}
 disponível no Laboratório de Sistemas Distribuídos e Programação Concorrente
-(LaSDPC). Nesse sentido, planejou-se utilizar até 11 nós: 1 para o servidor do
-jogo e 1 para cada 10 clientes (jogadores). Cada experimento foi planejado para
-ser executado 10 vezes, extraindo-se a média das informações obtidas,
-totalizando 160 execuções de experimentos.
+(LaSDPC). Desse modo, foi utilizada uma máquina virtual para a execução do
+servidor e 10 nós físicos para os clientes. O uso da máquina virtual ocorreu
+devido a necessidade de se instalar programas adicionais para medição dos dados
+enviados e recebidos pelo servidor.  As configurações dos nós físicos e máquina
+virtual utilizados podem ser visualizadas abaixo.
 
-$\ll\ll\ll$ configurações das maquinas utilizadas $\gg\gg\gg$
+\textbf{Nós Físicos}
+
+\begin{itemize}
+  \item Processador: Core2 Quad Q6600 8MB de Cache 2.40 Ghz
+  \item Memória: 8GB DDR3 1333Mhz
+  \item HD: Samsung 160GB Samsung 7200 RPM Sata II
+  \item Rede: Gigabit Ethernet 
+\end{itemize}
+
+\textbf{Nó Virtual}
+
+\begin{itemize}
+  \item Processador: 2 CPUs (2.40Ghz cada)
+  \item Memória: 4GB de RAM DDR3 1333 Mhz
+  \item HD: Virtual de 15GB
+  \item Rede: Gigabit Ethernet
+\end{itemize}
 
 \subsection{Especificação do Protocolo} \label{sub:protocolo}
 
