@@ -537,6 +537,15 @@ Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jog
 \end{figure}
 
 \subsection{Discussão dos Resultados} \label{sub:discussao}
+
+Na Tabela~\ref{tab:resultados}, pode-se observar que o atraso médio dos experimentos não variou muito com a alteração do número de clientes e o tamanho mínimo dos pacotes, com exceção de um caso, comentado logo abaixo. A variância seguiu a mesma analogia, não variando muito com o aumento de clientes e tamanho de pacotes. A carga no servidor foi maior para \emph{TCP} bloqueante em todos os experimentos. Esse resultado já era esperado, pois com o número alto de \emph{threads} criadas, há uma sobrecarga na troca de contexto entre elas. O número de \emph{bytes} enviados e recebidos seguiu a lógica ao aumentar quando o número de clientes e tamanho mínimo do pacote cresceram. Novamente, uma exceção a essa regra ocorreu e é comentada a seguir. Ainda, essa taxa de aumento não foi proporcional ao aumento da carga nos experimentos. Não é possível tirar uma conclusão óbvia desse ocorrido. Para poder responder essa anomalia, será preciso estudar como funciona o programa utilizado para a coleta desses valores, \emph{nstat}. Finalmente, como esperado, o número de pacotes perdidos para todos os casos \emph{TCP} foi de 0.
+
+Analisando os tempos médios de atraso, esses valores variam pouco e ficam próximos a 50$ms$. Esse valor é o mínimo possível porque na implementação do cliente, há um tempo de espera no laço principal do programa que corresponde a esse valor.
+
+É possível observar que não foi possível extrair resultados dos experimentos 3 e 4. Ainda, o resultado do experimento 2 não seguiu o esperado nesse tipo de execução (os experimentos 2, 3 e 4 são do tipo \emph{TCP} não bloqueante). Os resultados do experimento 2 não entraram na análise deste trabalho, pois foi considerado como anômalo. Adicionalmente, os experimentos 3 e 4 geraram um estresse no sistema tão grande no \emph{cluster} que não foi possível avaliar os resultados.
+
+Diante desses problemas, experimentos extras foram realizados com o \emph{TCP} não bloqueante com tamanho mínimo de pacotes 100. Esses experimentos estão ilustrados na Figura~\ref{fig:tcp-graph}. É importante ressaltar que já para um número pequeno de clientes, 20, o tempo de resposta aumenta exponencialmente. A utilização máxima da \emph{CPU} é descartada como hipótese desse problema, pois o tempo de ociosidade verificado nos experimentos foi alto (para 21 clientes, esse valor foi de 78\%). Mais experimentos devem ser realizados para poder responder de forma correta qual a causa desses tempos de atraso.
+
 \section{Conclusões} \label{sec:conclusoes}
 
 % \section{Referências} \label{sec:referencias}
