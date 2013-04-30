@@ -466,12 +466,12 @@ quantidade de pacotes perdidos em disco para análise posterior. Desse total de
 dados, foram extraídas as informações de interesse por meio de
 \textit{scripts}.
 
+Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho dessa linguagem, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. Por causa desse problema, os clientes foramd esenvolvidos em \emph{Java}.
+
+Outra resistência encontrada foi a dificuldade da utilização do \emph{cluster}. Inicialmente, os arquivos estavam na pasta do usuário (\emph{home}) e por questões de configuração do sistema de arquivos os experimentos ficavam lentos, resultando em valores errôneos. Ao passar os arquivos para a pasta \emph{opt} das máquinas, as execuções fluíram de maneira normal. 
+
 Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a
 respeito dos mesmos podem ser analisadas em~\ref{sub:discussao}.
-
-Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. 
-
-Outra dificuldade encontrada foi a dificuldade da utilização do \emph{cluster}. Inicialmente, os arquivos estavam na pasta do usuário (\emph{home}) e por questões de configuração do sistema de arquivos os experimentos ficavam lentos, resultando em valores errôneos. Ao passar os arquivos para a pasta \emph{opt} das máquinas, as execuções fluíram de maneira normal. 
 
 \section{Resultados} \label{sec:resultados}
 
@@ -479,7 +479,7 @@ Nessa Seção, os resultados obtidos a partir dos experimentos realizados são m
 
 \subsection{Dados Obtidos} \label{sub:dados}
 
-Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos. Os dados de \emph{CPU} e \emph{bytes} recebidos e enviados foram obtidos por meio dos programas presentes no \emph{Linux} chamados \emph{vmstat} e \emph{nstat} respectivamente. No segundo programa, os valores foram extraídos a partir dos campos \emph{IpExtInOctets} e \emph{IpExtOutOctets}.
+Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos. Os dados de \emph{CPU} e \emph{bytes} recebidos e enviados foram obtidos por meio dos programas presentes no \emph{Linux} chamados \emph{vmstat} \cite{Vmstat} e \emph{nstat} \cite{nstat} respectivamente. No segundo programa, os valores foram extraídos a partir dos campos \emph{IpExtInOctets} e \emph{IpExtOutOctets}.
 
 \begin{table}
   \center
@@ -504,34 +504,34 @@ Na Figura~\ref{fig:delay-graph}, os tempos de atraso e suas variâncias para os 
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.8\textwidth]{img/delay-graph.png}
+  \includegraphics[width=1\textwidth]{img/delay-graph.png}
   \caption{Tempos de atraso}
   \label{fig:delay-graph}
 \end{figure}
 
-Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente. O eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
+Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente. O eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.8\textwidth]{img/cpu-graph.png}
+  \includegraphics[width=1\textwidth]{img/cpu-graph.png}
   \caption{Cargas de \emph{CPU}}
   \label{fig:cpu-graph}
 \end{figure}
 
-A quantidade de \emph{bytes} enviados e recebidos durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indiciado. Os valores dessas métricas estão representados no eixo $y$.
+A quantidade de \emph{bytes} enviados e recebidos pelo servidor durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indiciado. Os valores dessas métricas estão representados no eixo $y$.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.8\textwidth]{img/delay-graph.png}
-  \caption{\emph{Bytes} de entrada e saída}
+  \includegraphics[width=1\textwidth]{img/delay-graph.png}
+  \caption{\emph{Bytes} enviados e recebidos}
   \label{fig:net-graph}
 \end{figure}
 
-Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100 estão apresentados. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos. A curva gerada é aproximada por linhas de \emph{Bezier}.
+Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100 estão apresentados. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos. A curva gerada é aproximada por linhas de \emph{Bezier} \cite{Bezier}.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.8\textwidth]{img/tcp-graph.png}
+  \includegraphics[width=1\textwidth]{img/tcp-graph.png}
   \caption{Tempos para o modo \emph{TCP} não bloqueante}
   \label{fig:tcp-graph}
 \end{figure}
