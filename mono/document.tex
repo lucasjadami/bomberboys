@@ -35,7 +35,7 @@ entre servidor e jogadores pode ser negativamente impactada, gerando sobrecarga
 nos servidores. Este projeto teve como objetivo investigar modos eficientes de
 comunicação para jogos cooperativos. Como resultados, foi possível observar
 grande diferenças de desempenho entre as abordagens propostas, as quais
-variavam parâmetros como o protocolo, no número de jogadores e tamanho de
+variavam parâmetros como o protocolo, o número de jogadores e o tamanho de
 pacotes.
 \end{resumo}
 
@@ -469,7 +469,9 @@ dados, foram extraídas as informações de interesse por meio de
 Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a
 respeito dos mesmos podem ser analisadas em~\ref{sub:discussao}.
 
-$\ll\ll\ll$ dificuldades encontradas $\gg\gg\gg$
+Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. 
+
+Outra dificuldade encontrada foi a dificuldade da utilização do \emph{cluster}. Inicialmente, os arquivos estavam na pasta do usuário (\emph{home}) e por questões de configuração do sistema de arquivos os experimentos ficavam lentos, resultando em valores errôneos. Ao passar os arquivos para a pasta \emph{opt} das máquinas, as execuções fluíram de maneira normal. 
 
 \section{Resultados} \label{sec:resultados}
 
@@ -477,7 +479,7 @@ Nessa Seção, os resultados obtidos a partir dos experimentos realizados são m
 
 \subsection{Dados Obtidos} \label{sub:dados}
 
-Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos.
+Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados. A primeira coluna representa os identificadores dos experimentos que podem ser consultados na Tabela~\ref{tab:experimentos}. As colunas atraso e variância representam a média do \emph{delay} do jogo na visão dos clientes e a variância desse valor, respectivamente. A coluna \emph{CPU} mostram a utilização da \emph{CPU} no modo usuário, no modo \emph{kernel} e sua ociosidade no servidor. A coluna \emph{bytes} possui dois valores que mostram o número de \emph{bytes} enviados e recebidos pelo servidor. A última coluna indica o número de pacotes perdidos. Os dados de \emph{CPU} e \emph{bytes} recebidos e enviados foram obtidos por meio dos programas presentes no \emph{Linux} chamados \emph{vmstat} e \emph{nstat} respectivamente. No segundo programa, os valores foram extraídos a partir dos campos \emph{IpExtInOctets} e \emph{IpExtOutOctets}.
 
 \begin{table}
   \center
@@ -486,7 +488,7 @@ Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados
   \hline
     \# & \textbf{Atraso ($ms$)} & \textbf{Variância ($ms$)} & \textbf{CPU (\%)} & \textbf{Bytes} & \textbf{Pacotes Perdidos} \\ \hline
     1 & 50.04 & 1.74 & 16.1/9.6/73.6 & 21688636.2/438917162.9 & 0 \\ \hline
-    2 & 309.486667 & 193.74 & 27.75/7.05/64.35 & 18397940.95/357472631.95 & 0 \\ \hline
+    2 & 302.68 & 192.15 & 27.8/7.2/63.83 & 21998667.43/380864913.9 & 0 \\ \hline
     3 & \er & \er & \er & \er & \er \\ \hline
     4 & \er & \er & \er & \er & \er \\ \hline
     5 & 50.16 & 3.14 & 31/25.6/43 & 20717318.5/310870796.8 & 0 \\ \hline
@@ -498,13 +500,40 @@ Na Tabela~\ref{tab:resultados}, os resultados dos experimentos estão ilustrados
 \label{tab:resultados}
 \end{table} 
 
-A Figura~\ref{fig:tcp-nonblocking-trash100} representa os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos.
+Na Figura~\ref{fig:delay-graph}, os tempos de atraso e suas variâncias para os experimentos executados estão apresentados. O eixo $x$ representa o número do experimento e o eixo $y$ o tempo em milisegundos.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.8\textwidth]{img/tcp-nonblocking-trash100.png}
+  \includegraphics[width=.8\textwidth]{img/delay-graph.png}
+  \caption{Tempos de atraso}
+  \label{fig:delay-graph}
+\end{figure}
+
+Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente. O eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/cpu-graph.png}
+  \caption{Cargas de \emph{CPU}}
+  \label{fig:cpu-graph}
+\end{figure}
+
+A quantidade de \emph{bytes} enviados e recebidos durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indiciado. Os valores dessas métricas estão representados no eixo $y$.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/delay-graph.png}
+  \caption{\emph{Bytes} de entrada e saída}
+  \label{fig:net-graph}
+\end{figure}
+
+Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jogo sendo executado no modo \emph{TCP} não bloqueante com pacotes de tamanho 100 estão apresentados. O eixo $x$ mostra o número de clientes conectados e o eixo $y$ o tempo em milisegundos. A curva gerada é aproximada por linhas de \emph{Bezier}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/tcp-graph.png}
   \caption{Tempos para o modo \emph{TCP} não bloqueante}
-  \label{fig:tcp-nonblocking-trash100}
+  \label{fig:tcp-graph}
 \end{figure}
 
 \subsection{Discussão dos Resultados} \label{sub:discussao}
