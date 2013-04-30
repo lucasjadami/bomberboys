@@ -509,7 +509,7 @@ Na Figura~\ref{fig:delay-graph}, os tempos de atraso e suas variâncias para os 
   \label{fig:delay-graph}
 \end{figure}
 
-Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente. O eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
+Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimentos executados estão à mostra. O eixo $x$ mostra o experimento correspondente enquanto o eixo $y$ indica a porcentagem dos valores para carga no modo usuário, \emph{kernel} e ocioso.
 
 \begin{figure}[ht]
   \centering
@@ -518,7 +518,7 @@ Na Figura~\ref{fig:cpu-graph}, as cargas de \emph{CPU} no servidor dos experimen
   \label{fig:cpu-graph}
 \end{figure}
 
-A quantidade de \emph{bytes} enviados e recebidos pelo servidor durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indiciado. Os valores dessas métricas estão representados no eixo $y$.
+A quantidade de \emph{bytes} enviados e recebidos pelo servidor durante os experimentos está ilustrada na Figura~\ref{fig:net-graph}. No eixo $x$, o experimento está indicado. Os valores dessas métricas estão representados no eixo $y$.
 
 \begin{figure}[ht]
   \centering
@@ -538,6 +538,14 @@ Na Figura~\ref{fig:tcp-graph}, os tempos de atraso e suas variâncias para o jog
 
 \subsection{Discussão dos Resultados} \label{sub:discussao}
 
+No decorrer da execução dos experimentos referentes ao protocolo \emph{UDP}, percebeu-se uma alta perda pacotes mesmo para casos simples com até 10 clientes que, em média, levava a uma perda de até 70000 pacotes. Dessa forma, para os parâmetros previamento estabelecidos (50 e 100 clientes), o experimento com esse protocolo foi inviável, já que perdia-se, inclusive, pacotes de controle do protocolo do jogo. 
+
+Essa perda de pacotes pode ser explicada pelo fato de o protocolo \emph{UDP}, além de não garantir na entrega de pacotes, não oferecer serviços de controle de congestionamento e de fluxo. Com isso, houve uma inundação de pacotes nos clientes e principalmente nos servidores, degradando a comunicação entre os pares.
+
+O fenômeno da alta perda de pacotes observadas nos experimentos não foi inicialmente prevista. Por isso, tinha-se como objetivo apenas a troca o protocolo \emph{TCP} pelo \emph{UDP} tolerando-se eventuais perdas de pacotes, o que não degradaria a experiência do jogo nem interferiria drasticamente no controle dos experimentos.
+
+Apesar de o projeto ter como foco, entre outros, a investigação do protocolo \emph{UDP} como alternativa viável, estes experimentos seriam viáveis caso houvesse a implementação do controle de fluxo e de congestionamento em nível de aplicação, o que foge do escopo proposto inicialmente.
+
 Na Tabela~\ref{tab:resultados}, pode-se observar que o atraso médio dos experimentos não variou muito com a alteração do número de clientes e o tamanho mínimo dos pacotes, com exceção de um caso, comentado logo abaixo. A variância seguiu a mesma analogia, não variando muito com o aumento de clientes e tamanho de pacotes. A carga no servidor foi maior para \emph{TCP} bloqueante em todos os experimentos. Esse resultado já era esperado, pois com o número alto de \emph{threads} criadas, há uma sobrecarga na troca de contexto entre elas. O número de \emph{bytes} enviados e recebidos seguiu a lógica ao aumentar quando o número de clientes e tamanho mínimo do pacote cresceram. Novamente, uma exceção a essa regra ocorreu e é comentada a seguir. Ainda, essa taxa de aumento não foi proporcional ao aumento da carga nos experimentos. Não é possível tirar uma conclusão óbvia desse ocorrido. Para poder responder essa anomalia, será preciso estudar como funciona o programa utilizado para a coleta desses valores, \emph{nstat}. Finalmente, como esperado, o número de pacotes perdidos para todos os casos \emph{TCP} foi de 0.
 
 Analisando os tempos médios de atraso, esses valores variam pouco e ficam próximos a 50$ms$. Esse valor é o mínimo possível porque na implementação do cliente, há um tempo de espera no laço principal do programa que corresponde a esse valor.
@@ -548,14 +556,12 @@ Diante desses problemas, experimentos extras foram realizados com o \emph{TCP} n
 
 \section{Conclusões} \label{sec:conclusoes}
 
-% \section{Referências} \label{sec:referencias}
+Tendo-se em vista os dados obtidos e as discussões a respeito da influência dos fatores sobre a qualidade do serviço (tempo de transferência, trafego de dados etc) discutidos na seção~\ref{sec:resultados}, pode-se recomendar certas abordagens na comunicação entre pares em um ambiente de jogos cooperativos.
 
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=.5\textwidth]{fig1.jpg}
-% \caption{A typical figure}
-% \label{fig:exampleFig1}
-% \end{figure}
+Como pôde ser notado, a utilização do protocolo \emph{UDP} de forma pura não pode ser aplicado para a comunicação entre cliente e servidor. Apesar desse tipo de aplicação tolerar perdas eventuais de pacotes, quando se trata de dezenas ou centenas de clientes interagindo pelo servidor, a perda de dados será muito elevada, levando o sistema como um todo ao colapso.
+No entanto, pode-se recomendar o protocolo \emph{UDP} em casos em que não é necessário o controle estatístico, em cenários em que há menos que 10 clientes ou ainda quando se dispõe minimanente de um controle de fluxo e congestionamento em nível de aplicação.
+
+
 
 \bibliographystyle{sbc}
 \bibliography{bibliography}
