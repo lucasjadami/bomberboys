@@ -624,7 +624,7 @@ necessário o controle estatístico, em cenários em que há menos que 10 client
 ou ainda quando se dispõe minimanente de um controle de fluxo e
 congestionamento em nível de aplicação.
 
-
+Para o contexto de jogos cooperativos, com pacotes de controle, o melhor protocolo a ser utilizado é o \emph{TCP}, porque o \emph{UDP} com certeza perderá muitos pacotes essenciais. O modo não bloqueante utiliza menos carga da \emph{CPU} e é mais fácil de programar, por não envolver concorrência. Os resultados mostraram que a partir de um número de clientes, o não bloqueante começou a gerar atrasos muito grandes. Considerando esse fato, é mais seguro utilizar a abordagem bloqueante. Porém, como não foi possível determinar o que realmente aconteceu, a abordagem não bloqueante não pode ser deixada de lado na escolha do melhor método. 
 
 \bibliographystyle{sbc}
 \bibliography{bibliography}
