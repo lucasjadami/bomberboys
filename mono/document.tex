@@ -624,7 +624,37 @@ necessário o controle estatístico, em cenários em que há menos que 10 client
 ou ainda quando se dispõe minimanente de um controle de fluxo e
 congestionamento em nível de aplicação.
 
-Para o contexto de jogos cooperativos, com pacotes de controle, o melhor protocolo a ser utilizado é o \emph{TCP}, porque o \emph{UDP} com certeza perderá muitos pacotes essenciais. O modo não bloqueante utiliza menos carga da \emph{CPU} e é mais fácil de programar, por não envolver concorrência. Os resultados mostraram que a partir de um número de clientes, o não bloqueante começou a gerar atrasos muito grandes. Considerando esse fato, é mais seguro utilizar a abordagem bloqueante. Porém, como não foi possível determinar o que realmente aconteceu, a abordagem não bloqueante não pode ser deixada de lado na escolha do melhor método. 
+Para o contexto de jogos cooperativos, com pacotes de controle, o melhor
+protocolo a ser utilizado é o \emph{TCP}, porque o \emph{UDP} com certeza
+perderá muitos pacotes essenciais. O modo não bloqueante utiliza menos carga da
+\emph{CPU} e é mais fácil de programar, por não envolver necessariamente
+concorrência, obtendo-se resultados bastante satisfatórios em termos de
+desempenho.
+
+Para o caso de estudo foco desse projeto, resultados mostraram que a partir de
+um número de clientes, a abordagem não bloqueante passou a gerar atrasos muito
+grandes. Considerando esse fato, é mais seguro utilizar a abordagem bloqueante
+que, para os experimentos realizados, demonstrou maior estabilidade nesse
+sentido.
+
+Não foi possível se extrair informações mais precisas a partir dos experimentos
+executados devido a fatores não considerados que, de fato, geraram grande
+impacto de performance principalmente nos casos em que o modo de execução era
+não bloqueante. Acredita-se que tal abordagem seja mais efetiva de maneira
+geral que a abordagem bloqueante uma vez que reduz-se custos na espera
+bloqueante para envio e recebimento de pacotes. Constata-se no entanto a
+presença de outros fatores não investigados nesse projeto que afetam
+diretamente aplicações desse tipo.
+
+Como trabalhos futuros, sugere-se principalmente a investigação de novos
+fatores que impactam diretamente na performance de servidores desse tipo.
+Outras possibilidades incluem a realização de experimentos utilizando-se a
+internet, validando as hipóteses para o cenário em que ocorre a troca de
+pacotes em um jogo colaborativo. Por fim, experimentos podem ser realizados
+tendo-se como base um protocolo, possívelmente na camada de aplicação, sem
+conexão como o \emph{UDP} mas com garantias de controle de fluxo e de
+congestionamento, por exemplo, algo que se mostrou necessário nos experimentos
+realizados nesse projeto.
 
 \bibliographystyle{sbc}
 \bibliography{bibliography}
