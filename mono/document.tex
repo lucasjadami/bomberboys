@@ -569,8 +569,9 @@ tamanho de pacotes.
 
 A carga no servidor foi maior para \emph{TCP} bloqueante em todos os
 experimentos. Esse resultado já era esperado, pois com o número alto de
-\emph{threads} criadas, há uma sobrecarga na troca de contexto entre elas. O
-número de \emph{bytes} enviados e recebidos seguiu a tendência esperada ao
+\emph{threads} criadas, há uma sobrecarga na troca de contexto entre elas. 
+
+O número de \emph{bytes} enviados e recebidos seguiu a tendência esperada ao
 aumentar quando o número de clientes e tamanho mínimo do pacote cresceram.
 Novamente, uma exceção a essa regra ocorreu e é comentada a seguir. Ainda, essa
 taxa de aumento não foi proporcional ao aumento da carga nos experimentos, o
@@ -580,7 +581,7 @@ utilizada para a coleta desses valores, o \emph{nstat}.
 Como representado na Tabela~\ref{tab:resultados}, não foi possível extrair
 resultados dos experimentos 3 e 4. Além disso, o resultado do experimento 2 não
 seguiu o esperado nesse tipo de execução (os experimentos 2, 3 e 4 são do tipo
-\emph{TCP} não bloqueante). Os resultados do experimento 2 não entraram na
+\emph{TCP} não bloqueante). O resultado do experimento 2 não entrou na
 análise deste trabalho, pois foi considerado como anômalo. Foi possível
 analisar, no entanto, um grande estresse no sistema ao se executar os
 experimentos 3 e 4, o que inviabilizou a avaliação dos resultados.
@@ -600,7 +601,7 @@ foi alto (para 21 clientes, esse valor foi de 78\%). Outras análises devem ser
 feitas para se justificar a causa a causa desses tempos de atraso.
 
 Com relação aos os tempos médios de atraso, houve pouca variação sendo que
-estes ficaram próximos a 50$ms$. Esse valor (50 ms) é o mínimo possível por ser
+estes ficaram próximos a 50$ms$. Esse valor (50$ms$) é o mínimo possível por ser
 o valor de espera interno (antes de processar novos pacotes) na implementação
 do cliente. Finalmente, o número de pacotes perdidos para todos
 os casos \emph{TCP} foi de 0, algo esperado por se tratar de um protocolo de
@@ -649,9 +650,9 @@ diretamente aplicações desse tipo.
 Como trabalhos futuros, sugere-se principalmente a investigação de novos
 fatores que impactam diretamente na performance de servidores desse tipo.
 Outras possibilidades incluem a realização de experimentos utilizando-se a
-internet, validando as hipóteses para o cenário em que ocorre a troca de
+\emph{Internet}, validando as hipóteses para o cenário em que ocorre a troca de
 pacotes em um jogo colaborativo. Por fim, experimentos podem ser realizados
-tendo-se como base um protocolo, possívelmente na camada de aplicação, sem
+tendo-se como base um protocolo, possivelmente na camada de aplicação, sem
 conexão como o \emph{UDP} mas com garantias de controle de fluxo e de
 congestionamento, por exemplo, algo que se mostrou necessário nos experimentos
 realizados nesse projeto.
