@@ -229,7 +229,7 @@ abaixo. Com isso, foram planejados os experimentos listados na Tabela~\ref{tab:e
 \label{tab:experimentos}
 \end{table} 
 
-Em cada experimentos foram observados e medidos os efeitos das configurações no
+Em cada experimento foram observados e medidos os efeitos das configurações no
 desempenho do servidor e na comunicação entre o mesmo e os clientes. Desse
 modo, o foco do projeto foi em medir a atividade de \emph{CPU}, a quantidade total de
 pacotes trocados, o atraso na troca de mensagens e a quantidade de pacotes
@@ -466,7 +466,7 @@ dados, foram extraídas as informações de interesse por meio de
 \textit{scripts}.
 
 Uma dificuldade encontrada no trabalho foi o desenvolvimento do cliente utilizando a linguagem \emph{Ruby}. Nos experimentos, 10 clientes eram executados ao mesmo tempo em cada máquina. Por fatores de desempenho dessa linguagem, a máquina ficava lenta e os resultados dos experimentos eram inconsistentes. Por causa desse problema, os clientes foram desenvolvidos em \emph{Java}.
-
+Não Bloqueante
 Outra resistência encontrada foi a dificuldade da utilização do \emph{cluster}. Inicialmente, os arquivos estavam na pasta do usuário (\emph{home}) e por questões de configuração do sistema de arquivos os experimentos ficavam lentos, resultando em valores errôneos. Ao passar os arquivos para a pasta \emph{opt} das máquinas, as execuções fluíram de maneira normal. 
 
 Os resultados obtidos podem ser observados em~\ref{sub:dados} e as conclusões a
