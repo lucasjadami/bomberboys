@@ -58,7 +58,7 @@
 
 \begin{frame} \frametitle{Introdução}
 \begin{itemize}
-	\item \justifying Em tarefas que são executadas em ambientes distintos a comunicação necessária para a interação dos nós envolvidos ocorre tipicamente por meio de uma rede;
+	\item \justifying Em tarefas executadas em ambientes distintos a interação dos nós envolvidos ocorre tipicamente por meio de uma rede;
 	\item A eficiência da comunicação depende de muitos fatores:
 	\begin{itemize}
 		\item Congestionamento da rede;
@@ -93,13 +93,13 @@
 
 \begin{frame} \frametitle{\emph{Sockets}}
 \begin{itemize}
-	\item \justifying \emph{Sockets} são definidos como interfaces que possibilitam o fluxo de dados entre dois nós por meio de uma rede, utilizando uma \emph{API} definida \cite{Tanenbaum};
-	\item Eles operam sob dois modos:
+	\item \justifying \emph{Sockets} são interfaces que possibilitam fluxo de dados entre dois nós por uma rede, utilizando uma \emph{API} definida \cite{Tanenbaum};
+	\item Dois modos de operação:
 	\begin{itemize}
 		\item Bloqueante
 		\item Não Bloqueante
 	\end{itemize}
-	\item \justifying \emph{Sockets} ainda utilizam dois protocolos da camada de transporte:
+	\item \justifying Dois protocolos da camada de transporte:
 	\begin{itemize}
 		\item \emph{TCP}
 		\item \emph{UDP}
@@ -140,6 +140,7 @@
 
 \begin{frame} \frametitle{Configuração de Máquinas}
 \begin{itemize}
+  \item \justifying 11 nós: 10 físicos (clientes) e 1 virtual (servidor)
 	\item Nós Físicos:
 	\begin{itemize}
   		\item Processador: Core2 Quad Q6600 8MB de Cache 2.40 Ghz;
@@ -190,9 +191,9 @@
 	\item \justifying Envolveu a implementação do servidor e a implementação do cliente;
 	\item \justifying Utilizou-se \emph{C++} \cite{CPP} para a implementação do servidor e \emph{Java} \cite{Java} para a implementação dos
 clientes;
-	\item \justifying A ferramenta de versionamento \emph{Git} \cite{Git} foi escolhida como controladora de versão.
+	\item \justifying A ferramenta de versionamento \emph{Git} \cite{Git} foi escolhida como controladora de versão;
 	\begin{itemize}
-		\item \url{https://github.com/rafaelregis/bomberboys}
+		\item Disponibilizado em \url{https://github.com/rafaelregis/bomberboys}.
 	\end{itemize}
 \end{itemize}
 \end{frame}
