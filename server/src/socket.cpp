@@ -77,12 +77,8 @@ bool Socket::updateInBuffer(int& bytesRead)
                 size = PACKET_MOVE_ME_SIZE; break;
             case PACKET_PLANT_BOMB:
                 size = PACKET_PLANT_BOMB_SIZE; break;
-            case PACKET_ACK:
-                size = PACKET_ACK_SIZE; break;
             case PACKET_PING:
                 size = PACKET_PING_SIZE; break;
-            case PACKET_INFO:
-                size = PACKET_INFO_SIZE; break;
         }
 
         if (inPointer > PACKET_UID_SIZE + size)

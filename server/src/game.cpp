@@ -91,9 +91,6 @@ void Game::update(float time, float velocityIterations, float positionIterations
             fallPlayer(player);
             updatePlayerMovement(player);
         }
-
-        if (player->isIdle())
-            player->getSocket()->setDisconnectForced(true);
     }
 
     std::map<int, Bomb*>::iterator it = bombs.begin();
@@ -153,12 +150,8 @@ void Game::updatePlayerPackets(Player* player)
                 parseMoveMePacket(packet, player);
             else if (packet->getId() == PACKET_PLANT_BOMB)
                 parsePlantBombPacket(packet, player);
-            else if (packet->getId() == PACKET_ACK)
-                parseAckPacket(packet, player);
             else if (packet->getId() == PACKET_PING)
                 parsePingPacket(packet, player);
-            else if (packet->getId() == PACKET_INFO)
-                parseInfoPacket(packet, player);
         }
         delete packet;
     }
@@ -365,23 +358,10 @@ void Game::parsePlantBombPacket(Packet* packet, Player* player)
     }
 }
 
-void Game::parseAckPacket(Packet* packet, Player* player)
-{
-    player->updateLastAck();
-}
-
 void Game::parsePingPacket(Packet* packet, Player* player)
 {
     Packet* newPacket = createPongPacket();
     player->getSocket()->addOutPacket(newPacket);
-}
-
-void Game::parseInfoPacket(Packet* packet, Player* player)
-{
-    double average = Packet::getDouble(packet->getData());
-    double deviation = Packet::getDouble(packet->getData() + 16);
-    int packetsLost = Packet::getInt(packet->getData() + 32);
-    info("Player info (id, avg, dev, ploss): %d %lf %lf %d", player->getSocket()->getId(), average, deviation, packetsLost);
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)

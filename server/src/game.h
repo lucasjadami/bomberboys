@@ -41,9 +41,7 @@ private:
     void    parseLoginPacket(Packet*, Player*);
     void    parseMoveMePacket(Packet*, Player*);
     void    parsePlantBombPacket(Packet*, Player*);
-    void    parseAckPacket(Packet*, Player*);
     void    parsePingPacket(Packet*, Player*);
-    void    parseInfoPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
     Packet* createMovePlayerPacket(Player*);
