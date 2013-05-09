@@ -18,10 +18,6 @@ Game::Game()
 
     timespec time;
     startupTime = getTimeLL(getTime(&time));
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_init(&mutex, NULL);
-#endif
 }
 
 Game::~Game()
@@ -32,10 +28,6 @@ Game::~Game()
         delete players[i];
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&mutex);
-#endif
 }
 
 void Game::createWorld()
@@ -46,10 +38,6 @@ void Game::createWorld()
 
 void Game::connectionHandler(int eventId, Socket* socket)
 {
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&mutex);
-#endif
-
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
@@ -86,18 +74,10 @@ void Game::connectionHandler(int eventId, Socket* socket)
             }
         }
     }
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&mutex);
-#endif
 }
 
 void Game::update(float time, float velocityIterations, float positionIterations)
 {
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&mutex);
-#endif
-
     world->Step(time, velocityIterations, positionIterations);
 
     for (unsigned int i = 0; i < players.size(); ++i)
@@ -131,10 +111,6 @@ void Game::update(float time, float velocityIterations, float positionIterations
 
     // The shutdown is sent but the server is kept online.
     updateShutdown();
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&mutex);
-#endif
 }
 
 b2World* Game::getWorld()

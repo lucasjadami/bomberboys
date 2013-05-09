@@ -14,10 +14,7 @@ Connection::~Connection()
     std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
-#ifndef UDP_MODE
-        // UDP don't have client descriptors!
         close(it->second->getFd());
-#endif
         delete it->second;
         it++;
     }
