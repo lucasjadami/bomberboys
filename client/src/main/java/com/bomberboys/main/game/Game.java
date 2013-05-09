@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class Game {
     private Connection connection;
-    private Map<Integer, Player> players;
+    private Map<Integer, PlayerInfo> players;
     private Map<Integer, Bomb> bombs;
     private int packetUId;
     private String address;
@@ -78,7 +78,7 @@ public class Game {
         connection.sendPacket(new Packet(packetUId++, Packet.Id.PLANT_BOMB, buffer));
     }
 
-    public Map<Integer, Player> getPlayers() {
+    public Map<Integer, PlayerInfo> getPlayers() {
         return players;
     }
 
@@ -93,7 +93,7 @@ public class Game {
         byte[] name = new byte[20];
         buffer.get(name);
         
-        Player newPlayer = new Player(x, y, new String(name), players.isEmpty());
+        PlayerInfo newPlayer = new PlayerInfo(x, y, new String(name), players.isEmpty());
         players.put(id, newPlayer);
     }
     
@@ -102,9 +102,9 @@ public class Game {
         int x = buffer.getChar();
         int y = buffer.getChar();
         
-        Player playerToMove = players.get(id);
+        PlayerInfo playerToMove = players.get(id);
         if (playerToMove == null) {
-            playerToMove = new Player(0, 0, "?", false);
+            playerToMove = new PlayerInfo(0, 0, "?", false);
             players.put(id, playerToMove);
         }
 
