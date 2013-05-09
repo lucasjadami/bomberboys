@@ -1,0 +1,13 @@
+# Temp files
+*~
+
+# CodeBlocks files
+
+*.depend
+*.layout
+
+# Folders
+/server/codeblocks/bin
+/server/codeblocks/obj
+/client/build
+/client/.gradle
