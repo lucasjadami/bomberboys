@@ -3,7 +3,6 @@ package com.bomberboys.main.game;
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
 import com.bomberboys.network.TCPConnection;
-import com.bomberboys.network.UDPConnection;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +14,6 @@ public class Game {
     private Connection connection;
     private Map<Integer, PlayerInfo> players;
     private Map<Integer, Bomb> bombs;
-    private int packetUId;
     private String address;
     private int port;
     private int currentRecvPacket = -1;
@@ -41,7 +39,7 @@ public class Game {
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());
         
-        connection.sendPacket(new Packet(packetUId++, Packet.Id.LOGIN, buffer));
+        connection.sendPacket(new Packet(Packet.Id.LOGIN, buffer));
     }
 
     public void doRandomAction() {
@@ -70,12 +68,12 @@ public class Game {
     public void movementKeyPressed(int direction) {
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.MOVE_ME.getSize());
         buffer.put((byte) direction);
-        connection.sendPacket(new Packet(packetUId++, Packet.Id.MOVE_ME, buffer));
+        connection.sendPacket(new Packet(Packet.Id.MOVE_ME, buffer));
     }
     
     public void plantKeyPressed() {
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.PLANT_BOMB.getSize());
-        connection.sendPacket(new Packet(packetUId++, Packet.Id.PLANT_BOMB, buffer));
+        connection.sendPacket(new Packet(Packet.Id.PLANT_BOMB, buffer));
     }
 
     public Map<Integer, PlayerInfo> getPlayers() {

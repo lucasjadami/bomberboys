@@ -2,16 +2,8 @@ package com.bomberboys.network;
 
 import java.nio.ByteBuffer;
 
-/**
- *
- */
-public class Packet
-{
-    public static final int UID_SIZE = 4;
-    public static final int TRASH_SIZE = 0;
-    
-    public enum Id
-    {
+public class Packet {
+    public enum Id {
         LOGIN(20),
         ADD_PLAYER(26),
         REMOVE_PLAYER(2),
@@ -21,51 +13,34 @@ public class Packet
         ADD_BOMB(6),
         EXPLODE_BOMB(2),
         FALL_PLAYER(2),
-        ACKNOWLEDGE(0),
-        PING(0),
-        PONG(0),
-        INFO(36),
         SHUTDOWN(0);
         
         private int size;
         
-        Id(int size)
-        {
+        Id(int size) {
             this.size = size;
         }
 
-        public int getSize()
-        {
-            return size + TRASH_SIZE;
+        public int getSize() {
+            return size;
         }
     }
     
-    private int uId;
-    
     private Id id;
-
     private ByteBuffer data;
 
-    private long creationTime;
-
-    public Packet(int uId, Id id, ByteBuffer data)
-    {
-        this.uId = uId;
+    public Packet(Id id, ByteBuffer data) {
         this.id = id;
-        if (data == null)
-        {
+        if (data == null) {
             data = ByteBuffer.allocate(0);
         }
         data.rewind();
         this.data = data;
-        creationTime = System.nanoTime();
     }
 
-    public ByteBuffer serialize()
-    {
+    public ByteBuffer serialize() {
         data.rewind();
-        ByteBuffer buffer = ByteBuffer.allocate(1 + UID_SIZE + data.remaining());
-        buffer.putInt(uId);
+        ByteBuffer buffer = ByteBuffer.allocate(1 + data.remaining());
         buffer.put((byte) (id.ordinal()));
         buffer.put(data);
         data.rewind();
@@ -73,29 +48,16 @@ public class Packet
         return buffer;
     }
 
-    public ByteBuffer getData()
-    {
+    public ByteBuffer getData() {
         return data;
     }
 
-    public int getUId()
-    {
-        return uId;
-    }
-
-    public Id getId()
-    {
+    public Id getId() {
         return id;
     }
 
-    public long getCreationTime()
-    {
-        return creationTime;
-    }
-
     @Override
-    public String toString()
-    {
+    public String toString() {
         String result = "";
         byte[] buffer = serialize().array();
         for (int i = 0; i < buffer.length; i++)

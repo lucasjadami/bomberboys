@@ -6,24 +6,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-public class TCPConnection extends Connection
-{
+public class TCPConnection extends Connection {
     private Socket socket;
-    
     protected InputStream inputStream;
-
     protected OutputStream outputStream;
 
     @Override
-    protected void startConnectThread(final String ip, final int port)
-    {
-        Thread connectThread = new Thread()
-        {
+    protected void startConnectThread(final String ip, final int port) {
+        Thread connectThread = new Thread() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     socket = new Socket(ip, port);
                     socket.setTcpNoDelay(true);
                     inputStream = socket.getInputStream();
@@ -31,9 +24,7 @@ public class TCPConnection extends Connection
 
                     startSendThread();
                     startRecvThread();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     connectFailed = true;
                 }
             }
@@ -42,35 +33,23 @@ public class TCPConnection extends Connection
     }
     
     @Override
-    protected void startSendThread()
-    {
-        Thread sendThread = new Thread()
-        {
+    protected void startSendThread() {
+        Thread sendThread = new Thread() {
             @Override
-            public void run()
-            {
-                try
-                {
-                    while (!remoteDisconnected)
-                    {
-                        try
-                        {
+            public void run() {
+                try {
+                    while (!remoteDisconnected) {
+                        try {
                             Thread.sleep(INTERVAL);
-                        }
-                        catch (InterruptedException ex)
-                        {
-                        }
+                        } catch (InterruptedException ex) { }
 
-                        while (!sendPackets.isEmpty())
-                        {
+                        while (!sendPackets.isEmpty()) {
                             Packet packet = sendPackets.remove(0);
                             byte[] buffer = packet.serialize().array();
                             outputStream.write(buffer);
                         }
                     }
-                }
-                catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     remoteDisconnected = true;
                 }
             }
@@ -81,39 +60,30 @@ public class TCPConnection extends Connection
     @Override
     protected void startRecvThread()
     {
-        Thread recvThread = new Thread()
-        {
+        Thread recvThread = new Thread() {
             @Override
-            public void run()
-            {
-                try
-                {
-                    while (!remoteDisconnected)
-                    {
-                        byte[] idArray = readArray(Packet.UID_SIZE + 1);
-                        if (idArray == null)
-                        {
+            public void run() {
+                try {
+                    while (!remoteDisconnected) {
+                        byte[] idArray = readArray(1);
+                        if (idArray == null) {
                             remoteDisconnected = true;
                             continue;
                         }
 
-                        int uId = ByteBuffer.wrap(idArray).getInt();
-                        Packet.Id id = Packet.Id.values()[idArray[Packet.UID_SIZE]];
+                        Packet.Id id = Packet.Id.values()[idArray[0]];
                         
                         // Protects from reading negative sizes.
                         byte[] dataArray = readArray(Math.max(0, id.getSize()));
-                        if (dataArray == null)
-                        {
+                        if (dataArray == null) {
                             remoteDisconnected = true;
                             continue;
                         }
 
-                        Packet packet = new Packet(uId, id, ByteBuffer.wrap(dataArray));
+                        Packet packet = new Packet(id, ByteBuffer.wrap(dataArray));
                         recvPackets.add(packet);
                     }
-                }
-                catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     remoteDisconnected = true;
                 }
             }
@@ -121,17 +91,14 @@ public class TCPConnection extends Connection
         recvThread.start();
     }
     
-    private byte[] readArray(int size) throws IOException
-    {
+    private byte[] readArray(int size) throws IOException {
         byte[] array = new byte[size];
 
         int totalRead = 0;
-        while (totalRead < array.length)
-        {
+        while (totalRead < array.length) {
             int bytesRead = inputStream.read(array, totalRead, array.length - totalRead);
 
-            if (bytesRead == -1)
-            {
+            if (bytesRead == -1) {
                 return null;
             }
 
