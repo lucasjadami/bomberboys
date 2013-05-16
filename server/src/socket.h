@@ -2,16 +2,11 @@
 #define SOCKET_H
 
 #include "packet.h"
-#include "connection_config.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <vector>
 
-#ifdef BLOCKING_MODE
-#include <pthread.h>
-#endif
-
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 4096
 
 class Socket
 {
@@ -48,11 +43,6 @@ private:
     std::vector<Packet*>    outPackets;
     int                     packetUId;
     bool                    disconnectForced;
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_t         inMutex;
-    pthread_mutex_t         outMutex;
-#endif
 
 };
 

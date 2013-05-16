@@ -3,7 +3,6 @@
 
 #define NAME_SIZE       20
 #define PACKET_UID_SIZE 4
-#define TRASH_SIZE      0
 
 #define PACKET_LOGIN            0
 #define PACKET_ADD_PLAYER       1
@@ -14,26 +13,22 @@
 #define PACKET_ADD_BOMB         6
 #define PACKET_EXPLODE_BOMB     7
 #define PACKET_FALL_PLAYER      8
-#define PACKET_ACK              9
 #define PACKET_PING             10
 #define PACKET_PONG             11
-#define PACKET_INFO             12
 #define PACKET_SHUTDOWN         13
 
-#define PACKET_LOGIN_SIZE           NAME_SIZE + TRASH_SIZE
-#define PACKET_ADD_PLAYER_SIZE      2 + 2 + 2 + NAME_SIZE + TRASH_SIZE
-#define PACKET_REMOVE_PLAYER_SIZE   2 + TRASH_SIZE
-#define PACKET_MOVE_ME_SIZE         1 + TRASH_SIZE
-#define PACKET_MOVE_PLAYER_SIZE     2 + 2 + 2 + TRASH_SIZE
-#define PACKET_PLANT_BOMB_SIZE      0 + TRASH_SIZE
-#define PACKET_ADD_BOMB_SIZE        2 + 2 + 2 + TRASH_SIZE
-#define PACKET_EXPLODE_BOMB_SIZE    2 + TRASH_SIZE
-#define PACKET_FALL_PLAYER_SIZE     2 + TRASH_SIZE
-#define PACKET_ACK_SIZE             0 + TRASH_SIZE
-#define PACKET_PING_SIZE            0 + TRASH_SIZE
-#define PACKET_PONG_SIZE            0 + TRASH_SIZE
-#define PACKET_INFO_SIZE            8 + 8 + 8 + 8 + 4 + TRASH_SIZE
-#define PACKET_SHUTDOWN_SIZE        0 + TRASH_SIZE
+#define PACKET_LOGIN_SIZE           NAME_SIZE
+#define PACKET_ADD_PLAYER_SIZE      2 + 2 + 2 + NAME_SIZE
+#define PACKET_REMOVE_PLAYER_SIZE   2
+#define PACKET_MOVE_ME_SIZE         1
+#define PACKET_MOVE_PLAYER_SIZE     2 + 2 + 2
+#define PACKET_PLANT_BOMB_SIZE      0
+#define PACKET_ADD_BOMB_SIZE        2 + 2 + 2
+#define PACKET_EXPLODE_BOMB_SIZE    2
+#define PACKET_FALL_PLAYER_SIZE     2
+#define PACKET_PING_SIZE            0
+#define PACKET_PONG_SIZE            0
+#define PACKET_SHUTDOWN_SIZE        0
 
 class Packet
 {

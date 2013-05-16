@@ -14,11 +14,6 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     memset(outBuffer, 0, sizeof(outBuffer));
     packetUId = 0;
     disconnectForced = false;
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_init(&inMutex, NULL);
-    pthread_mutex_init(&outMutex, NULL);
-#endif
 }
 
 Socket::~Socket()
@@ -27,11 +22,6 @@ Socket::~Socket()
         delete inPackets[i];
     for (unsigned int i = 0; i < outPackets.size(); ++i)
         delete outPackets[i];
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&inMutex);
-    pthread_mutex_destroy(&outMutex);
-#endif
 }
 
 sockaddr_in Socket::getAddress()
@@ -87,12 +77,8 @@ bool Socket::updateInBuffer(int& bytesRead)
                 size = PACKET_MOVE_ME_SIZE; break;
             case PACKET_PLANT_BOMB:
                 size = PACKET_PLANT_BOMB_SIZE; break;
-            case PACKET_ACK:
-                size = PACKET_ACK_SIZE; break;
             case PACKET_PING:
                 size = PACKET_PING_SIZE; break;
-            case PACKET_INFO:
-                size = PACKET_INFO_SIZE; break;
         }
 
         if (inPointer > PACKET_UID_SIZE + size)
@@ -100,13 +86,7 @@ bool Socket::updateInBuffer(int& bytesRead)
             char* data = new char[size];
             memcpy(data, inBuffer + PACKET_UID_SIZE + 1, sizeof(char) * size);
 
-#ifdef BLOCKING_MODE
-            pthread_mutex_lock(&inMutex);
-#endif
             inPackets.push_back(new Packet(Packet::getInt(inBuffer), packetId, data));
-#ifdef BLOCKING_MODE
-            pthread_mutex_unlock(&inMutex);
-#endif
 
             memcpy(auxBuffer, inBuffer + size + PACKET_UID_SIZE + 1, sizeof(char) * (BUFFER_SIZE - (size + PACKET_UID_SIZE + 1)));
             memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
@@ -132,10 +112,6 @@ bool Socket::updateOutBuffer(int& bytesWritten)
     }
 
     bytesWritten = 0;
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&outMutex);
-#endif
 
     Packet* packet = outPackets.empty() ? NULL : outPackets[0];
     if (packet != NULL)
@@ -176,43 +152,25 @@ bool Socket::updateOutBuffer(int& bytesWritten)
         }
     }
 
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&outMutex);
-#endif
-
     return retValue;
 }
 
 void Socket::addOutPacket(Packet* packet)
 {
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&outMutex);
-#endif
     if (packet->getUId() == 0)
         packet->setUId(packetUId++);
     outPackets.push_back(packet);
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&outMutex);
-#endif
 }
 
 Packet* Socket::getInPacket()
 {
     Packet* packet = NULL;
 
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&inMutex);
-#endif
-
     if (!inPackets.empty())
     {
         packet = inPackets[0];
         inPackets.erase(inPackets.begin());
     }
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&inMutex);
-#endif
 
     return packet;
 }
