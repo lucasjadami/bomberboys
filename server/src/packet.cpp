@@ -31,6 +31,12 @@ int Packet::getSize(int id)
             size = PACKET_PONG_SIZE; break;
         case PACKET_SHUTDOWN:
             size = PACKET_SHUTDOWN_SIZE; break;
+        case PACKET_LOGIN_EX:
+            size = PACKET_LOGIN_EX_SIZE; break;
+        case PACKET_MOVE_ME_EX:
+            size = PACKET_MOVE_ME_EX_SIZE; break;
+        case PACKET_PLANT_BOMB_EX:
+            size = PACKET_PLANT_BOMB_EX_SIZE; break;
     }
     return size;
 }
@@ -123,12 +129,13 @@ char* Packet::getData()
     return data;
 }
 
-Packet* Packet::clone()
+Packet* Packet::clone(int newId)
 {
-    int id = this->id;
-    int size = getSize(id);
-    char* data = new char[size];
-    memcpy(data, this->getData(), size);
-    Packet* packet = new Packet(id, data);
+    int newSize = getSize(newId);
+    int size = getSize(this->id);
+    char* data = new char[newSize];
+    // The newId must incur a newSize bigger than this id.
+    memcpy(data + newSize - size, this->getData(), size);
+    Packet* packet = new Packet(newId, data);
     return packet;
 }

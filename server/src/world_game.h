@@ -24,6 +24,12 @@ private:
     void    parseMoveMePacket(Packet*, Player*);
     void    parsePlantBombPacket(Packet*, Player*);
     void    parsePingPacket(Packet*, Player*);
+    Packet* createMovePlayerPacket(Player*);
+    Packet* createAddBombPacket(Bomb*);
+    Packet* createExplodeBombPacket(Bomb*);
+    Packet* createFallPlayerPacket(Player*);
+    Packet* createPongPacket();
+    Packet* createShutdownPacket();
 
 };
 

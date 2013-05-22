@@ -36,10 +36,15 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
 
 void GhostGame::update(float time, float velocityIteration, float positionIterations)
 {
-    updateServerSocket();
+    updateServerPackets();
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+    {
+        Player* player = it->second;
+        updatePlayerPackets(player);
+    }
 }
 
-void GhostGame::updateServerSocket()
+void GhostGame::updateServerPackets()
 {
     Packet* packet;
     while ((packet = server->getSocket()->getInPacket()) != NULL)
@@ -59,20 +64,37 @@ void GhostGame::updateServerSocket()
         else if (packet->getId() == PACKET_SHUTDOWN)
             parseShutdownPacket(packet);
 
-        routePacket(packet);
+        routePacketToClients(packet);
 
         delete packet;
     }
 }
 
-void GhostGame::routePacket(Packet* packet)
+void GhostGame::updatePlayerPackets(Player* player)
+{
+    Packet* packet;
+    while ((packet = player->getSocket()->getInPacket()) != NULL)
+    {
+        routePacketToServer(player, packet);
+        delete packet;
+    }
+}
+
+void GhostGame::routePacketToClients(Packet* packet)
 {
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
         Player* player = it->second;
         if (player->getSocket() != NULL)
-            player->getSocket()->addOutPacket(packet->clone());
+            player->getSocket()->addOutPacket(packet->clone(packet->getId()));
     }
+}
+
+void GhostGame::routePacketToServer(Player* player, Packet* packet)
+{
+    Packet* newPacket = packet->clone(packet->getId() + EX_GAP);
+    Packet::putBytes(newPacket->getData(), player->getSocket()->getId(), 4);
+    server->getSocket()->addOutPacket(newPacket);
 }
 
 void GhostGame::parseAddPlayerPacket(Packet* packet)

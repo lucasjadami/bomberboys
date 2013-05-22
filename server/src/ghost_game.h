@@ -16,8 +16,10 @@ private:
 
     Server* server;
 
-    void updateServerSocket();
-    void routePacket(Packet*);
+    void updateServerPackets();
+    void updatePlayerPackets(Player*);
+    void routePacketToClients(Packet*);
+    void routePacketToServer(Player*, Packet*);
     void parseAddPlayerPacket(Packet*);
     void parseRemovePlayerPacket(Packet*);
     void parseMovePlayerPacket(Packet*);

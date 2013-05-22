@@ -287,3 +287,51 @@ void WorldGame::parsePingPacket(Packet* packet, Player* player)
     Packet* newPacket = createPongPacket();
     player->getSocket()->addOutPacket(newPacket);
 }
+
+Packet* WorldGame::createMovePlayerPacket(Player* player)
+{
+    char* data = new char[PACKET_MOVE_PLAYER_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_MOVE_PLAYER_SIZE);
+    Packet::putBytes(data, player->getSocket()->getId(), ID_SIZE);
+    Packet::putBytes(data + ID_SIZE, (int) player->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + ID_SIZE + 2, (int) player->getBody()->GetPosition().y, 2);
+    return new Packet(PACKET_MOVE_PLAYER, data);
+}
+
+Packet* WorldGame::createAddBombPacket(Bomb* bomb)
+{
+    char* data = new char[PACKET_ADD_BOMB_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_ADD_BOMB_SIZE);
+    Packet::putBytes(data, bomb->getId(), ID_SIZE);
+    Packet::putBytes(data + ID_SIZE, (int) bomb->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + ID_SIZE + 2, (int) bomb->getBody()->GetPosition().y, 2);
+    return new Packet(PACKET_ADD_BOMB, data);
+}
+
+Packet* WorldGame::createExplodeBombPacket(Bomb* bomb)
+{
+    char* data = new char[PACKET_EXPLODE_BOMB_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_EXPLODE_BOMB_SIZE);
+    Packet::putBytes(data, bomb->getId(), ID_SIZE);
+    return new Packet(PACKET_EXPLODE_BOMB, data);
+}
+
+Packet* WorldGame::createFallPlayerPacket(Player* player)
+{
+    char* data = new char[PACKET_FALL_PLAYER_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
+    Packet::putBytes(data, player->getSocket()->getId(), ID_SIZE);
+    return new Packet(PACKET_FALL_PLAYER, data);
+}
+
+Packet* WorldGame::createPongPacket()
+{
+    char* data = new char[PACKET_PONG_SIZE];
+    return new Packet(PACKET_PONG, data);
+}
+
+Packet* WorldGame::createShutdownPacket()
+{
+    char* data = new char[PACKET_SHUTDOWN_SIZE];
+    return new Packet(PACKET_SHUTDOWN, data);
+}

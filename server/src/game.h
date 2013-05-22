@@ -33,12 +33,6 @@ protected:
     void    createBombBody(Bomb*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
-    Packet* createMovePlayerPacket(Player*);
-    Packet* createAddBombPacket(Bomb*);
-    Packet* createExplodeBombPacket(Bomb*);
-    Packet* createFallPlayerPacket(Player*);
-    Packet* createPongPacket();
-    Packet* createShutdownPacket();
 
 };
 
