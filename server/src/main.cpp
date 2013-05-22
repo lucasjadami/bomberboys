@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     info("Bomberboys server 1.0");
 
     info("Using non-blocking TCP connection");
-	connection = new NonBlockingTcpConnection(&connectionHandler);
+	connection = new NonBlockingTcpConnection(0, &connectionHandler);
 
     int port = 10011;
 	connection->init(port);

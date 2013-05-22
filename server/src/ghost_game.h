@@ -24,7 +24,6 @@ private:
     void parseAddBombPacket(Packet*);
     void parseExplodeBombPacket(Packet*);
     void parseFallPlayerPacket(Packet*);
-    void parsePongPacket(Packet*);
     void parseShutdownPacket(Packet*);
 
 };

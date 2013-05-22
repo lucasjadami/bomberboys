@@ -3,8 +3,9 @@
 #include <cstring>
 #include <unistd.h>
 
-Connection::Connection(void (*connectionHandler)(int, Socket*))
+Connection::Connection(int seed, void (*connectionHandler)(int, Socket*))
 {
+    this->seed = seed;
     this->connectionHandler = connectionHandler;
     idCount = 0;
 }
@@ -52,4 +53,9 @@ void Connection::init(int port)
 Socket* Connection::getServerSocket()
 {
     return serverSocket;
+}
+
+int Connection::generateId()
+{
+    return seed * SEED_SIZE + idCount++;
 }

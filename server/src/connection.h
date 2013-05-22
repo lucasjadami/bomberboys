@@ -8,6 +8,7 @@
 #include <map>
 
 #define MAX_CONNECTIONS 100
+#define SEED_SIZE       10000000
 
 #define EVENT_CLIENT_CONNECTED      0
 #define EVENT_CLIENT_DISCONNECTED   1
@@ -26,7 +27,7 @@ class Connection
 {
 public:
 
-                    Connection(void (*)(int, Socket*));
+                    Connection(int seed, void (*)(int, Socket*));
     virtual        ~Connection();
     void            init(int port);
 	virtual	void    process() {};
@@ -36,10 +37,16 @@ protected:
 
     Socket*                         serverSocket;
 	std::map<int, Socket*> 	        clientSockets;
-	int                             idCount;
 
+    int             generateId();
 	virtual int     create() { return -1; };
 	void            (*connectionHandler)(int, Socket*);
+
+private:
+
+    int                             idCount;
+	// The seed is used to generate sockets IDs. Each server should have one seed, 0 <= seed <= 99.
+	int                             seed;
 
 };
 

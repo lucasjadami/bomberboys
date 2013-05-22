@@ -1,7 +1,6 @@
 #include "socket.h"
 #include "output.h"
 #include <cstring>
-#include <climits>
 
 Socket::Socket(int id, int fd, sockaddr_in address)
 {
@@ -68,25 +67,14 @@ bool Socket::updateInBuffer(int& bytesRead)
     if (inPointer > 1)
     {
         int packetId = inBuffer[0];
-        int size = INT_MAX / 2;
-        switch (packetId)
-        {
-            case PACKET_LOGIN:
-                size = PACKET_LOGIN_SIZE; break;
-            case PACKET_MOVE_ME:
-                size = PACKET_MOVE_ME_SIZE; break;
-            case PACKET_PLANT_BOMB:
-                size = PACKET_PLANT_BOMB_SIZE; break;
-            case PACKET_PING:
-                size = PACKET_PING_SIZE; break;
-        }
+        int size = Packet::getSize(packetId);
 
         if (inPointer > size)
         {
             char* data = new char[size];
             memcpy(data, inBuffer + 1, sizeof(char) * size);
 
-            inPackets.push_back(new Packet(Packet::getInt(inBuffer), packetId, data));
+            inPackets.push_back(new Packet(packetId, data));
 
             memcpy(auxBuffer, inBuffer + size + 1, sizeof(char) * (BUFFER_SIZE - (size + 1)));
             memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
@@ -116,30 +104,9 @@ bool Socket::updateOutBuffer(int& bytesWritten)
     Packet* packet = outPackets.empty() ? NULL : outPackets[0];
     if (packet != NULL)
     {
-        int size = INT_MAX / 2;
-        switch (packet->getId())
-        {
-            case PACKET_ADD_PLAYER:
-                size = PACKET_ADD_PLAYER_SIZE; break;
-            case PACKET_REMOVE_PLAYER:
-                size = PACKET_REMOVE_PLAYER_SIZE; break;
-            case PACKET_MOVE_PLAYER:
-                size = PACKET_MOVE_PLAYER_SIZE; break;
-            case PACKET_ADD_BOMB:
-                size = PACKET_ADD_BOMB_SIZE; break;
-            case PACKET_EXPLODE_BOMB:
-                size = PACKET_EXPLODE_BOMB_SIZE; break;
-            case PACKET_FALL_PLAYER:
-                size = PACKET_FALL_PLAYER_SIZE; break;
-            case PACKET_PONG:
-                size = PACKET_PONG_SIZE; break;
-            case PACKET_SHUTDOWN:
-                size = PACKET_SHUTDOWN_SIZE; break;
-        }
-
+        int size = Packet::getSize(packet->getId());
         if (outPointer + size + 1 <= BUFFER_SIZE)
         {
-            Packet::putBytes(outBuffer + outPointer, packet->getUId(), 4);
             outBuffer[outPointer] = packet->getId();
             memcpy(outBuffer + outPointer + 1, packet->getData(), sizeof(char) * size);
 
@@ -157,8 +124,6 @@ bool Socket::updateOutBuffer(int& bytesWritten)
 
 void Socket::addOutPacket(Packet* packet)
 {
-    if (packet->getUId() == 0)
-        packet->setUId(packetUId++);
     outPackets.push_back(packet);
 }
 
