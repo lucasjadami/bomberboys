@@ -1,6 +1,8 @@
 #include "non_blocking_tcp_connection.h"
 #include "output.h"
 #include "game.h"
+#include "world_game.h"
+#include "ghost_game.h"
 
 #ifdef TESTBED
 #include "testbed/testbed.h"
@@ -185,7 +187,7 @@ int main(int argc, char** argv)
 
 	info("Server connection stabilished at port %d", port);
 
-	game = new Game();
+	game = new WorldGame();
 	game->createWorld();
 
 	info("World created");
