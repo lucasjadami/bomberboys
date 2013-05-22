@@ -15,7 +15,7 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
-        players.push_back(newPlayer);
+        players.insert(std::make_pair(socket->getId(), newPlayer));
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
     {
@@ -26,16 +26,16 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
             bombs.erase(socket->getId());
         }
 
-        std::vector<Player*>::iterator it = players.begin();
+        std::map<int, Player*>::iterator it = players.begin();
         while (it != players.end())
         {
-            Player* player = *it;
+            Player* player = it->second;
             if (player->getSocket()->getId() == socket->getId())
             {
                 if (player->isPlaying())
                     world->DestroyBody(player->getBody());
                 delete player;
-                it = players.erase(it);
+                players.erase(it++);
             }
             else
             {
@@ -54,9 +54,9 @@ void WorldGame::update(float time, float velocityIterations, float positionItera
 {
     world->Step(time, velocityIterations, positionIterations);
 
-    for (unsigned int i = 0; i < players.size(); ++i)
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
-        Player* player = players[i];
+        Player* player = it->second;
 
         updatePlayerPackets(player);
 
@@ -94,9 +94,9 @@ void WorldGame::updateShutdown()
 
         startupTime = 1LL << 62;
 
-        for (unsigned int i = 0; i < players.size(); ++i)
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         {
-            Player* player = players[i];
+            Player* player = it->second;
             Packet* packet = createShutdownPacket();
             player->getSocket()->addOutPacket(packet);
         }
@@ -130,13 +130,13 @@ void WorldGame::updatePlayerMovement(Player* player)
 {
     if (player->isLastPositionDifferent())
     {
-        for (unsigned int i = 0; i < players.size(); ++i)
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         {
-            if (!players[i]->isPlaying())
+            if (!it->second->isPlaying())
                 continue;
 
             Packet* newPacket = createMovePlayerPacket(player);
-            players[i]->getSocket()->addOutPacket(newPacket);
+            it->second->getSocket()->addOutPacket(newPacket);
         }
     }
 
@@ -156,25 +156,25 @@ void WorldGame::fallPlayer(Player* player)
 
         player->getBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 
-        for (unsigned int i = 0; i < players.size(); ++i)
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         {
-            if (!players[i]->isPlaying())
+            if (!it->second->isPlaying())
                 continue;
 
             Packet* newPacket = createFallPlayerPacket(player);
-            players[i]->getSocket()->addOutPacket(newPacket);
+            it->second->getSocket()->addOutPacket(newPacket);
 
             newPacket = createMovePlayerPacket(player);
-            players[i]->getSocket()->addOutPacket(newPacket);
+            it->second->getSocket()->addOutPacket(newPacket);
         }
     }
 }
 
 void WorldGame::explodeBomb(Bomb* bomb)
 {
-    for (unsigned int i = 0; i < players.size(); ++i)
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
-        Player* player = players[i];
+        Player* player = it->second;
 
         if (!player->isPlaying())
                 continue;
@@ -213,15 +213,15 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
     Packet* newPacket = createAddPlayerPacket(player);
     player->getSocket()->addOutPacket(newPacket);
 
-    for (unsigned int i = 0; i < players.size(); ++i)
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
-        if (players[i] == player || !players[i]->isPlaying())
+        if (it->second == player || !it->second->isPlaying())
             continue;
 
         newPacket = createAddPlayerPacket(player);
-        players[i]->getSocket()->addOutPacket(newPacket);
+        it->second->getSocket()->addOutPacket(newPacket);
 
-        newPacket = createAddPlayerPacket(players[i]);
+        newPacket = createAddPlayerPacket(it->second);
         player->getSocket()->addOutPacket(newPacket);
     }
 
@@ -271,13 +271,13 @@ void WorldGame::parsePlantBombPacket(Packet* packet, Player* player)
 
         bombs.insert(std::make_pair(player->getSocket()->getId(), bomb));
 
-        for (unsigned int i = 0; i < players.size(); ++i)
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         {
-            if (!players[i]->isPlaying())
+            if (!it->second->isPlaying())
                 continue;
 
             Packet* newPacket = createAddBombPacket(bomb);
-            players[i]->getSocket()->addOutPacket(newPacket);
+            it->second->getSocket()->addOutPacket(newPacket);
         }
     }
 }

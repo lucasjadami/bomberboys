@@ -26,6 +26,21 @@ int Packet::getInt(char* data)
     return value;
 }
 
+short Packet::getShort(char* data)
+{
+    short value = 0;
+    int mask = 0;
+
+    for (int i = 1; i > -1; --i)
+    {
+        short buffer = (unsigned char) data[i];
+        value |= buffer << mask;
+        mask += 8;
+    }
+
+    return value;
+}
+
 double Packet::getDouble(char* data)
 {
     long long numerator = 0;

@@ -4,7 +4,6 @@
 #include "player.h"
 #include "socket.h"
 #include "bomb.h"
-#include <vector>
 #include <map>
 #include <Box2D/Dynamics/b2World.h>
 
@@ -26,9 +25,9 @@ public:
 
 protected:
 
-    std::vector<Player*> players;
-    std::map<int, Bomb*> bombs;
-    b2World*             world;
+    std::map<int, Player*> players;
+    std::map<int, Bomb*>   bombs;
+    b2World*               world;
 
     void    createPlayerBody(Player*);
     void    createBombBody(Bomb*, Player*);

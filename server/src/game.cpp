@@ -18,8 +18,8 @@ Game::~Game()
 {
     if (world != NULL)
         delete world;
-    for (unsigned int i = 0; i < players.size(); ++i)
-        delete players[i];
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+        delete it->second;
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
 }

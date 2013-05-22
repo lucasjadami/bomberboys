@@ -35,6 +35,7 @@ public:
 
     static void     putBytes(char*, int, int);
     static int      getInt(char*);
+    static short    getShort(char*);
     static double   getDouble(char*);
                     Packet(int, char*);
                     Packet(int, int, char*);
