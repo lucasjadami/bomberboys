@@ -65,9 +65,9 @@ bool Socket::updateInBuffer(int& bytesRead)
 
     bytesRead = 0;
 
-    if (inPointer > PACKET_UID_SIZE)
+    if (inPointer > 1)
     {
-        int packetId = inBuffer[PACKET_UID_SIZE];
+        int packetId = inBuffer[0];
         int size = INT_MAX / 2;
         switch (packetId)
         {
@@ -81,17 +81,17 @@ bool Socket::updateInBuffer(int& bytesRead)
                 size = PACKET_PING_SIZE; break;
         }
 
-        if (inPointer > PACKET_UID_SIZE + size)
+        if (inPointer > size)
         {
             char* data = new char[size];
-            memcpy(data, inBuffer + PACKET_UID_SIZE + 1, sizeof(char) * size);
+            memcpy(data, inBuffer + 1, sizeof(char) * size);
 
             inPackets.push_back(new Packet(Packet::getInt(inBuffer), packetId, data));
 
-            memcpy(auxBuffer, inBuffer + size + PACKET_UID_SIZE + 1, sizeof(char) * (BUFFER_SIZE - (size + PACKET_UID_SIZE + 1)));
+            memcpy(auxBuffer, inBuffer + size + 1, sizeof(char) * (BUFFER_SIZE - (size + 1)));
             memcpy(inBuffer, auxBuffer, sizeof(char) * BUFFER_SIZE);
 
-            inPointer -= size + PACKET_UID_SIZE + 1;
+            inPointer -= size + 1;
 
             return true;
         }
@@ -137,13 +137,13 @@ bool Socket::updateOutBuffer(int& bytesWritten)
                 size = PACKET_SHUTDOWN_SIZE; break;
         }
 
-        if (outPointer + size + PACKET_UID_SIZE + 1 <= BUFFER_SIZE)
+        if (outPointer + size + 1 <= BUFFER_SIZE)
         {
             Packet::putBytes(outBuffer + outPointer, packet->getUId(), 4);
-            outBuffer[outPointer + PACKET_UID_SIZE] = packet->getId();
-            memcpy(outBuffer + outPointer + PACKET_UID_SIZE + 1, packet->getData(), sizeof(char) * size);
+            outBuffer[outPointer] = packet->getId();
+            memcpy(outBuffer + outPointer + 1, packet->getData(), sizeof(char) * size);
 
-            outPointer += 1 + PACKET_UID_SIZE + size;
+            outPointer += 1 + size;
 
             delete packet;
             outPackets.erase(outPackets.begin());

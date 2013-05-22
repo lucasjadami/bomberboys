@@ -2,7 +2,6 @@
 #define PACKET_H
 
 #define NAME_SIZE       20
-#define PACKET_UID_SIZE 4
 
 #define PACKET_LOGIN            0
 #define PACKET_ADD_PLAYER       1
