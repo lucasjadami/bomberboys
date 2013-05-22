@@ -10,7 +10,7 @@
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
-#define SHUTDOWN_TIME 70000
+#define SHUTDOWN_TIME 700000
 
 class Game
 {
@@ -31,8 +31,10 @@ protected:
 
     void    createPlayerBody(Player*);
     void    createBombBody(Bomb*, Player*);
+    void    parsePingPacket(Packet*, Player*);
     Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
+    Packet* createPongPacket();
 
 };
 

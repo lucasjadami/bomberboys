@@ -10,6 +10,12 @@ WorldGame::WorldGame()
     startupTime = getTimeLL(getTime(&time));
 }
 
+WorldGame::~WorldGame()
+{
+    for (unsigned int i = 0; i < servers.size(); ++i)
+        delete servers[i];
+}
+
 void WorldGame::connectionHandler(int eventId, Socket* socket)
 {
     if (eventId == EVENT_CLIENT_CONNECTED)
@@ -45,6 +51,43 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
                     player->getSocket()->addOutPacket(packet);
                 }
                 it++;
+            }
+        }
+
+        for (unsigned int i = 0; i < servers.size(); ++i)
+        {
+            Packet* packet = createRemovePlayerPacket(socket->getId());
+            servers[i]->getSocket()->addOutPacket(packet);
+        }
+    }
+    else if (eventId == EVENT_SERVER_CONNECTED)
+    {
+        servers.push_back(new Server(socket));
+
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+        {
+            if (!it->second->isPlaying())
+                continue;
+
+            Packet* newPacket = createAddPlayerPacket(it->second);
+            socket->addOutPacket(newPacket);
+        }
+
+        for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        {
+            Packet* newPacket = createAddBombPacket(it->second);
+            socket->addOutPacket(newPacket);
+        }
+    }
+    else if (eventId == EVENT_SERVER_DISCONNECTED)
+    {
+        for (unsigned int i = 0; i < servers.size(); ++i)
+        {
+            if (servers[i]->getSocket()->getId() == socket->getId())
+            {
+                delete servers[i];
+                servers.erase(servers.begin() + i);
+                break;
             }
         }
     }
@@ -84,6 +127,13 @@ void WorldGame::update(float time, float velocityIterations, float positionItera
     updateShutdown();
 }
 
+void WorldGame::broadcastPacketToServers(Packet* packet)
+{
+    for (unsigned int i = 0; i < servers.size(); ++i)
+        servers[i]->getSocket()->addOutPacket(packet->clone(packet->getId()));
+    delete packet;
+}
+
 void WorldGame::updateShutdown()
 {
     timespec time;
@@ -100,6 +150,8 @@ void WorldGame::updateShutdown()
             Packet* packet = createShutdownPacket();
             player->getSocket()->addOutPacket(packet);
         }
+
+        broadcastPacketToServers(createShutdownPacket());
     }
 }
 
@@ -138,6 +190,8 @@ void WorldGame::updatePlayerMovement(Player* player)
             Packet* newPacket = createMovePlayerPacket(player);
             it->second->getSocket()->addOutPacket(newPacket);
         }
+
+        broadcastPacketToServers(createMovePlayerPacket(player));
     }
 
     player->saveLastPosition();
@@ -167,6 +221,9 @@ void WorldGame::fallPlayer(Player* player)
             newPacket = createMovePlayerPacket(player);
             it->second->getSocket()->addOutPacket(newPacket);
         }
+
+        broadcastPacketToServers(createFallPlayerPacket(player));
+        broadcastPacketToServers(createMovePlayerPacket(player));
     }
 }
 
@@ -195,6 +252,8 @@ void WorldGame::explodeBomb(Bomb* bomb)
         float impulseMag = b2Min(900.0f * invDistance * invDistance, BOMB_MAX_IMPULSE);
         player->getBody()->ApplyLinearImpulse(impulseMag * blastDir, player->getBody()->GetWorldCenter());
     }
+
+    broadcastPacketToServers(createExplodeBombPacket(bomb));
 
     world->DestroyBody(bomb->getBody());
     delete bomb;
@@ -230,6 +289,8 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
         newPacket = createAddBombPacket(it->second);
         player->getSocket()->addOutPacket(newPacket);
     }
+
+    broadcastPacketToServers(createAddPlayerPacket(player));
 }
 
 void WorldGame::parseMoveMePacket(Packet* packet, Player* player)
@@ -279,13 +340,9 @@ void WorldGame::parsePlantBombPacket(Packet* packet, Player* player)
             Packet* newPacket = createAddBombPacket(bomb);
             it->second->getSocket()->addOutPacket(newPacket);
         }
-    }
-}
 
-void WorldGame::parsePingPacket(Packet* packet, Player* player)
-{
-    Packet* newPacket = createPongPacket();
-    player->getSocket()->addOutPacket(newPacket);
+        broadcastPacketToServers(createAddBombPacket(bomb));
+    }
 }
 
 Packet* WorldGame::createMovePlayerPacket(Player* player)
@@ -322,12 +379,6 @@ Packet* WorldGame::createFallPlayerPacket(Player* player)
     memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
     Packet::putBytes(data, player->getSocket()->getId(), ID_SIZE);
     return new Packet(PACKET_FALL_PLAYER, data);
-}
-
-Packet* WorldGame::createPongPacket()
-{
-    char* data = new char[PACKET_PONG_SIZE];
-    return new Packet(PACKET_PONG, data);
 }
 
 Packet* WorldGame::createShutdownPacket()

@@ -75,6 +75,8 @@ void GhostGame::updatePlayerPackets(Player* player)
     Packet* packet;
     while ((packet = player->getSocket()->getInPacket()) != NULL)
     {
+        if (packet->getId() == PACKET_PING)
+            parsePingPacket(packet, player);
         routePacketToServer(player, packet);
         delete packet;
     }
