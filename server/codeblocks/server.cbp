@@ -149,8 +149,12 @@
 		<Unit filename="../src/player.h">
 			<Option virtualFolder="game/" />
 		</Unit>
-		<Unit filename="../src/server.cpp" />
-		<Unit filename="../src/server.h" />
+		<Unit filename="../src/server.cpp">
+			<Option virtualFolder="game/" />
+		</Unit>
+		<Unit filename="../src/server.h">
+			<Option virtualFolder="game/" />
+		</Unit>
 		<Unit filename="../src/socket.cpp">
 			<Option virtualFolder="network/other/" />
 		</Unit>
