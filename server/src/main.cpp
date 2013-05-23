@@ -1,6 +1,8 @@
 #include "non_blocking_tcp_connection.h"
 #include "output.h"
 #include "game.h"
+#include "world_game.h"
+#include "ghost_game.h"
 
 #ifdef TESTBED
 #include "testbed/testbed.h"
@@ -178,14 +180,14 @@ int main(int argc, char** argv)
     info("Bomberboys server 1.0");
 
     info("Using non-blocking TCP connection");
-	connection = new NonBlockingTcpConnection(&connectionHandler);
+	connection = new NonBlockingTcpConnection(0, &connectionHandler);
 
     int port = 10011;
 	connection->init(port);
 
 	info("Server connection stabilished at port %d", port);
 
-	game = new Game();
+	game = new WorldGame();
 	game->createWorld();
 
 	info("World created");

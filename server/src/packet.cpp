@@ -1,4 +1,45 @@
 #include "packet.h"
+#include <climits>
+#include <cstring>
+
+int Packet::getSize(int id)
+{
+    int size = INT_MAX / 2;
+    switch (id)
+    {
+        case PACKET_LOGIN:
+            size = PACKET_LOGIN_SIZE; break;
+        case PACKET_ADD_PLAYER:
+            size = PACKET_ADD_PLAYER_SIZE; break;
+        case PACKET_REMOVE_PLAYER:
+            size = PACKET_REMOVE_PLAYER_SIZE; break;
+        case PACKET_MOVE_ME:
+            size = PACKET_MOVE_ME_SIZE; break;
+        case PACKET_MOVE_PLAYER:
+            size = PACKET_MOVE_PLAYER_SIZE; break;
+        case PACKET_PLANT_BOMB:
+            size = PACKET_PLANT_BOMB_SIZE; break;
+        case PACKET_ADD_BOMB:
+            size = PACKET_ADD_BOMB_SIZE; break;
+        case PACKET_EXPLODE_BOMB:
+            size = PACKET_EXPLODE_BOMB_SIZE; break;
+        case PACKET_FALL_PLAYER:
+            size = PACKET_FALL_PLAYER_SIZE; break;
+        case PACKET_PING:
+            size = PACKET_PING_SIZE; break;
+        case PACKET_PONG:
+            size = PACKET_PONG_SIZE; break;
+        case PACKET_SHUTDOWN:
+            size = PACKET_SHUTDOWN_SIZE; break;
+        case PACKET_LOGIN_EX:
+            size = PACKET_LOGIN_EX_SIZE; break;
+        case PACKET_MOVE_ME_EX:
+            size = PACKET_MOVE_ME_EX_SIZE; break;
+        case PACKET_PLANT_BOMB_EX:
+            size = PACKET_PLANT_BOMB_EX_SIZE; break;
+    }
+    return size;
+}
 
 void Packet::putBytes(char* data, int value, int bytes)
 {
@@ -19,6 +60,21 @@ int Packet::getInt(char* data)
     for (int i = 3; i > -1; --i)
     {
         int buffer = (unsigned char) data[i];
+        value |= buffer << mask;
+        mask += 8;
+    }
+
+    return value;
+}
+
+short Packet::getShort(char* data)
+{
+    short value = 0;
+    int mask = 0;
+
+    for (int i = 1; i > -1; --i)
+    {
+        short buffer = (unsigned char) data[i];
         value |= buffer << mask;
         mask += 8;
     }
@@ -54,14 +110,6 @@ double Packet::getDouble(char* data)
 
 Packet::Packet(int id, char* data)
 {
-    uId = 0;
-    this->id = id;
-    this->data = data;
-}
-
-Packet::Packet(int uId, int id, char* data)
-{
-    this->uId = uId;
     this->id = id;
     this->data = data;
 }
@@ -69,16 +117,6 @@ Packet::Packet(int uId, int id, char* data)
 Packet::~Packet()
 {
     delete[] data;
-}
-
-int Packet::getUId()
-{
-    return uId;
-}
-
-void Packet::setUId(int uId)
-{
-    this->uId = uId;
 }
 
 int Packet::getId()
@@ -89,4 +127,15 @@ int Packet::getId()
 char* Packet::getData()
 {
     return data;
+}
+
+Packet* Packet::clone(int newId)
+{
+    int newSize = getSize(newId);
+    int size = getSize(this->id);
+    char* data = new char[newSize];
+    // The newId must incur a newSize bigger than this id.
+    memcpy(data + newSize - size, this->getData(), size);
+    Packet* packet = new Packet(newId, data);
+    return packet;
 }

@@ -7,7 +7,7 @@ class NonBlockingTcpConnection : public Connection
 {
 public:
 
-         NonBlockingTcpConnection(void (*)(int, Socket*));
+         NonBlockingTcpConnection(int, void (*)(int, Socket*));
 	void process();
 
 protected:

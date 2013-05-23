@@ -7,8 +7,8 @@
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 
-NonBlockingTcpConnection::NonBlockingTcpConnection(void (*connectionHandler)(int, Socket*))
-    : Connection(connectionHandler)
+NonBlockingTcpConnection::NonBlockingTcpConnection(int seed, void (*connectionHandler)(int, Socket*))
+    : Connection(seed, connectionHandler)
 {
 }
 
@@ -59,9 +59,9 @@ void NonBlockingTcpConnection::getNewClient()
 
 	maxFd = clientFd > maxFd ? clientFd : maxFd;
 
-	Socket* socket = new Socket(idCount, clientFd, address);
-	clientSockets.insert(std::make_pair(idCount, socket));
-	idCount++;
+    int socketId = generateId();
+	Socket* socket = new Socket(socketId, clientFd, address);
+	clientSockets.insert(std::make_pair(socketId, socket));
 
     connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
