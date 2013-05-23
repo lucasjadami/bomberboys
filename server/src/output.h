@@ -1,5 +1,5 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
 #include <signal.h>
 #include <cstdio>
