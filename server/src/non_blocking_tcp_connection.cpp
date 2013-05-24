@@ -92,6 +92,7 @@ void NonBlockingTcpConnection::getNewClient()
     std::string clientName = inet_ntoa(address.sin_addr);
 
     if (ghostServers.find(clientName) != ghostServers.end())
+    //if (clientSockets.size() == 1)
         connectionHandler(EVENT_SERVER_CONNECTED, socket);
     else
         connectionHandler(EVENT_CLIENT_CONNECTED, socket);

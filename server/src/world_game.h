@@ -4,7 +4,7 @@
 #include "game.h"
 #include "server.h"
 
-#define SHUTDOWN_TIME 7000000
+#define SHUTDOWN_TIME 700000000
 
 class WorldGame : public Game
 {
@@ -23,17 +23,24 @@ private:
     void    broadcastPacketToServers(Packet*);
     void    updateShutdown();
     void    updatePlayerPackets(Player*);
+    void    updateServerPackets(Server*);
     void    updatePlayerMovement(Player*);
     void    fallPlayer(Player*);
     void    explodeBomb(Bomb*);
     void    parseLoginPacket(Packet*, Player*);
-    void    parseMoveMePacket(Packet*, Player*);
-    void    parsePlantBombPacket(Packet*, Player*);
+    void    parseMoveMePacket(Packet*, Player*, int);
+    void    parsePlantBombPacket(Packet*, Player*, int);
+    void    parseAddPlayerPacket(Packet*);
+    void    parseRemovePlayerPacket(Packet*);
+    void    parseLoginExPacket(Packet*);
+    void    parseMoveMeExPacket(Packet*);
+    void    parsePlantBombExPacket(Packet*);
     Packet* createMovePlayerPacket(Player*);
     Packet* createAddBombPacket(Bomb*);
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
     Packet* createShutdownPacket();
+    Packet* createAddPlayerPacket(Player*);
 
 };
 

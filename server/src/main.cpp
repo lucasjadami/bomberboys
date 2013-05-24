@@ -165,31 +165,13 @@ void gameUpdateHandler(Settings* settings)
 }
 #endif
 
-int main(int argc, char** argv)
+void createGhostGame()
 {
-    sigIntHandler.sa_handler = exitHandler;
-   	sigemptyset(&sigIntHandler.sa_mask);
-   	sigIntHandler.sa_flags = 0;
-   	sigaction(SIGINT, &sigIntHandler, NULL);
-
-    info("Bomberboys server 1.0");
-
-    info("Using non-blocking TCP connection");
-
     std::set<std::string> ghostServers;
-    // ghostServers.insert(std::string("127.0.0.1"));
 
-	connection = new NonBlockingTcpConnection(ghostServers, 0, &connectionHandler);
+    connection = new NonBlockingTcpConnection(ghostServers, 1, &connectionHandler);
 
-    /*int port = 10011;
-	connection->init(port);
-
-	info("Server connection stabilished at port %d", port);
-
-	game = new WorldGame();
-	game->createWorld();*/
-
-	int port = 10012;
+    int port = 10012;
 	connection->init(port);
 
 	info("Server connection stabilished at port %d", port);
@@ -202,6 +184,37 @@ int main(int argc, char** argv)
 
 	game = new GhostGame(connection->getWorldServerSocket());
 	game->createWorld();
+}
+
+void createWorldGame()
+{
+    std::set<std::string> ghostServers;
+    ghostServers.insert(std::string("127.0.0.1"));
+
+	connection = new NonBlockingTcpConnection(ghostServers, 0, &connectionHandler);
+
+    int port = 10011;
+	connection->init(port);
+
+	info("Server connection stabilished at port %d", port);
+
+	game = new WorldGame();
+	game->createWorld();
+}
+
+int main(int argc, char** argv)
+{
+    sigIntHandler.sa_handler = exitHandler;
+   	sigemptyset(&sigIntHandler.sa_mask);
+   	sigIntHandler.sa_flags = 0;
+   	sigaction(SIGINT, &sigIntHandler, NULL);
+
+    info("Bomberboys server 1.0");
+
+    info("Using non-blocking TCP connection");
+
+    //createWorldGame();
+    createGhostGame();
 
 	info("World created");
 

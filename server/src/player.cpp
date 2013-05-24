@@ -5,6 +5,16 @@
 Player::Player(Socket* socket)
 {
     this->socket = socket;
+    this->id = socket->getId();
+    body = NULL;
+    name = NULL;
+    lastImpulse = 0;
+}
+
+Player::Player(int id)
+{
+    this->socket = NULL;
+    this->id = id;
     body = NULL;
     name = NULL;
     lastImpulse = 0;
@@ -66,4 +76,14 @@ void Player::applyImpulse(b2Vec2& impulse)
         lastImpulse = now;
         body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
     }
+}
+
+bool Player::isLocal()
+{
+    return socket != NULL;
+}
+
+int Player::getId()
+{
+    return id;
 }

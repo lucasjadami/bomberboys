@@ -30,7 +30,6 @@ protected:
     void    createPlayerBody(Player*);
     void    createBombBody(Bomb*, Player*);
     void    parsePingPacket(Packet*, Player*);
-    Packet* createAddPlayerPacket(Player*);
     Packet* createRemovePlayerPacket(int);
     Packet* createPongPacket();
 

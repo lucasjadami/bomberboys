@@ -28,6 +28,7 @@ private:
     void parseExplodeBombPacket(Packet*);
     void parseFallPlayerPacket(Packet*);
     void parseShutdownPacket(Packet*);
+    Packet* createAddPlayerPacket(Player*);
 
 };
 
