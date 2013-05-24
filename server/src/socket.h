@@ -4,6 +4,7 @@
 #include "packet.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <vector>
 
 #define BUFFER_SIZE 4096
@@ -13,6 +14,7 @@ class Socket
 public:
 
                 Socket(int, int, sockaddr_in);
+                Socket(int, int, addrinfo*);
                ~Socket();
     int         getId();
     int         getFd();
@@ -34,6 +36,7 @@ private:
     int                     id;
     int                     fd;
     sockaddr_in             address;
+    addrinfo*               addressInfo;
     char                    auxBuffer[BUFFER_SIZE];
     char                    inBuffer[BUFFER_SIZE];
     char                    outBuffer[BUFFER_SIZE];

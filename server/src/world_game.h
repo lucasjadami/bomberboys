@@ -4,6 +4,8 @@
 #include "game.h"
 #include "server.h"
 
+#define SHUTDOWN_TIME 7000000
+
 class WorldGame : public Game
 {
 public:

@@ -7,6 +7,22 @@ Socket::Socket(int id, int fd, sockaddr_in address)
     this->id = id;
     this->fd = fd;
     this->address = address;
+    addressInfo = NULL;
+    inPointer = 0;
+    outPointer = 0;
+    memset(inBuffer, 0, sizeof(inBuffer));
+    memset(outBuffer, 0, sizeof(outBuffer));
+    packetUId = 0;
+    disconnectForced = false;
+}
+
+Socket::Socket(int id, int fd, addrinfo* addressInfo)
+{
+    // Unfortunatelly, this C++ version does not have constructor-constructor calls.
+    this->id = id;
+    this->fd = fd;
+    this->address = *((sockaddr_in*) addressInfo->ai_addr);
+    this->addressInfo = addressInfo;
     inPointer = 0;
     outPointer = 0;
     memset(inBuffer, 0, sizeof(inBuffer));
@@ -17,6 +33,9 @@ Socket::Socket(int id, int fd, sockaddr_in address)
 
 Socket::~Socket()
 {
+    if (addressInfo != NULL)
+        freeaddrinfo(addressInfo);
+
     for (unsigned int i = 0; i < inPackets.size(); ++i)
         delete inPackets[i];
     for (unsigned int i = 0; i < outPackets.size(); ++i)

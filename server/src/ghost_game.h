@@ -8,6 +8,7 @@ class GhostGame : public Game
 {
 public:
 
+            GhostGame(Socket*);
            ~GhostGame();
     void    connectionHandler(int, Socket*);
     void    update(float, float, float);

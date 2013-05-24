@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <map>
+#include <set>
+#include <string>
 
 #define MAX_CONNECTIONS 100
 #define SEED_SIZE       10000000
@@ -28,19 +30,25 @@ class Connection
 {
 public:
 
-                    Connection(int seed, void (*)(int, Socket*));
+                    Connection(std::set<std::string>, int seed, void (*)(int, Socket*));
     virtual        ~Connection();
     void            init(int port);
 	virtual	void    process() {};
     Socket*         getServerSocket();
+    Socket*         getWorldServerSocket();
+    void            connectToWorldServer(const char*, const char*);
 
 protected:
 
+    Socket*                         worldServerSocket;
+    std::set<std::string>           ghostServers;
     Socket*                         serverSocket;
 	std::map<int, Socket*> 	        clientSockets;
 
+    void            setTCPNoDelay(int);
     int             generateId();
-	virtual int     create() { return -1; };
+    virtual int     createWorldServerSocket() { return -1; }
+	virtual int     createServerSocket() { return -1; };
 	void            (*connectionHandler)(int, Socket*);
 
 private:

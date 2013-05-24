@@ -1,6 +1,11 @@
 #include "ghost_game.h"
 #include "connection.h"
 
+GhostGame::GhostGame(Socket* worldServerSocket)
+{
+    server = new Server(worldServerSocket);
+}
+
 GhostGame::~GhostGame()
 {
     if (server != NULL)
@@ -9,9 +14,9 @@ GhostGame::~GhostGame()
 
 void GhostGame::connectionHandler(int eventId, Socket* socket)
 {
-    if (eventId == EVENT_SERVER_CONNECTED)
+    if (eventId == EVENT_SERVER_DISCONNECTED)
     {
-        server = new Server(socket);
+        // TODO
     }
     else if (eventId == EVENT_CLIENT_CONNECTED)
     {
@@ -40,7 +45,8 @@ void GhostGame::update(float time, float velocityIteration, float positionIterat
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
         Player* player = it->second;
-        updatePlayerPackets(player);
+        if (player->getSocket() != NULL)
+            updatePlayerPackets(player);
     }
 }
 

@@ -7,12 +7,13 @@ class NonBlockingTcpConnection : public Connection
 {
 public:
 
-         NonBlockingTcpConnection(int, void (*)(int, Socket*));
+         NonBlockingTcpConnection(std::set<std::string>, int, void (*)(int, Socket*));
 	void process();
 
 protected:
 
-    int  create();
+    int  createWorldServerSocket();
+    int  createServerSocket();
 
 private:
 
@@ -21,7 +22,10 @@ private:
 
 	void getNewClient();
 	void processClients(fd_set&, fd_set&);
+	void processWorldServerSocket(fd_set&, fd_set&);
 	void createFdSet(fd_set&);
+	bool readFromSocket(Socket*);
+	bool writeToSocket(Socket*);
 
 };
 

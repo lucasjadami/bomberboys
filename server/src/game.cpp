@@ -103,7 +103,7 @@ Packet* Game::createAddPlayerPacket(Player* player)
     Packet::putBytes(data, player->getSocket()->getId(), ID_SIZE);
     Packet::putBytes(data + ID_SIZE, player->getBody()->GetPosition().x, 2);
     Packet::putBytes(data + ID_SIZE + 2, player->getBody()->GetPosition().y, 2);
-    memcpy(data + 6, player->getName(), sizeof(char) * NAME_SIZE);
+    memcpy(data + ID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
     Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
     return packet;
 }
