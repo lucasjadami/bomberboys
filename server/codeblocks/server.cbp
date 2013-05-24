@@ -101,18 +101,6 @@
 		<Linker>
 			<Add library="Box2D" />
 		</Linker>
-		<Unit filename="../src/blocking_tcp_connection.cpp">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/blocking_tcp_connection.h">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/blocking_udp_connection.cpp">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/blocking_udp_connection.h">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
 		<Unit filename="../src/bomb.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>
@@ -124,12 +112,6 @@
 		</Unit>
 		<Unit filename="../src/connection.h">
 			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/connection_config.h">
-			<Option virtualFolder="network/other/" />
-		</Unit>
-		<Unit filename="../src/connection_thread.h">
-			<Option virtualFolder="network/other/" />
 		</Unit>
 		<Unit filename="../src/game.cpp">
 			<Option virtualFolder="game/" />
@@ -144,12 +126,6 @@
 			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/non_blocking_tcp_connection.h">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/non_blocking_udp_connection.cpp">
-			<Option virtualFolder="network/connection/" />
-		</Unit>
-		<Unit filename="../src/non_blocking_udp_connection.h">
 			<Option virtualFolder="network/connection/" />
 		</Unit>
 		<Unit filename="../src/output.h">

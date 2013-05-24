@@ -1,7 +1,4 @@
 #include "non_blocking_tcp_connection.h"
-#include "non_blocking_udp_connection.h"
-#include "blocking_tcp_connection.h"
-#include "blocking_udp_connection.h"
 #include "output.h"
 #include "game.h"
 
@@ -180,21 +177,8 @@ int main(int argc, char** argv)
 
     info("Bomberboys server 1.0");
 
-#if defined(NON_BLOCKING_TCP_CONNECTION)
     info("Using non-blocking TCP connection");
 	connection = new NonBlockingTcpConnection(&connectionHandler);
-#elif defined(NON_BLOCKING_UDP_CONNECTION)
-    info("Using non-blocking UDP connection");
-	connection = new NonBlockingUdpConnection(&connectionHandler);
-#elif defined(BLOCKING_TCP_CONNECTION)
-    info("Using blocking TCP connection");
-    connection = new BlockingTcpConnection(&connectionHandler);
-#elif defined(BLOCKING_UDP_CONNECTION)
-    info("Using blocking UDP connection");
-    connection = new BlockingUdpConnection(&connectionHandler);
-#else
-    error("Connection type unknown");
-#endif
 
     int port = 10011;
 	connection->init(port);

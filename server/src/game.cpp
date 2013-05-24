@@ -18,10 +18,6 @@ Game::Game()
 
     timespec time;
     startupTime = getTimeLL(getTime(&time));
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_init(&mutex, NULL);
-#endif
 }
 
 Game::~Game()
@@ -32,10 +28,6 @@ Game::~Game()
         delete players[i];
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_destroy(&mutex);
-#endif
 }
 
 void Game::createWorld()
@@ -46,10 +38,6 @@ void Game::createWorld()
 
 void Game::connectionHandler(int eventId, Socket* socket)
 {
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&mutex);
-#endif
-
     if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
@@ -86,18 +74,10 @@ void Game::connectionHandler(int eventId, Socket* socket)
             }
         }
     }
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&mutex);
-#endif
 }
 
 void Game::update(float time, float velocityIterations, float positionIterations)
 {
-#ifdef BLOCKING_MODE
-    pthread_mutex_lock(&mutex);
-#endif
-
     world->Step(time, velocityIterations, positionIterations);
 
     for (unsigned int i = 0; i < players.size(); ++i)
@@ -111,9 +91,6 @@ void Game::update(float time, float velocityIterations, float positionIterations
             fallPlayer(player);
             updatePlayerMovement(player);
         }
-
-        if (player->isIdle())
-            player->getSocket()->setDisconnectForced(true);
     }
 
     std::map<int, Bomb*>::iterator it = bombs.begin();
@@ -131,10 +108,6 @@ void Game::update(float time, float velocityIterations, float positionIterations
 
     // The shutdown is sent but the server is kept online.
     updateShutdown();
-
-#ifdef BLOCKING_MODE
-    pthread_mutex_unlock(&mutex);
-#endif
 }
 
 b2World* Game::getWorld()
@@ -177,12 +150,8 @@ void Game::updatePlayerPackets(Player* player)
                 parseMoveMePacket(packet, player);
             else if (packet->getId() == PACKET_PLANT_BOMB)
                 parsePlantBombPacket(packet, player);
-            else if (packet->getId() == PACKET_ACK)
-                parseAckPacket(packet, player);
             else if (packet->getId() == PACKET_PING)
                 parsePingPacket(packet, player);
-            else if (packet->getId() == PACKET_INFO)
-                parseInfoPacket(packet, player);
         }
         delete packet;
     }
@@ -389,23 +358,10 @@ void Game::parsePlantBombPacket(Packet* packet, Player* player)
     }
 }
 
-void Game::parseAckPacket(Packet* packet, Player* player)
-{
-    player->updateLastAck();
-}
-
 void Game::parsePingPacket(Packet* packet, Player* player)
 {
     Packet* newPacket = createPongPacket();
     player->getSocket()->addOutPacket(newPacket);
-}
-
-void Game::parseInfoPacket(Packet* packet, Player* player)
-{
-    double average = Packet::getDouble(packet->getData());
-    double deviation = Packet::getDouble(packet->getData() + 16);
-    int packetsLost = Packet::getInt(packet->getData() + 32);
-    info("Player info (id, avg, dev, ploss): %d %lf %lf %d", player->getSocket()->getId(), average, deviation, packetsLost);
 }
 
 Packet* Game::createAddPlayerPacket(Player* player)

@@ -5,6 +5,7 @@
 #include <utility>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 
 NonBlockingTcpConnection::NonBlockingTcpConnection(void (*connectionHandler)(int, Socket*))
     : Connection(connectionHandler)
@@ -51,6 +52,10 @@ void NonBlockingTcpConnection::getNewClient()
 	int clientFd = accept(serverSocket->getFd(), (sockaddr*) &address, &addressLen);
 	if (clientFd < 0)
 		error("ERROR on accept, %s", strerror(errno));
+
+    int flag = 1;
+    if (setsockopt(clientFd, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int)) < 0)
+        error("ERROR on TCP_NODELAY, %s", strerror(errno));
 
 	maxFd = clientFd > maxFd ? clientFd : maxFd;
 
