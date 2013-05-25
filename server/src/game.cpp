@@ -92,8 +92,7 @@ void Game::createBombBody(Bomb* bomb, Player* player)
 
 void Game::parsePingPacket(Packet* packet, Player* player)
 {
-    Packet* newPacket = createPongPacket();
-    player->getSocket()->addOutPacket(newPacket);
+    player->getSocket()->addOutPacket(createPongPacket());
 }
 
 Packet* Game::createRemovePlayerPacket(int id)
@@ -108,4 +107,25 @@ Packet* Game::createPongPacket()
 {
     char* data = new char[PACKET_PONG_SIZE];
     return new Packet(PACKET_PONG, data);
+}
+
+Packet* Game::createAddBombPacket(Bomb* bomb)
+{
+    char* data = new char[PACKET_ADD_BOMB_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_ADD_BOMB_SIZE);
+    Packet::putBytes(data, bomb->getId(), ID_SIZE);
+    Packet::putBytes(data + ID_SIZE, (int) bomb->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + ID_SIZE + 2, (int) bomb->getBody()->GetPosition().y, 2);
+    return new Packet(PACKET_ADD_BOMB, data);
+}
+
+Packet* Game::createAddPlayerPacket(Player* player)
+{
+    char* data = new char[PACKET_ADD_PLAYER_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
+    Packet::putBytes(data, player->getId(), ID_SIZE);
+    Packet::putBytes(data + ID_SIZE, player->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + ID_SIZE + 2, player->getBody()->GetPosition().y, 2);
+    memcpy(data + ID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
+    return new Packet(PACKET_ADD_PLAYER, data);
 }

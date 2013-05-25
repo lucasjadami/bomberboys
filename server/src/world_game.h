@@ -37,11 +37,9 @@ private:
     void    parseMoveMeExPacket(Packet*);
     void    parsePlantBombExPacket(Packet*);
     Packet* createMovePlayerPacket(Player*);
-    Packet* createAddBombPacket(Bomb*);
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
     Packet* createShutdownPacket();
-    Packet* createAddPlayerPacket(Player*);
 
 };
 

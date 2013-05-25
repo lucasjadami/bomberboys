@@ -55,6 +55,8 @@ void GhostGame::updateServerPackets()
     Packet* packet;
     while ((packet = server->getSocket()->getInPacket()) != NULL)
     {
+        routePacketToClients(packet);
+
         if (packet->getId() == PACKET_ADD_PLAYER)
             parseAddPlayerPacket(packet);
         else if (packet->getId() == PACKET_REMOVE_PLAYER)
@@ -69,8 +71,6 @@ void GhostGame::updateServerPackets()
             parseFallPlayerPacket(packet);
         else if (packet->getId() == PACKET_SHUTDOWN)
             parseShutdownPacket(packet);
-
-        routePacketToClients(packet);
 
         delete packet;
     }
@@ -123,7 +123,21 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
         players.insert(std::make_pair(id, player));
     }
     else
+    {
+        // The player is local.
         player = it->second;
+
+        for (it = players.begin(); it != players.end(); ++it)
+        {
+            if (it->second == player)
+                continue;
+
+            player->getSocket()->addOutPacket(Game::createAddPlayerPacket(it->second));
+        }
+
+        for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+            player->getSocket()->addOutPacket(createAddBombPacket(it->second));
+    }
 
     player->setName(name);
 
@@ -202,6 +216,5 @@ Packet* GhostGame::createAddPlayerPacket(Player* player)
     Packet::putBytes(data + ID_SIZE, 0, 2);
     Packet::putBytes(data + ID_SIZE + 2, 0, 2);
     memcpy(data + ID_SIZE + 4, "", sizeof(char) * NAME_SIZE);
-    Packet* packet = new Packet(PACKET_ADD_PLAYER, data);
-    return packet;
+    return new Packet(PACKET_ADD_PLAYER, data);
 }

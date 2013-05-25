@@ -27,11 +27,13 @@ protected:
     std::map<int, Bomb*>   bombs;
     b2World*               world;
 
-    void    createPlayerBody(Player*);
-    void    createBombBody(Bomb*, Player*);
-    void    parsePingPacket(Packet*, Player*);
-    Packet* createRemovePlayerPacket(int);
-    Packet* createPongPacket();
+    void            createPlayerBody(Player*);
+    void            createBombBody(Bomb*, Player*);
+    void            parsePingPacket(Packet*, Player*);
+    Packet*         createRemovePlayerPacket(int);
+    Packet*         createPongPacket();
+    Packet*         createAddBombPacket(Bomb*);
+    virtual Packet* createAddPlayerPacket(Player*);
 
 };
 
