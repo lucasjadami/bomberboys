@@ -25,12 +25,7 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
     {
-        Bomb* bomb = bombs.find(socket->getId()) == bombs.end() ? NULL : bombs[socket->getId()];
-        if (bomb != NULL)
-        {
-            explodeBomb(bomb);
-            bombs.erase(socket->getId());
-        }
+        explodePlayerBombs(socket->getId());
 
         std::map<int, Player*>::iterator it = players.begin();
         while (it != players.end())
@@ -38,7 +33,10 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
             Player* player = it->second;
 
             if (!player->isLocal())
+            {
+                it++;
                 continue;
+            }
 
             if (player->getId() == socket->getId())
             {
@@ -132,6 +130,16 @@ void WorldGame::update(float time, float velocityIterations, float positionItera
 
     // The shutdown is sent but the server is kept online.
     updateShutdown();
+}
+
+void WorldGame::explodePlayerBombs(int playerId)
+{
+    Bomb* bomb = bombs.find(playerId) == bombs.end() ? NULL : bombs[playerId];
+    if (bomb != NULL)
+    {
+        explodeBomb(bomb);
+        bombs.erase(playerId);
+    }
 }
 
 void WorldGame::broadcastPacketToServers(Packet* packet)
@@ -392,7 +400,11 @@ void WorldGame::parseRemovePlayerPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
 
+    Player* player = players[id];
+    delete player;
     players.erase(id);
+
+    explodePlayerBombs(id);
 
     broadcastPacketToServers(packet->clone(packet->getId()));
 
@@ -420,7 +432,7 @@ void WorldGame::parseLoginExPacket(Packet* packet)
 
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
-        if (it->second == player || !it->second->isPlaying())
+        if (it->second == player || !it->second->isPlaying() || !it->second->isLocal())
             continue;
 
         Packet* newPacket = createAddPlayerPacket(player);

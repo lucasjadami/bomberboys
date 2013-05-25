@@ -11,6 +11,7 @@
 
 #define MAX_CONNECTIONS 100
 #define SEED_SIZE       10000000
+#define GHOST_PORT      2505
 
 #define EVENT_CLIENT_CONNECTED      0
 #define EVENT_CLIENT_DISCONNECTED   1
@@ -45,6 +46,7 @@ protected:
     Socket*                         serverSocket;
 	std::map<int, Socket*> 	        clientSockets;
 
+    bool            isGhostServer(const char*, int);
     void            setTCPNoDelay(int);
     int             generateId();
     virtual int     createWorldServerSocket() { return -1; }
@@ -56,6 +58,8 @@ private:
     int                             idCount;
 	// The seed is used to generate sockets IDs. Each server should have one seed, 0 <= seed <= 99.
 	int                             seed;
+
+	sockaddr_in     bindSocket(int, int);
 
 };
 

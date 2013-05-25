@@ -41,6 +41,11 @@ Socket* Player::getSocket()
     return socket;
 }
 
+void Player::setSocket(Socket* socket)
+{
+    this->socket = socket;
+}
+
 bool Player::isPlaying()
 {
     return name != NULL;

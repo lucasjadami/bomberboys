@@ -20,6 +20,7 @@ private:
     std::vector<Server*> servers;
     long long            startupTime;
 
+    void    explodePlayerBombs(int);
     void    broadcastPacketToServers(Packet*);
     void    updateShutdown();
     void    updatePlayerPackets(Player*);

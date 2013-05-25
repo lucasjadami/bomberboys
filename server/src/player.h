@@ -17,6 +17,7 @@ public:
    char*    getName();
    void     setName(char*);
    Socket*  getSocket();
+   void     setSocket(Socket*);
    bool     isPlaying();
    b2Body*  getBody();
    void     setBody(b2Body*);

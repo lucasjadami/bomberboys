@@ -89,15 +89,12 @@ void NonBlockingTcpConnection::getNewClient()
 	Socket* socket = new Socket(socketId, clientFd, address);
 	clientSockets.insert(std::make_pair(socketId, socket));
 
-    std::string clientName = inet_ntoa(address.sin_addr);
-
-    if (ghostServers.find(clientName) != ghostServers.end())
-    //if (clientSockets.size() == 1)
+    if (isGhostServer(inet_ntoa(address.sin_addr), ntohs(address.sin_port)))
         connectionHandler(EVENT_SERVER_CONNECTED, socket);
     else
         connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
-	debug("New connection from %s", clientName.c_str());
+	debug("New connection from %s:%d", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 }
 
 void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFdSet)
@@ -123,9 +120,7 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
 
         if (removeIt)
         {
-            std::string clientName = inet_ntoa(socket->getAddress().sin_addr);
-
-            if (ghostServers.find(clientName) != ghostServers.end())
+            if (isGhostServer(inet_ntoa(socket->getAddress().sin_addr), ntohs(socket->getAddress().sin_port)))
                 connectionHandler(EVENT_SERVER_DISCONNECTED, socket);
             else
                 connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);

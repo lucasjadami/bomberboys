@@ -40,20 +40,7 @@ void Connection::init(int port)
 {
     int serverFd = createServerSocket();
 
-    int yes = 1;
-    if (setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-        error("ERROR on set SO_REUSEADDR %s", strerror(errno));
-
-    sockaddr_in address;
-
-    memset(&address, 0, sizeof(address));
-	address.sin_family = AF_INET;
-	address.sin_port = htons(port);
-	address.sin_addr.s_addr = INADDR_ANY;
-
-	if (bind(serverFd, (sockaddr*) &address, sizeof(address)) < 0)
-  		error("ERROR on binding %s", strerror(errno));
-
+    sockaddr_in address = bindSocket(serverFd, port);
     serverSocket = new Socket(-1, serverFd, address);
 
     listen(serverFd, MAX_CONNECTIONS);
@@ -73,6 +60,8 @@ void Connection::connectToWorldServer(const char* worldServerName, const char* p
 {
     int serverFd = createWorldServerSocket();
 
+    bindSocket(serverFd, GHOST_PORT);
+
     addrinfo hints, *addressInfo;
     int status;
 
@@ -88,6 +77,11 @@ void Connection::connectToWorldServer(const char* worldServerName, const char* p
     worldServerSocket = new Socket(generateId(), serverFd, addressInfo);
 }
 
+bool Connection::isGhostServer(const char* serverName, int port)
+{
+    return port == GHOST_PORT && ghostServers.find(std::string(serverName)) != ghostServers.end();
+}
+
 void Connection::setTCPNoDelay(int fd)
 {
     int flag = 1;
@@ -98,4 +92,23 @@ void Connection::setTCPNoDelay(int fd)
 int Connection::generateId()
 {
     return seed * SEED_SIZE + idCount++;
+}
+
+sockaddr_in Connection::bindSocket(int fd, int port)
+{
+    int yes = 1;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+        error("ERROR on set SO_REUSEADDR ,%s", strerror(errno));
+
+    sockaddr_in address;
+
+    memset(&address, 0, sizeof(address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+	address.sin_addr.s_addr = INADDR_ANY;
+
+	if (bind(fd, (sockaddr*) &address, sizeof(address)) < 0)
+  		error("ERROR on binding, %s", strerror(errno));
+
+    return address;
 }

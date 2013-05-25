@@ -21,20 +21,19 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
     else if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
-        Packet* newPacket = createAddPlayerPacket(newPlayer);
-        server->getSocket()->addOutPacket(newPacket);
+        server->getSocket()->addOutPacket(createAddPlayerPacket(newPlayer));
         players.insert(std::make_pair(socket->getId(), newPlayer));
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
     {
-        std::map<int, Player*>::iterator it = players.begin();
-        while (it != players.end())
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         {
             Player* player = it->second;
             if (player->isLocal() && player->getId() == socket->getId())
             {
-                Packet* newPacket = createRemovePlayerPacket(player->getId());
-                server->getSocket()->addOutPacket(newPacket);
+                server->getSocket()->addOutPacket(createRemovePlayerPacket(player->getId()));
+                player->setSocket(NULL);
+                break;
             }
         }
     }
@@ -113,7 +112,7 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
     int id = Packet::getInt(packet->getData());
     int x = Packet::getShort(packet->getData() + ID_SIZE);
     int y = Packet::getShort(packet->getData() + ID_SIZE + 2);
-    char name[NAME_SIZE];
+    char* name = new char[NAME_SIZE];
     strcpy(name, packet->getData() + ID_SIZE + 4);
 
     Player* player;
