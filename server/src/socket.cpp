@@ -124,7 +124,7 @@ bool Socket::updateOutBuffer(int& bytesWritten)
     if (packet != NULL)
     {
         int size = Packet::getSize(packet->getId());
-        if (outPointer + size + 1 <= BUFFER_SIZE)
+        if (outPointer + size + 1 < BUFFER_SIZE)
         {
             outBuffer[outPointer] = packet->getId();
             memcpy(outBuffer + outPointer + 1, packet->getData(), sizeof(char) * size);

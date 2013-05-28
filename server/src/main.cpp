@@ -213,8 +213,8 @@ int main(int argc, char** argv)
 
     info("Using non-blocking TCP connection");
 
-    //createWorldGame();
-    createGhostGame();
+    createWorldGame();
+    //createGhostGame();
 
 	info("World created");
 
