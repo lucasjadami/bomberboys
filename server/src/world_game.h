@@ -31,8 +31,8 @@ private:
     void    parseLoginPacket(Packet*, Player*);
     void    parseMoveMePacket(Packet*, Player*, int);
     void    parsePlantBombPacket(Packet*, Player*, int);
-    void    parseAddPlayerPacket(Packet*);
-    void    parseRemovePlayerPacket(Packet*);
+    void    parseAddPlayerPacket(Packet*, Server*);
+    void    parseRemovePlayerPacket(Packet*, Server*);
     void    parseLoginExPacket(Packet*);
     void    parseMoveMeExPacket(Packet*);
     void    parsePlantBombExPacket(Packet*);

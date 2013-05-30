@@ -9,3 +9,8 @@ Socket* Server::getSocket()
 {
     return socket;
 }
+
+std::map<int, Player*>* Server::getPlayers()
+{
+    return &players;
+}

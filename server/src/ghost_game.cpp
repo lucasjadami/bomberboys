@@ -113,7 +113,8 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
     int x = Packet::getShort(packet->getData() + ID_SIZE);
     int y = Packet::getShort(packet->getData() + ID_SIZE + 2);
     char* name = new char[NAME_SIZE];
-    strcpy(name, packet->getData() + ID_SIZE + 4);
+    memcpy(name, packet->getData() + ID_SIZE + 4, sizeof(char) * NAME_SIZE);
+    name[NAME_SIZE - 1] = '\0';
 
     Player* player;
     std::map<int, Player*>::iterator it = players.find(id);

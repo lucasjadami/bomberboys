@@ -1,6 +1,7 @@
 #include "world_game.h"
 #include "time.h"
 #include "connection.h"
+#include <list>
 
 WorldGame::WorldGame()
 {
@@ -77,8 +78,26 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
         {
             if (servers[i]->getSocket()->getId() == socket->getId())
             {
+                std::list<int> playersToRemove;
+                for (std::map<int, Player*>::iterator it = servers[i]->getPlayers()->begin(); it != servers[i]->getPlayers()->end(); ++it)
+                {
+                    playersToRemove.push_back(it->first);
+                    delete it->second;
+                    players.erase(it->first);
+                }
+
+                for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+                {
+                    if (!it->second->isPlaying() || !it->second->isLocal())
+                        continue;
+
+                    for (std::list<int>::iterator it2 = playersToRemove.begin(); it2 != playersToRemove.end(); ++it2)
+                        it->second->getSocket()->addOutPacket(createRemovePlayerPacket(*it2));
+                }
+
                 delete servers[i];
                 servers.erase(servers.begin() + i);
+
                 break;
             }
         }
@@ -195,9 +214,9 @@ void WorldGame::updateServerPackets(Server* server)
     while ((packet = server->getSocket()->getInPacket()) != NULL)
     {
         if (packet->getId() == PACKET_ADD_PLAYER)
-            parseAddPlayerPacket(packet);
+            parseAddPlayerPacket(packet, server);
         else if (packet->getId() == PACKET_REMOVE_PLAYER)
-            parseRemovePlayerPacket(packet);
+            parseRemovePlayerPacket(packet, server);
         else if (packet->getId() == PACKET_LOGIN_EX)
             parseLoginExPacket(packet);
         else if (packet->getId() == PACKET_MOVE_ME_EX)
@@ -299,10 +318,12 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
 
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
-        if (it->second == player || !it->second->isPlaying() || !it->second->isLocal())
+        if (it->second == player || !it->second->isPlaying())
             continue;
 
-        it->second->getSocket()->addOutPacket(createAddPlayerPacket(player));
+        if (it->second->isLocal())
+            it->second->getSocket()->addOutPacket(createAddPlayerPacket(player));
+
         player->getSocket()->addOutPacket(createAddPlayerPacket(it->second));
     }
 
@@ -363,20 +384,22 @@ void WorldGame::parsePlantBombPacket(Packet* packet, Player* player, int offset)
     }
 }
 
-void WorldGame::parseAddPlayerPacket(Packet* packet)
+void WorldGame::parseAddPlayerPacket(Packet* packet, Server* server)
 {
     int id = Packet::getInt(packet->getData());
     Player* newPlayer = new Player(id);
     players.insert(std::make_pair(id, newPlayer));
+    server->getPlayers()->insert(std::make_pair(id, newPlayer));
 }
 
-void WorldGame::parseRemovePlayerPacket(Packet* packet)
+void WorldGame::parseRemovePlayerPacket(Packet* packet, Server* server)
 {
     int id = Packet::getInt(packet->getData());
 
     Player* player = players[id];
     delete player;
     players.erase(id);
+    server->getPlayers()->erase(id);
 
     explodePlayerBombs(id);
 
