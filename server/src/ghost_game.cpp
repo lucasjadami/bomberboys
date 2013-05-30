@@ -122,6 +122,7 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
     {
         player = new Player(id);
         players.insert(std::make_pair(id, player));
+        server->getPlayers()->insert(std::make_pair(id, player));
     }
     else
     {
@@ -155,6 +156,10 @@ void GhostGame::parseRemovePlayerPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
     Player* player = players[id];
+
+    if (!player->isLocal())
+        server->getPlayers()->erase(id);
+
     delete player;
     players.erase(id);
 }
