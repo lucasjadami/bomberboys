@@ -3,12 +3,15 @@ package com.bomberboys.game;
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
 import com.bomberboys.network.TCPConnection;
+import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 public class Game {
+    public static final Dimension MAP_SIZE = new Dimension(600, 420);
+
     private Connection connection;
     private Map<Integer, Player> players;
     private Map<Integer, Bomb> bombs;
@@ -19,8 +22,8 @@ public class Game {
         bombs = new HashMap<>();
     }
 
-    public void connect() {
-        connection.connect("127.0.0.1", 10011);
+    public void connect(String address, int port) {
+        connection.connect(address, port);
         
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());

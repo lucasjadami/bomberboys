@@ -27,11 +27,11 @@ public class GamePanel extends JPanel {
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         for (Bomb bomb: game.getBombs().values()) {
-            bomb.draw(g2D, 300);
+            bomb.draw(g2D);
         }
 
         for (Player player : game.getPlayers().values()) {
-            player.draw(g2D, 300);
+            player.draw(g2D);
         }
     }
 }

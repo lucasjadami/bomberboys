@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         if (args.length == 3) {
             Game game = new Game();
-            game.connect();
+            game.connect(args[1], Integer.parseInt(args[2]));
 
             GameWindow window = new GameWindow(game);
             window.setup();

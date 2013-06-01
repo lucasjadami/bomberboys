@@ -24,7 +24,7 @@ public class GameWindow {
 
     private void setupFrame() {
         frame = new JFrame();
-        frame.setSize(300, 300);
+        frame.setSize(Game.MAP_SIZE.width, Game.MAP_SIZE.height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(panel);
         frame.setVisible(true);
