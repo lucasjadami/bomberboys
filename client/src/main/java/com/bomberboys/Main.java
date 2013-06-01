@@ -1,6 +1,9 @@
 package com.bomberboys;
 
 import com.bomberboys.game.Game;
+import com.bomberboys.ui.PlayerKeyboardListener;
+import com.bomberboys.ui.MainWindow;
+import java.awt.KeyboardFocusManager;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -16,25 +19,35 @@ public class Main {
     }
 
     private static void startHuman() {
+        Game game = new Game();
+        game.connect();
+
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.setVisible(true);
+
+        PlayerKeyboardListener listener = new PlayerKeyboardListener(game);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(listener);
+
+        while (true) {
+            try {
+                Thread.sleep(50);
+            } catch (Exception ex) { }
+
+            game.processPackets();
+        }
     }
 
     private static void startBot() {
-        new Thread() {
-            @Override
-            public void run() {
-                Game game = new Game();
+        Game game = new Game();
+        game.connect();
 
-                game.connect();
+        while (true) {
+            try {
+                Thread.sleep(50);
+            } catch (Exception ex) { }
 
-                while (true) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception ex) { }
-
-                    game.processPackets();
-                    game.doRandomAction();
-                }
-            }
-        }.start();
+            game.processPackets();
+            game.doRandomAction();
+        }
     }
 }
