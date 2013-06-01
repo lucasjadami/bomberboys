@@ -5,14 +5,14 @@ import java.nio.ByteBuffer;
 public class Packet {
     public enum Id {
         LOGIN(20),
-        ADD_PLAYER(26),
-        REMOVE_PLAYER(2),
+        ADD_PLAYER(28),
+        REMOVE_PLAYER(4),
         MOVE_ME(1),
-        MOVE_PLAYER(6),
+        MOVE_PLAYER(8),
         PLANT_BOMB(0),
-        ADD_BOMB(6),
-        EXPLODE_BOMB(2),
-        FALL_PLAYER(2),
+        ADD_BOMB(8),
+        EXPLODE_BOMB(4),
+        FALL_PLAYER(4),
         SHUTDOWN(0);
         
         private int size;

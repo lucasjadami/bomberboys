@@ -1,24 +1,23 @@
 package com.bomberboys.main.game;
 
-public class Player implements Runnable {
-    private String address;
-    private int port;
 
-    public Player(String address, int port) {
-        this.address = address;
-        this.port    = port;
+public class Player extends MapObject {
+    public static final int RADIUS = 10;
+
+    private String name;
+    private boolean player;
+
+    public Player(int x, int y, String name, boolean player) {
+        super(x, y);
+        this.name = name;
+        this.player = player;
     }
 
-    @Override
-    public void run() {
-        Game game = new Game(address, port);
-        game.connect();
+    public String getName() {
+        return name;
+    }
 
-        while (!game.isShutdown()) {
-            try { Thread.sleep(50); } catch (Exception ex) { }
-
-            game.processPackets();
-            game.doRandomAction();
-        }
+    public boolean isPlayer() {
+        return player;
     }
 }

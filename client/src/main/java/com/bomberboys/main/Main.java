@@ -1,16 +1,29 @@
 package com.bomberboys.main;
 
 import com.bomberboys.main.game.Game;
-import com.bomberboys.main.game.Player;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("Usage: address port\n");
+        startGameThread();
+    }
 
-        Player player = new Player(args[0], Integer.parseInt(args[1]));
+    private static void startGameThread() {
+        new Thread() {
+            @Override
+            public void run() {
+                Game game = new Game();
 
-        Thread thread = new Thread(player);
-        thread.start();
-        thread.join();
+                game.connect();
+
+                while (true) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (Exception ex) { }
+
+                    game.processPackets();
+                    game.doRandomAction();
+                }
+            }
+        }.start();
     }
 }

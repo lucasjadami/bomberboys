@@ -7,34 +7,20 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Game {
     private Connection connection;
-    private Map<Integer, PlayerInfo> players;
+    private Map<Integer, Player> players;
     private Map<Integer, Bomb> bombs;
-    private String address;
-    private int port;
-    private int currentRecvPacket = -1;
-
-    private boolean isShutdown;
     
-    public Game(String address, int port) {
+    public Game() {
         connection = new TCPConnection();
-        this.address = address;
-        this.port = port;
         players = new HashMap<>();
         bombs = new HashMap<>();
-        isShutdown = false;
-    }
-
-    public boolean isShutdown() {
-        return isShutdown;
     }
 
     public void connect() {
-        connection.connect(address, port);
+        connection.connect("127.0.0.1", 10011);
         
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());
@@ -76,7 +62,7 @@ public class Game {
         connection.sendPacket(new Packet(Packet.Id.PLANT_BOMB, buffer));
     }
 
-    public Map<Integer, PlayerInfo> getPlayers() {
+    public Map<Integer, Player> getPlayers() {
         return players;
     }
 
@@ -85,24 +71,24 @@ public class Game {
     }
     
     private void addPlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         byte[] name = new byte[20];
         buffer.get(name);
         
-        PlayerInfo newPlayer = new PlayerInfo(x, y, new String(name), players.isEmpty());
+        Player newPlayer = new Player(x, y, new String(name), players.isEmpty());
         players.put(id, newPlayer);
     }
     
     private void movePlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         
-        PlayerInfo playerToMove = players.get(id);
+        Player playerToMove = players.get(id);
         if (playerToMove == null) {
-            playerToMove = new PlayerInfo(0, 0, "?", false);
+            playerToMove = new Player(0, 0, "?", false);
             players.put(id, playerToMove);
         }
 
@@ -111,12 +97,12 @@ public class Game {
     }
     
     private void removePlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         players.remove(id);
     }
     
     private void addBomb(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         
@@ -125,11 +111,10 @@ public class Game {
     }
     
     private void explodeBomb(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         bombs.remove(id);
     }
     
     private void shutdown(ByteBuffer buffer) {
-        isShutdown = true;
     }
 }
