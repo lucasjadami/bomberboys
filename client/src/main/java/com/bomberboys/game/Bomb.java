@@ -1,4 +1,4 @@
-package com.bomberboys.main.game;
+package com.bomberboys.game;
 
 public class Bomb extends MapObject
 {

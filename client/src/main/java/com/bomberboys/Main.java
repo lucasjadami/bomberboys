@@ -1,13 +1,24 @@
-package com.bomberboys.main;
+package com.bomberboys;
 
-import com.bomberboys.main.game.Game;
+import com.bomberboys.game.Game;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        startGameThread();
+        if (args.length == 3) {
+            if (args[0].equals("b")) {
+                startBot();
+            } else {
+                startHuman();
+            }
+        } else {
+            System.out.println("Usage: client [h|b] ip port");
+        }
     }
 
-    private static void startGameThread() {
+    private static void startHuman() {
+    }
+
+    private static void startBot() {
         new Thread() {
             @Override
             public void run() {

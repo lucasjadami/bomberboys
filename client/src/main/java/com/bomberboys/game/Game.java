@@ -1,4 +1,4 @@
-package com.bomberboys.main.game;
+package com.bomberboys.game;
 
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
