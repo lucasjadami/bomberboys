@@ -19,8 +19,8 @@
 *
 */
 
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef DEBUG_DRAW_H
+#define DEBUG_DRAW_H
 
 #include <Box2D/Box2D.h>
 
@@ -42,6 +42,5 @@ public:
     void DrawString(int x, int y, const char* string, ...);
     void DrawAABB(b2AABB* aabb, const b2Color& color);
 };
-
 
 #endif

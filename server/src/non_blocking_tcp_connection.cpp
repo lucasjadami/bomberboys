@@ -5,10 +5,10 @@
 #include <utility>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <netinet/tcp.h>
 
-NonBlockingTcpConnection::NonBlockingTcpConnection(void (*connectionHandler)(int, Socket*))
-    : Connection(connectionHandler)
+NonBlockingTcpConnection::NonBlockingTcpConnection(std::set<std::string> ghostServers, int seed,
+                                                   void (*connectionHandler)(int, Socket*))
+    : Connection(ghostServers, seed, connectionHandler)
 {
 }
 
@@ -28,11 +28,38 @@ void NonBlockingTcpConnection::process()
 
 	processClients(readFdSet, writeFdSet);
 
+    bool removeFlag = false;
+	if (worldServerSocket != NULL && FD_ISSET(worldServerSocket->getFd(), &readFdSet))
+        removeFlag = readFromSocket(worldServerSocket);
+	if (!removeFlag && worldServerSocket != NULL && FD_ISSET(worldServerSocket->getFd(), &writeFdSet))
+        removeFlag = writeToSocket(worldServerSocket);
+
+    if (removeFlag)
+    {
+        connectionHandler(EVENT_SERVER_DISCONNECTED, worldServerSocket);
+        delete worldServerSocket;
+        worldServerSocket = NULL;
+    }
+
 	if (FD_ISSET(serverSocket->getFd(), &readFdSet))
         getNewClient();
 }
 
-int NonBlockingTcpConnection::create()
+int NonBlockingTcpConnection::createWorldServerSocket()
+{
+    int serverFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverFd == -1)
+        error("Error opening world server socket, %s", strerror(errno));
+
+    maxFd = serverFd;
+
+    setTCPNoDelay(serverFd);
+    fcntl(serverFd, F_SETFL, O_NONBLOCK);
+
+    return serverFd;
+}
+
+int NonBlockingTcpConnection::createServerSocket()
 {
 	int serverFd = socket(AF_INET, SOCK_STREAM, 0);
     if (serverFd < 0)
@@ -40,6 +67,7 @@ int NonBlockingTcpConnection::create()
 
     maxFd = serverFd;
 
+    setTCPNoDelay(serverFd);
     fcntl(serverFd, F_SETFL, O_NONBLOCK);
 
     return serverFd;
@@ -53,19 +81,20 @@ void NonBlockingTcpConnection::getNewClient()
 	if (clientFd < 0)
 		error("ERROR on accept, %s", strerror(errno));
 
-    int flag = 1;
-    if (setsockopt(clientFd, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int)) < 0)
-        error("ERROR on TCP_NODELAY, %s", strerror(errno));
+    setTCPNoDelay(clientFd);
 
 	maxFd = clientFd > maxFd ? clientFd : maxFd;
 
-	Socket* socket = new Socket(idCount, clientFd, address);
-	clientSockets.insert(std::make_pair(idCount, socket));
-	idCount++;
+    int socketId = generateId();
+	Socket* socket = new Socket(socketId, clientFd, address);
+	clientSockets.insert(std::make_pair(socketId, socket));
 
-    connectionHandler(EVENT_CLIENT_CONNECTED, socket);
+    if (isGhostServer(inet_ntoa(address.sin_addr), ntohs(address.sin_port)))
+        connectionHandler(EVENT_SERVER_CONNECTED, socket);
+    else
+        connectionHandler(EVENT_CLIENT_CONNECTED, socket);
 
-	debug("New connection from %s", inet_ntoa(address.sin_addr));
+	debug("New connection from %s:%d", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 }
 
 void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFdSet)
@@ -84,44 +113,18 @@ void NonBlockingTcpConnection::processClients(fd_set& readFdSet, fd_set& writeFd
         }
 
         if (!removeIt && FD_ISSET(socket->getFd(), &readFdSet))
-        {
-            int bytesRead;
-            if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), socket->getInBufferSize(), 0)) <= 0)
-            {
-                if (bytesRead == 0)
-                    debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
-                else
-                    warning("ERROR on recv, %s", strerror(errno));
-                removeIt = true;
-                close(socket->getFd());
-            }
-            else
-            {
-                while (socket->updateInBuffer(bytesRead));
-            }
-        }
+            removeIt = readFromSocket(socket);
 
         if (!removeIt && FD_ISSET(socket->getFd(), &writeFdSet))
-        {
-            int bytesWritten;
-            if ((bytesWritten = send(socket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0)) < 0)
-            {
-                if (errno == ERRNO_CONNECTION_RESET)
-                    debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
-                else
-                    warning("ERROR on send, %s", strerror(errno));
-                removeIt = true;
-                close(socket->getFd());
-            }
-            else
-            {
-                while (socket->updateOutBuffer(bytesWritten));
-            }
-        }
+            removeIt = writeToSocket(socket);
 
         if (removeIt)
         {
-            connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
+            if (isGhostServer(inet_ntoa(socket->getAddress().sin_addr), ntohs(socket->getAddress().sin_port)))
+                connectionHandler(EVENT_SERVER_DISCONNECTED, socket);
+            else
+                connectionHandler(EVENT_CLIENT_DISCONNECTED, socket);
+
             clientSockets.erase(it++);
             delete socket;
         }
@@ -135,10 +138,53 @@ void NonBlockingTcpConnection::createFdSet(fd_set& fdSet)
     FD_ZERO(&fdSet);
     FD_SET(serverSocket->getFd(), &fdSet);
 
+    if (worldServerSocket != NULL)
+        FD_SET(worldServerSocket->getFd(), &fdSet);
+
     std::map<int, Socket*>::iterator it = clientSockets.begin();
     while (it != clientSockets.end())
     {
         FD_SET(it->second->getFd(), &fdSet);
         it++;
     }
+}
+
+bool NonBlockingTcpConnection::readFromSocket(Socket* socket)
+{
+    bool remove = false;
+    int bytesRead;
+
+    if ((bytesRead = recv(socket->getFd(), socket->getInBuffer(), socket->getInBufferSize(), 0)) <= 0)
+    {
+        if (bytesRead == 0)
+            debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
+        else
+            warning("ERROR on recv, %s", strerror(errno));
+        remove = true;
+        close(socket->getFd());
+    }
+    else
+        while (socket->updateInBuffer(bytesRead));
+
+    return remove;
+}
+
+bool NonBlockingTcpConnection::writeToSocket(Socket* socket)
+{
+    bool remove = false;
+    int bytesWritten;
+
+    if ((bytesWritten = send(socket->getFd(), socket->getOutBuffer(), socket->getOutBufferSize(), 0)) < 0)
+    {
+        if (errno == ERRNO_CONNECTION_RESET)
+            debug("Connection closed from %s", inet_ntoa(socket->getAddress().sin_addr));
+        else
+            warning("ERROR on send, %s", strerror(errno));
+        remove = true;
+        close(socket->getFd());
+    }
+    else
+        while (socket->updateOutBuffer(bytesWritten));
+
+    return remove;
 }

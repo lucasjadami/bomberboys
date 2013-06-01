@@ -1,10 +1,11 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
 #include <signal.h>
 #include <cstdio>
 #include <errno.h>
 #include <cstring>
+#include <unistd.h>
 
 #define RED     "\033[0;31m"
 #define CYAN    "\033[0;36m"
@@ -21,6 +22,8 @@
 inline int exit()
 {
     raise(SIGINT);
+    while (true)
+        usleep(1000);
     return 1;
 }
 

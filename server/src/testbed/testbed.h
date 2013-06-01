@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef TESTBED_H
+#define TESTBED_H
 
 #include "settings.h"
 

@@ -119,6 +119,12 @@
 		<Unit filename="../src/game.h">
 			<Option virtualFolder="game/" />
 		</Unit>
+		<Unit filename="../src/ghost_game.cpp">
+			<Option virtualFolder="game/" />
+		</Unit>
+		<Unit filename="../src/ghost_game.h">
+			<Option virtualFolder="game/" />
+		</Unit>
 		<Unit filename="../src/main.cpp">
 			<Option virtualFolder="misc/" />
 		</Unit>
@@ -141,6 +147,12 @@
 			<Option virtualFolder="game/" />
 		</Unit>
 		<Unit filename="../src/player.h">
+			<Option virtualFolder="game/" />
+		</Unit>
+		<Unit filename="../src/server.cpp">
+			<Option virtualFolder="game/" />
+		</Unit>
+		<Unit filename="../src/server.h">
 			<Option virtualFolder="game/" />
 		</Unit>
 		<Unit filename="../src/socket.cpp">
@@ -176,6 +188,12 @@
 		</Unit>
 		<Unit filename="../src/time.h">
 			<Option virtualFolder="misc/" />
+		</Unit>
+		<Unit filename="../src/world_game.cpp">
+			<Option virtualFolder="game/" />
+		</Unit>
+		<Unit filename="../src/world_game.h">
+			<Option virtualFolder="game/" />
 		</Unit>
 		<Extensions>
 			<code_completion />

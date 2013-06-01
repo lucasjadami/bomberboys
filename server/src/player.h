@@ -12,19 +12,24 @@ class Player
 public:
 
             Player(Socket*);
+            Player(int);
            ~Player();
    char*    getName();
    void     setName(char*);
    Socket*  getSocket();
+   void     setSocket(Socket*);
    bool     isPlaying();
    b2Body*  getBody();
    void     setBody(b2Body*);
    void     saveLastPosition();
    bool     isLastPositionDifferent();
    void     applyImpulse(b2Vec2&);
+   bool     isLocal();
+   int      getId();
 
 private:
 
+    int         id;
     Socket*     socket;
     char*       name;
     b2Body*     body;

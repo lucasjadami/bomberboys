@@ -1,6 +1,8 @@
 #include "non_blocking_tcp_connection.h"
 #include "output.h"
 #include "game.h"
+#include "world_game.h"
+#include "ghost_game.h"
 
 #ifdef TESTBED
 #include "testbed/testbed.h"
@@ -14,7 +16,6 @@
 struct sigaction    sigIntHandler;
 Connection* 	    connection;
 Game*               game;
-bool                gameRunning = true;
 
 #ifdef TESTBED
 DebugDraw           debugDraw;
@@ -26,13 +27,9 @@ int                 stepCount;
 void exitHandler(int s)
 {
 	info("Server closed");
-	gameRunning = false;
-
-#ifdef TESTBED
     delete connection;
     delete game;
     exit(0);
-#endif
 }
 
 void connectionHandler(int eventId, Socket* socket)
@@ -168,6 +165,43 @@ void gameUpdateHandler(Settings* settings)
 }
 #endif
 
+void createGhostGame()
+{
+    std::set<std::string> ghostServers;
+
+    connection = new NonBlockingTcpConnection(ghostServers, 1, &connectionHandler);
+
+    int port = 10012;
+	connection->init(port);
+
+	info("Server connection stabilished at port %d", port);
+
+    const char* portS = "10011";
+    const char* serverName = "127.0.0.1";
+	connection->connectToWorldServer(serverName, portS);
+
+	info("Connected to world server on IP %s at port %s", serverName, portS);
+
+	game = new GhostGame(connection->getWorldServerSocket());
+	game->createWorld();
+}
+
+void createWorldGame()
+{
+    std::set<std::string> ghostServers;
+    ghostServers.insert(std::string("127.0.0.1"));
+
+	connection = new NonBlockingTcpConnection(ghostServers, 0, &connectionHandler);
+
+    int port = 10011;
+	connection->init(port);
+
+	info("Server connection stabilished at port %d", port);
+
+	game = new WorldGame();
+	game->createWorld();
+}
+
 int main(int argc, char** argv)
 {
     sigIntHandler.sa_handler = exitHandler;
@@ -178,20 +212,14 @@ int main(int argc, char** argv)
     info("Bomberboys server 1.0");
 
     info("Using non-blocking TCP connection");
-	connection = new NonBlockingTcpConnection(&connectionHandler);
 
-    int port = 10011;
-	connection->init(port);
-
-	info("Server connection stabilished at port %d", port);
-
-	game = new Game();
-	game->createWorld();
+    //createWorldGame();
+    createGhostGame();
 
 	info("World created");
 
 #ifndef TESTBED
-	while (gameRunning)
+	while (true)
 	{
 		usleep(1000);
 		connection->process();
@@ -205,8 +233,5 @@ int main(int argc, char** argv)
     launchTestbed(gameUpdateHandler, gameDrawHandler, argc, argv, MAP_WIDTH, MAP_HEIGHT);
 #endif
 
-    delete connection;
-    delete game;
-
-	return 0;
+    return 0;
 }
