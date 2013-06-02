@@ -36,7 +36,6 @@ public class Bomb extends MapObject {
             switch (explosionStage) {
                 case 0: drawBomb(g); break;
                 case 1: drawExplosion(g); break;
-                case 2: drawRuins(g); break;
             }
         }
     }
@@ -50,16 +49,12 @@ public class Bomb extends MapObject {
     }
 
     private void drawExplosion(Graphics2D g) {
-        explosionRadius += 10;
-        if (255 - explosionRadius < 0) {
-            explosionStage = 2;
-            return;
-        }
+        drawRuins(g);
+        drawBoom(g);
 
-        g.setColor(new Color(255, 0, 0, 255 - explosionRadius));
-        g.fillArc(x - explosionRadius, MAP_HEIGHT - (y + explosionRadius),
-                explosionRadius * 2, explosionRadius * 2, 0, 360);
-
+        explosionRadius = explosionRadius < 250 ? explosionRadius + 10 : 255;
+        animationTimeout -= 1;
+        if (animationTimeout < 0) animationInProgress = false;
     }
 
     private void drawRuins(Graphics2D g) {
@@ -68,8 +63,11 @@ public class Bomb extends MapObject {
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, animationTimeout * 0.01f));
         g.drawImage(sprite, x - size / 2, MAP_HEIGHT - (y + size / 2), null);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+    }
 
-        animationTimeout -= 1;
-        if (animationTimeout < 0) animationInProgress = false;
+    private void drawBoom(Graphics2D g) {
+        g.setColor(new Color(255, 0, 0, 255 - explosionRadius));
+        g.fillArc(x - explosionRadius, MAP_HEIGHT - (y + explosionRadius),
+                explosionRadius * 2, explosionRadius * 2, 0, 360);
     }
 }

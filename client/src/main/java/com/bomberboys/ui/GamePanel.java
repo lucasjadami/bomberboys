@@ -37,11 +37,11 @@ public class GamePanel extends JPanel {
 
         paintBackground(g2D);
         
-        for (Bomb bomb: game.getBombs().values()) {
+        for (Bomb bomb: game.getAllBombs()) {
             bomb.draw(g2D);
         }
 
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getAllPlayers()) {
             player.draw(g2D);
         }
     }
