@@ -26,9 +26,7 @@ public class GamePanel extends JPanel {
     }
 
     public void setup() throws IOException {
-        ClassLoader load = getClass().getClassLoader();
-
-        background = ImageIO.read(load.getResourceAsStream("images/ground1.png"));
+        background = Images.get("background");
     }
     
     @Override
