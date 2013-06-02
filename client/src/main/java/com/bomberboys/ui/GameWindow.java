@@ -39,6 +39,8 @@ public class GameWindow {
         ClassLoader load = getClass().getClassLoader();
         Images.put("background", ImageIO.read(load.getResourceAsStream("images/ground1.png")));
 
+        Images.put("crater1", ImageIO.read(load.getResourceAsStream("images/crater1.png")));
+
         //bombs
         BufferedImage b1 = ImageIO.read(load.getResourceAsStream("images/bomb1.png"));
         Images.put("bomb1", b1);

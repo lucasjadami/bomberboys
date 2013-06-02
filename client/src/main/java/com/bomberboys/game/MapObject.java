@@ -7,13 +7,19 @@ public abstract class MapObject {
 
     protected int x;
     protected int y;
+    protected boolean animationInProgress;
     
     public MapObject(int x, int y) {
         this.x = x;
         this.y = y;
+        this.animationInProgress = true;
     }
 
     public abstract void draw(Graphics2D g2D);
+
+    public boolean isAnimationInProgress() {
+        return animationInProgress;
+    }
     
     public int getX() {
         return x;

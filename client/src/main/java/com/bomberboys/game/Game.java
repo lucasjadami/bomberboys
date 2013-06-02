@@ -51,6 +51,20 @@ public class Game {
                 case EXPLODE_BOMB: explodeBomb(packet.getData()); break;
                 case SHUTDOWN: shutdown(packet.getData()); break;
             }
+            removeTerminatedItems();
+        }
+    }
+
+    private void removeTerminatedItems() {
+        for (Bomb bomb : bombs.values()) {
+            if (!bomb.isAnimationInProgress()) {
+                bombs.remove(bomb);
+            }
+        }
+        for (Player player : players.values()) {
+            if (!player.isAnimationInProgress()) {
+                players.remove(player);
+            }
         }
     }
     
@@ -101,7 +115,7 @@ public class Game {
     
     private void removePlayer(ByteBuffer buffer) {
         int id = buffer.getInt();
-        players.remove(id);
+        players.get(id).kill();
     }
     
     private void addBomb(ByteBuffer buffer) {
@@ -115,7 +129,7 @@ public class Game {
     
     private void explodeBomb(ByteBuffer buffer) {
         int id = buffer.getInt();
-        bombs.remove(id);
+        bombs.get(id).explode();
     }
     
     private void shutdown(ByteBuffer buffer) {

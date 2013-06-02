@@ -21,6 +21,10 @@ public class Player extends MapObject {
         g2D.fillArc(x - RADIUS, MAP_HEIGHT - (y + RADIUS), RADIUS * 2, RADIUS * 2, 0, 360);
     }
 
+    public void kill() {
+        animationInProgress = false;
+    }
+
     public String getName() {
         return name;
     }
