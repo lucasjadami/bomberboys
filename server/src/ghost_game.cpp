@@ -16,7 +16,8 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
 {
     if (eventId == EVENT_SERVER_DISCONNECTED)
     {
-        // TODO
+        delete server;
+        server = NULL;
     }
     else if (eventId == EVENT_CLIENT_CONNECTED)
     {

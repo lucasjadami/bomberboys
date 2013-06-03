@@ -13,9 +13,12 @@
 #include <signal.h>
 #include <cstdlib>
 
-struct sigaction    sigIntHandler;
-Connection* 	    connection;
-Game*               game;
+struct sigaction                                    sigIntHandler;
+Connection* 	                                    connection;
+Game*                                               game = NULL;
+std::vector<std::pair<std::string, std::string> >   serverNames;
+int                                                 serverId;
+int                                                 currentServerId;
 
 #ifdef TESTBED
 DebugDraw           debugDraw;
@@ -165,41 +168,22 @@ void gameUpdateHandler(Settings* settings)
 }
 #endif
 
-void createGhostGame()
+void createServerNamesList()
 {
-    std::set<std::string> ghostServers;
-
-    connection = new NonBlockingTcpConnection(ghostServers, 1, &connectionHandler);
-
-    int port = 10012;
-	connection->init(port);
-
-	info("Server connection stabilished at port %d", port);
-
-    const char* portS = "10011";
-    const char* serverName = "127.0.0.1";
-	connection->connectToWorldServer(serverName, portS);
-
-	info("Connected to world server on IP %s at port %s", serverName, portS);
-
-	game = new GhostGame(connection->getWorldServerSocket());
-	game->createWorld();
+    serverNames.push_back(std::make_pair("127.0.0.1", "10011"));
+    serverNames.push_back(std::make_pair("127.0.0.1", "10012"));
 }
 
-void createWorldGame()
+void changeServer()
 {
-    std::set<std::string> ghostServers;
-    ghostServers.insert(std::string("127.0.0.1"));
-
-	connection = new NonBlockingTcpConnection(ghostServers, 0, &connectionHandler);
-
-    int port = 10011;
-	connection->init(port);
-
-	info("Server connection stabilished at port %d", port);
-
-	game = new WorldGame();
-	game->createWorld();
+    currentServerId++;
+    if (currentServerId == serverId)
+        game = game == NULL ? new WorldGame() : new WorldGame();
+    else
+    {
+        connection->connectToWorldServer(serverNames[currentServerId].first.c_str(), serverNames[currentServerId].second.c_str());
+        game = game == NULL ? new GhostGame(connection->getWorldServerSocket()) : new GhostGame(connection->getWorldServerSocket());
+    }
 }
 
 int main(int argc, char** argv)
@@ -213,9 +197,23 @@ int main(int argc, char** argv)
 
     info("Using non-blocking TCP connection");
 
-    //createWorldGame();
-    createGhostGame();
+    std::set<std::string> validServerNames;
+    for (unsigned int i = 0; i < serverNames.size(); ++i)
+        validServerNames.insert(serverNames[i].first);
 
+    serverId = 1;
+    currentServerId = -1;
+
+    createServerNamesList();
+
+    connection = new NonBlockingTcpConnection(validServerNames, serverId, &connectionHandler);
+	connection->init(atoi(serverNames[serverId].second.c_str()));
+
+	info("Server connection stabilished at port %s", serverNames[serverId].second.c_str());
+
+    changeServer();
+
+    game->createWorld();
 	info("World created");
 
 #ifndef TESTBED
