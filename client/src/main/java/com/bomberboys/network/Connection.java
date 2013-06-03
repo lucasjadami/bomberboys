@@ -4,30 +4,23 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class Connection
-{
+public abstract class Connection {
     protected static int INTERVAL = 15;
-
     protected static long DISCONNECT_TIME = 1_000_000_000L;
 
     protected final List<Packet> sendPackets;
-
     protected final List<Packet> recvPackets;
-
     protected boolean connectFailed;
-
     protected boolean remoteDisconnected;
 
-    public Connection()
-    {
+    public Connection() {
         sendPackets = Collections.synchronizedList(new LinkedList<Packet>());
         recvPackets = Collections.synchronizedList(new LinkedList<Packet>());
         connectFailed = false;
         remoteDisconnected = false;
     }
     
-    public void connect(String ip, int port)
-    {
+    public void connect(String ip, int port) {
         startConnectThread(ip, port);
     }
     
@@ -37,41 +30,33 @@ public abstract class Connection
     
     protected abstract void startRecvThread();
     
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         // If there are received packets to process, it is still connected!
-        return !recvPackets.isEmpty()
-                || (!connectFailed && !remoteDisconnected);
+        return !recvPackets.isEmpty() || (!connectFailed && !remoteDisconnected);
     }
     
-    public boolean isConnectFailed()
-    {
+    public boolean isConnectFailed() {
         return connectFailed;
     }
 
-    public boolean isRemoteDisconnected()
-    {
+    public boolean isRemoteDisconnected() {
         return remoteDisconnected;
     }
     
-    public boolean waitForDisconnect() throws Exception
-    {
+    public boolean waitForDisconnect() throws Exception {
         long startTime = System.nanoTime();
-        while (!remoteDisconnected && System.nanoTime() - startTime < DISCONNECT_TIME)
-        {
+        while (!remoteDisconnected && System.nanoTime() - startTime < DISCONNECT_TIME) {
             Thread.sleep(INTERVAL);
         }
 
         return remoteDisconnected;
     }
     
-    public Packet recvPacket()
-    {
+    public Packet recvPacket() {
         return recvPackets.isEmpty() ? null : recvPackets.remove(0);
     }
 
-    public void sendPacket(Packet packet)
-    {
+    public void sendPacket(Packet packet) {
         sendPackets.add(packet);
     }
 }

@@ -1,39 +1,35 @@
-package com.bomberboys.main.game;
+package com.bomberboys.game;
 
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
 import com.bomberboys.network.TCPConnection;
+import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Game {
-    private Connection connection;
-    private Map<Integer, PlayerInfo> players;
-    private Map<Integer, Bomb> bombs;
-    private String address;
-    private int port;
-    private int currentRecvPacket = -1;
+    public static final Dimension MAP_SIZE = new Dimension(600, 420);
 
-    private boolean isShutdown;
+    private Connection connection;
+    private Map<Integer, Player> players;
+    private Map<Integer, Bomb> bombs;
+    private List<Bomb> discardedBombs;
+    private List<Player> discardedPlayers;
     
-    public Game(String address, int port) {
+    public Game() {
         connection = new TCPConnection();
-        this.address = address;
-        this.port = port;
         players = new HashMap<>();
         bombs = new HashMap<>();
-        isShutdown = false;
+        discardedBombs = new ArrayList<>();
+        discardedPlayers = new ArrayList<>();
     }
 
-    public boolean isShutdown() {
-        return isShutdown;
-    }
-
-    public void connect() {
+    public void connect(String address, int port) {
         connection.connect(address, port);
         
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
@@ -60,7 +56,20 @@ public class Game {
                 case REMOVE_PLAYER: removePlayer(packet.getData()); break;
                 case ADD_BOMB: addBomb(packet.getData()); break;
                 case EXPLODE_BOMB: explodeBomb(packet.getData()); break;
-                case SHUTDOWN: shutdown(packet.getData()); break;
+            }
+            removeTerminatedItems();
+        }
+    }
+
+    private void removeTerminatedItems() {
+        for (Iterator<Bomb> it = discardedBombs.iterator(); it.hasNext();) {
+            if (!it.next().isAnimationInProgress()) {
+                it.remove();
+            }
+        }
+        for (Iterator<Player> it = discardedPlayers.iterator(); it.hasNext();) {
+            if (!it.next().isAnimationInProgress()) {
+                it.remove();
             }
         }
     }
@@ -76,33 +85,37 @@ public class Game {
         connection.sendPacket(new Packet(Packet.Id.PLANT_BOMB, buffer));
     }
 
-    public Map<Integer, PlayerInfo> getPlayers() {
-        return players;
+    public List<Player> getAllPlayers() {
+        List<Player> allPlayers = new ArrayList<>(players.values());
+        allPlayers.addAll(discardedPlayers);
+        return allPlayers;
     }
 
-    public Map<Integer, Bomb> getBombs() {
-        return bombs;
+    public List<Bomb> getAllBombs() {
+        List<Bomb> allBombs = new ArrayList<>(bombs.values());
+        allBombs.addAll(discardedBombs);
+        return allBombs;
     }
     
     private void addPlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         byte[] name = new byte[20];
         buffer.get(name);
         
-        PlayerInfo newPlayer = new PlayerInfo(x, y, new String(name), players.isEmpty());
+        Player newPlayer = new Player(x, y, new String(name), players.isEmpty());
         players.put(id, newPlayer);
     }
     
     private void movePlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         
-        PlayerInfo playerToMove = players.get(id);
+        Player playerToMove = players.get(id);
         if (playerToMove == null) {
-            playerToMove = new PlayerInfo(0, 0, "?", false);
+            playerToMove = new Player(0, 0, "?", false);
             players.put(id, playerToMove);
         }
 
@@ -111,12 +124,13 @@ public class Game {
     }
     
     private void removePlayer(ByteBuffer buffer) {
-        int id = buffer.getChar();
-        players.remove(id);
+        int id = buffer.getInt();
+        players.get(id).kill();
+        discardedPlayers.add(players.remove(id));
     }
     
     private void addBomb(ByteBuffer buffer) {
-        int id = buffer.getChar();
+        int id = buffer.getInt();
         int x = buffer.getChar();
         int y = buffer.getChar();
         
@@ -125,11 +139,8 @@ public class Game {
     }
     
     private void explodeBomb(ByteBuffer buffer) {
-        int id = buffer.getChar();
-        bombs.remove(id);
-    }
-    
-    private void shutdown(ByteBuffer buffer) {
-        isShutdown = true;
+        int id = buffer.getInt();
+        bombs.get(id).explode();
+        discardedBombs.add(bombs.remove(id));
     }
 }

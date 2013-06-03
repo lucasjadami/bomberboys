@@ -5,7 +5,7 @@ apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'application'
 
-mainClassName = "com.bomberboys.main.Main"
+mainClassName = "com.bomberboys.Main"
 
 repositories {
     mavenCentral()
