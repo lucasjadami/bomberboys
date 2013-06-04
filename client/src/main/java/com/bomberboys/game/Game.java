@@ -2,7 +2,6 @@ package com.bomberboys.game;
 
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
-import com.bomberboys.network.TCPConnection;
 import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -21,20 +20,17 @@ public class Game {
     private List<Bomb> discardedBombs;
     private List<Player> discardedPlayers;
     
-    public Game() {
-        connection = new TCPConnection();
+    public Game(Connection connection) {
+        this.connection = connection;
         players = new HashMap<>();
         bombs = new HashMap<>();
         discardedBombs = new ArrayList<>();
         discardedPlayers = new ArrayList<>();
     }
 
-    public void connect(String address, int port) {
-        connection.connect(address, port);
-        
+    public void login() {
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());
-        
         connection.sendPacket(new Packet(Packet.Id.LOGIN, buffer));
     }
 

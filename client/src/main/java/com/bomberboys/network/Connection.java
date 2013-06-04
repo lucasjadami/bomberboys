@@ -3,32 +3,59 @@ package com.bomberboys.network;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.Random;
 
-public abstract class Connection {
-    protected static int INTERVAL = 15;
+public class Connection {
     protected static long DISCONNECT_TIME = 1_000_000_000L;
+
+    private Socket socket;
 
     protected final List<Packet> sendPackets;
     protected final List<Packet> recvPackets;
+    private final List<InetSocketAddress> addressList;
     protected boolean connectFailed;
     protected boolean remoteDisconnected;
+    private SendThread send;
+    private ReceiveThread recv;
 
-    public Connection() {
+    public Connection(List<InetSocketAddress> addressList) {
+        this.addressList = addressList;
         sendPackets = Collections.synchronizedList(new LinkedList<Packet>());
         recvPackets = Collections.synchronizedList(new LinkedList<Packet>());
         connectFailed = false;
         remoteDisconnected = false;
     }
     
-    public void connect(String ip, int port) {
-        startConnectThread(ip, port);
+    public void connect() {
+        Thread connectThread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    establishConnection();
+                    try {
+                        send = new SendThread(socket.getOutputStream(), sendPackets);
+                        recv = new ReceiveThread(socket.getInputStream(), recvPackets);
+
+                        send.start();
+                        recv.start();
+
+                        send.join();
+                        recv.join();
+                    } catch (Exception e) {
+                        send.deactivate();
+                        recv.deactivate();
+                        try { socket.close(); } catch (IOException ie) { }
+                    }
+                }
+            }
+        };
+        connectThread.start();
     }
-    
-    protected abstract void startConnectThread(final String ip, final int port);
-    
-    protected abstract void startSendThread();
-    
-    protected abstract void startRecvThread();
     
     public boolean isConnected() {
         // If there are received packets to process, it is still connected!
@@ -46,7 +73,7 @@ public abstract class Connection {
     public boolean waitForDisconnect() throws Exception {
         long startTime = System.nanoTime();
         while (!remoteDisconnected && System.nanoTime() - startTime < DISCONNECT_TIME) {
-            Thread.sleep(INTERVAL);
+            Thread.sleep(15);
         }
 
         return remoteDisconnected;
@@ -58,5 +85,26 @@ public abstract class Connection {
 
     public void sendPacket(Packet packet) {
         sendPackets.add(packet);
+    }
+
+    private void establishConnection() {
+        Random rand = new Random();
+
+        boolean connectionEstablished = false;
+        while (!connectionEstablished) {
+            try {
+                InetSocketAddress address;
+                do {
+                    address = addressList.get(Math.abs(rand.nextInt() % addressList.size()));
+                    System.out.println("Trying to connect with " + address.getHostName() + ":" + address.getPort());
+                } while (!address.getAddress().isReachable(1000));
+
+                socket = new Socket();
+                socket.connect(address);
+                socket.setTcpNoDelay(true);
+                connectionEstablished = true;
+                System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
+            } catch (IOException e) { }
+        }
     }
 }
