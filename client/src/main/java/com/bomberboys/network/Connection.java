@@ -88,13 +88,22 @@ public class Connection {
     }
 
     private void establishConnection() {
+        Random rand = new Random();
+
         boolean connectionEstablished = false;
         while (!connectionEstablished) {
             try {
+                InetSocketAddress address;
+                do {
+                    address = addressList.get(Math.abs(rand.nextInt() % addressList.size()));
+                    System.out.println("Trying to connect with " + address.getHostName() + ":" + address.getPort());
+                } while (!address.getAddress().isReachable(1000));
+
                 socket = new Socket();
-                socket.connect(addressList.get(0));
+                socket.connect(address);
                 socket.setTcpNoDelay(true);
                 connectionEstablished = true;
+                System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
             } catch (IOException e) { }
         }
     }
