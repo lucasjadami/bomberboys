@@ -20,8 +20,8 @@ public class Connection {
     private final List<InetSocketAddress> addressList;
     protected boolean connectFailed;
     protected boolean remoteDisconnected;
-    private Thread sendThread;
-    private Thread recvThread;
+    private SendThread send;
+    private ReceiveThread recv;
 
     public Connection(List<InetSocketAddress> addressList) {
         this.addressList = addressList;
@@ -38,17 +38,19 @@ public class Connection {
                 while (true) {
                     establishConnection();
                     try {
-                        sendThread = new SendThread(socket.getOutputStream(), sendPackets);
-                        recvThread = new ReceiveThread(socket.getInputStream(), recvPackets);
-                    } catch (IOException e) { }
+                        send = new SendThread(socket.getOutputStream(), sendPackets);
+                        recv = new ReceiveThread(socket.getInputStream(), recvPackets);
 
-                    sendThread.start();
-                    recvThread.start();
+                        send.start();
+                        recv.start();
 
-                    try {
-                        sendThread.join();
-                        recvThread.join();
-                    } catch (InterruptedException e) { }
+                        send.join();
+                        recv.join();
+                    } catch (Exception e) {
+                        send.deactivate();
+                        recv.deactivate();
+                        try { socket.close(); } catch (IOException ie) { }
+                    }
                 }
             }
         };

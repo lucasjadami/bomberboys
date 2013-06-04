@@ -8,21 +8,26 @@ import java.util.List;
 class ReceiveThread extends Thread {
     private InputStream stream;
     private List<Packet> packetList;
+    private boolean activated;
     
     public ReceiveThread(InputStream stream, List<Packet> packetList) {
         this.stream = stream;
         this.packetList = packetList;
+        activated = true;
+    }
+
+    public void deactivate() {
+        activated = false;
     }
 
     @Override
     public void run() {
-        boolean remoteDisconnected = false;
         try {
-            while (!remoteDisconnected) {
+            while (activated) {
                 byte[] idArray = readArray(1);
                 if (idArray == null) {
-                    remoteDisconnected = true;
-                    continue;
+                    deactivate();
+                    break;
                 }
 
                 Packet.Id id = Packet.Id.values()[idArray[0]];
@@ -30,15 +35,15 @@ class ReceiveThread extends Thread {
                 // Protects from reading negative sizes.
                 byte[] dataArray = readArray(Math.max(0, id.getSize()));
                 if (dataArray == null) {
-                    remoteDisconnected = true;
-                    continue;
+                    deactivate();
+                    break;
                 }
 
                 Packet packet = new Packet(id, ByteBuffer.wrap(dataArray));
                 packetList.add(packet);
             }
         } catch (IOException ex) {
-            remoteDisconnected = true;
+            deactivate();
         }
     }
 

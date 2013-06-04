@@ -7,18 +7,22 @@ import java.util.List;
 class SendThread extends Thread {
     private OutputStream stream;
     private List<Packet> packetList;
+    private boolean activated;
 
     public SendThread(OutputStream stream, List<Packet> packetList) {
         this.stream = stream;
         this.packetList = packetList;
+        activated = true;
+    }
+
+    public void deactivate() {
+        activated = false;
     }
 
     @Override
     public void run() {
-        boolean remoteDisconnected = false;
-
         try {
-            while (!remoteDisconnected) {
+            while (activated) {
                 try { Thread.sleep(15); } catch (InterruptedException ex) { }
 
                 while (!packetList.isEmpty()) {
@@ -27,7 +31,7 @@ class SendThread extends Thread {
                 }
             }
         } catch (IOException ex) {
-            remoteDisconnected = true;
+            deactivate();
         }
     }
 }
