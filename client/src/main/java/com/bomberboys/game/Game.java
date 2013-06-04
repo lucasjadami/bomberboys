@@ -2,7 +2,6 @@ package com.bomberboys.game;
 
 import com.bomberboys.network.Connection;
 import com.bomberboys.network.Packet;
-import com.bomberboys.network.TCPConnection;
 import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class Game {
     private List<Player> discardedPlayers;
     
     public Game() {
-        connection = new TCPConnection();
+        connection = new Connection();
         players = new HashMap<>();
         bombs = new HashMap<>();
         discardedBombs = new ArrayList<>();
