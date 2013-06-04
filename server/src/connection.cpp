@@ -4,10 +4,19 @@
 #include <unistd.h>
 #include <netinet/tcp.h>
 
-Connection::Connection(std::set<std::string> ghostServers, int seed, void (*connectionHandler)(int, Socket*))
+char serverNames[SERVER_COUNT][2][BIAS_SIZE] =
+{
+    {
+        "127.0.0.1", "10011"
+    },
+    {
+        "127.0.0.1", "10012"
+    }
+};
+
+Connection::Connection(int seed, void (*connectionHandler)(int, Socket*))
 {
     worldServerSocket = NULL;
-    this->ghostServers = ghostServers;
     this->seed = seed;
     this->connectionHandler = connectionHandler;
     idCount = 0;
@@ -79,7 +88,16 @@ void Connection::connectToWorldServer(const char* worldServerName, const char* p
 
 bool Connection::isGhostServer(const char* serverName, int port)
 {
-    return port == GHOST_PORT && ghostServers.find(std::string(serverName)) != ghostServers.end();
+    if (port != GHOST_PORT)
+        return false;
+
+    for (int i = 0; i < SERVER_COUNT; ++i)
+    {
+        if (strcmp(serverName, serverNames[i][0]) == 0)
+            return true;
+    }
+
+    return false;
 }
 
 void Connection::setTCPNoDelay(int fd)

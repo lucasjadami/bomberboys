@@ -8,7 +8,7 @@ class GhostGame : public Game
 {
 public:
 
-            GhostGame(Socket*);
+            GhostGame(Socket*, void (*)(void));
            ~GhostGame();
     void    connectionHandler(int, Socket*);
     void    update(float, float, float);
@@ -16,6 +16,8 @@ public:
 private:
 
     Server* server;
+
+    void (*offlineHandler)(void);
 
     void updateServerPackets();
     void updatePlayerPackets(Player*);

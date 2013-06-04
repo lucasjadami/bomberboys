@@ -6,9 +6,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-NonBlockingTcpConnection::NonBlockingTcpConnection(std::set<std::string> ghostServers, int seed,
-                                                   void (*connectionHandler)(int, Socket*))
-    : Connection(ghostServers, seed, connectionHandler)
+NonBlockingTcpConnection::NonBlockingTcpConnection(int seed, void (*connectionHandler)(int, Socket*))
+    : Connection(seed, connectionHandler)
 {
 }
 

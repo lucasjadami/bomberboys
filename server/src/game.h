@@ -20,6 +20,8 @@ public:
     virtual void    connectionHandler(int, Socket*);
     virtual void    update(float, float, float);
     b2World*        getWorld();
+    void            setDestructorDisabled(bool);
+    void            copyTo(Game* game);
 
 protected:
 
@@ -34,6 +36,10 @@ protected:
     Packet*         createPongPacket();
     Packet*         createAddBombPacket(Bomb*);
     virtual Packet* createAddPlayerPacket(Player*);
+
+private:
+
+    bool                    destructorDisabled;
 
 };
 

@@ -9,6 +9,8 @@ Player::Player(Socket* socket)
     body = NULL;
     name = NULL;
     lastImpulse = 0;
+    lastX = -1;
+    lastY = -1;
 }
 
 Player::Player(int id)
@@ -18,6 +20,8 @@ Player::Player(int id)
     body = NULL;
     name = NULL;
     lastImpulse = 0;
+    lastX = -1;
+    lastY = -1;
 }
 
 Player::~Player()

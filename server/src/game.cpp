@@ -12,10 +12,14 @@
 Game::Game()
 {
     world = NULL;
+    destructorDisabled = false;
 }
 
 Game::~Game()
 {
+    if (destructorDisabled)
+        return;
+
     if (world != NULL)
         delete world;
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
@@ -43,6 +47,20 @@ void Game::update(float time, float velocityIterations, float positionIterations
 b2World* Game::getWorld()
 {
     return world;
+}
+
+void Game::setDestructorDisabled(bool destructorDisabled)
+{
+    this->destructorDisabled = destructorDisabled;
+}
+
+void Game::copyTo(Game* game)
+{
+    game->world = world;
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+        game->players.insert(std::make_pair(it->first, it->second));
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        game->bombs.insert(std::make_pair(it->first, it->second));
 }
 
 void Game::createPlayerBody(Player* player)

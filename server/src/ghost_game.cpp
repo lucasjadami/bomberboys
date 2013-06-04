@@ -1,8 +1,9 @@
 #include "ghost_game.h"
 #include "connection.h"
 
-GhostGame::GhostGame(Socket* worldServerSocket)
+GhostGame::GhostGame(Socket* worldServerSocket, void (*offlineHandler)(void))
 {
+    this->offlineHandler = offlineHandler;
     server = new Server(worldServerSocket);
 }
 
@@ -18,11 +19,15 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
     {
         delete server;
         server = NULL;
+        offlineHandler();
     }
     else if (eventId == EVENT_CLIENT_CONNECTED)
     {
         Player* newPlayer = new Player(socket);
-        server->getSocket()->addOutPacket(createAddPlayerPacket(newPlayer));
+
+        if (server != NULL)
+            server->getSocket()->addOutPacket(createAddPlayerPacket(newPlayer));
+
         players.insert(std::make_pair(socket->getId(), newPlayer));
     }
     else if (eventId == EVENT_CLIENT_DISCONNECTED)
@@ -32,7 +37,9 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
             Player* player = it->second;
             if (player->isLocal() && player->getId() == socket->getId())
             {
-                server->getSocket()->addOutPacket(createRemovePlayerPacket(player->getId()));
+                if (server != NULL)
+                    server->getSocket()->addOutPacket(createRemovePlayerPacket(player->getId()));
+
                 player->setSocket(NULL);
                 break;
             }
@@ -43,6 +50,7 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
 void GhostGame::update(float time, float velocityIteration, float positionIterations)
 {
     updateServerPackets();
+
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
         Player* player = it->second;
@@ -54,7 +62,7 @@ void GhostGame::update(float time, float velocityIteration, float positionIterat
 void GhostGame::updateServerPackets()
 {
     Packet* packet;
-    while ((packet = server->getSocket()->getInPacket()) != NULL)
+    while (server != NULL && (packet = server->getSocket()->getInPacket()) != NULL)
     {
         routePacketToClients(packet);
 
@@ -105,7 +113,9 @@ void GhostGame::routePacketToServer(Player* player, Packet* packet)
 {
     Packet* newPacket = packet->clone(packet->getId() + EX_GAP);
     Packet::putBytes(newPacket->getData(), player->getId(), 4);
-    server->getSocket()->addOutPacket(newPacket);
+
+    if (server != NULL)
+        server->getSocket()->addOutPacket(newPacket);
 }
 
 void GhostGame::parseAddPlayerPacket(Packet* packet)

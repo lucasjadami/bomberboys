@@ -6,8 +6,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <map>
-#include <set>
-#include <string>
 
 #define MAX_CONNECTIONS 100
 #define SEED_SIZE       10000000
@@ -27,11 +25,15 @@
 #endif
 #endif
 
+#define SERVER_COUNT    2
+#define BIAS_SIZE       40
+extern char serverNames[SERVER_COUNT][2][BIAS_SIZE];
+
 class Connection
 {
 public:
 
-                    Connection(std::set<std::string>, int seed, void (*)(int, Socket*));
+                    Connection(int seed, void (*)(int, Socket*));
     virtual        ~Connection();
     void            init(int port);
 	virtual	void    process() {};
@@ -42,7 +44,6 @@ public:
 protected:
 
     Socket*                         worldServerSocket;
-    std::set<std::string>           ghostServers;
     Socket*                         serverSocket;
 	std::map<int, Socket*> 	        clientSockets;
 
@@ -55,9 +56,9 @@ protected:
 
 private:
 
-    int                             idCount;
+    int             idCount;
 	// The seed is used to generate sockets IDs. Each server should have one seed, 0 <= seed <= 99.
-	int                             seed;
+	int             seed;
 
 	sockaddr_in     bindSocket(int, int);
 

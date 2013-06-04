@@ -60,17 +60,7 @@ void WorldGame::connectionHandler(int eventId, Socket* socket)
     else if (eventId == EVENT_SERVER_CONNECTED)
     {
         servers.push_back(new Server(socket));
-
-        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
-        {
-            if (!it->second->isPlaying())
-                continue;
-
-            socket->addOutPacket(createAddPlayerPacket(it->second));
-        }
-
-        for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
-            socket->addOutPacket(createAddBombPacket(it->second));
+        sendGameStateToServer(socket);
     }
     else if (eventId == EVENT_SERVER_DISCONNECTED)
     {
@@ -139,6 +129,26 @@ void WorldGame::update(float time, float velocityIterations, float positionItera
 
     // The shutdown is sent but the server is kept online.
     updateShutdown();
+}
+
+void WorldGame::updateServers()
+{
+    for (unsigned int i = 0; i < servers.size(); ++i)
+        sendGameStateToServer(servers[i]->getSocket());
+}
+
+void WorldGame::sendGameStateToServer(Socket* socket)
+{
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+    {
+        if (!it->second->isPlaying())
+            continue;
+
+        socket->addOutPacket(createAddPlayerPacket(it->second));
+    }
+
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        socket->addOutPacket(createAddBombPacket(it->second));
 }
 
 void WorldGame::explodePlayerBombs(int playerId)

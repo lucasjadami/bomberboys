@@ -11,15 +11,18 @@ class WorldGame : public Game
 public:
 
             WorldGame();
+            WorldGame(b2World);
            ~WorldGame();
     void    connectionHandler(int, Socket*);
     void    update(float, float, float);
+    void    updateServers();
 
 private:
 
     std::vector<Server*> servers;
     long long            startupTime;
 
+    void    sendGameStateToServer(Socket*);
     void    explodePlayerBombs(int);
     void    broadcastPacketToServers(Packet*);
     void    updateShutdown();

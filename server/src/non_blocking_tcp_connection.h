@@ -7,7 +7,7 @@ class NonBlockingTcpConnection : public Connection
 {
 public:
 
-         NonBlockingTcpConnection(std::set<std::string>, int, void (*)(int, Socket*));
+         NonBlockingTcpConnection(int, void (*)(int, Socket*));
 	void process();
 
 protected:

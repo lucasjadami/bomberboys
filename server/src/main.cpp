@@ -13,12 +13,11 @@
 #include <signal.h>
 #include <cstdlib>
 
-struct sigaction                                    sigIntHandler;
-Connection* 	                                    connection;
-Game*                                               game = NULL;
-std::vector<std::pair<std::string, std::string> >   serverNames;
-int                                                 serverId;
-int                                                 currentServerId;
+struct sigaction    sigIntHandler;
+Connection* 	    connection;
+Game*               game = NULL;
+int                 serverId;
+int                 currentServerId;
 
 #ifdef TESTBED
 DebugDraw           debugDraw;
@@ -26,6 +25,9 @@ b2Profile           maxProfile;
 b2Profile           totalProfile;
 int                 stepCount;
 #endif
+
+void handleServerOffline();
+void changeServer();
 
 void exitHandler(int s)
 {
@@ -168,21 +170,46 @@ void gameUpdateHandler(Settings* settings)
 }
 #endif
 
-void createServerNamesList()
+void handleServerOffline()
 {
-    serverNames.push_back(std::make_pair("127.0.0.1", "10011"));
-    serverNames.push_back(std::make_pair("127.0.0.1", "10012"));
+    changeServer();
 }
 
 void changeServer()
 {
-    currentServerId++;
+    currentServerId = (currentServerId + 1) % SERVER_COUNT;
+
     if (currentServerId == serverId)
-        game = game == NULL ? new WorldGame() : new WorldGame();
+    {
+        if (game == NULL)
+            game = new WorldGame();
+        else
+        {
+            WorldGame* newGame = new WorldGame();
+            game->setDestructorDisabled(true);
+            game->copyTo(newGame);
+            delete game;
+            newGame->updateServers();
+            game = newGame;
+        }
+
+        info("Created world game");
+    }
     else
     {
-        connection->connectToWorldServer(serverNames[currentServerId].first.c_str(), serverNames[currentServerId].second.c_str());
-        game = game == NULL ? new GhostGame(connection->getWorldServerSocket()) : new GhostGame(connection->getWorldServerSocket());
+        connection->connectToWorldServer(serverNames[currentServerId][0], serverNames[currentServerId][1]);
+
+        if (game == NULL)
+            game = new GhostGame(connection->getWorldServerSocket(), handleServerOffline);
+        else
+        {
+            GhostGame* newGame = new GhostGame(connection->getWorldServerSocket(), handleServerOffline);
+            game->setDestructorDisabled(true);
+            game->copyTo(newGame);
+            delete game;
+        }
+
+        info("Created ghost game. World game is %s %s", serverNames[currentServerId][0], serverNames[currentServerId][1]);
     }
 }
 
@@ -197,19 +224,13 @@ int main(int argc, char** argv)
 
     info("Using non-blocking TCP connection");
 
-    std::set<std::string> validServerNames;
-    for (unsigned int i = 0; i < serverNames.size(); ++i)
-        validServerNames.insert(serverNames[i].first);
-
     serverId = 1;
     currentServerId = -1;
 
-    createServerNamesList();
+    connection = new NonBlockingTcpConnection(serverId, &connectionHandler);
+	connection->init(atoi(serverNames[serverId][1]));
 
-    connection = new NonBlockingTcpConnection(validServerNames, serverId, &connectionHandler);
-	connection->init(atoi(serverNames[serverId].second.c_str()));
-
-	info("Server connection stabilished at port %s", serverNames[serverId].second.c_str());
+	info("Server connection stabilished at port %s", serverNames[serverId][1]);
 
     changeServer();
 
