@@ -9,20 +9,21 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Random;
 
 public class Connection {
     protected static int INTERVAL = 15;
     protected static long DISCONNECT_TIME = 1_000_000_000L;
 
     private Socket socket;
-    protected InputStream inputStream;
-    protected OutputStream outputStream;
 
     protected final List<Packet> sendPackets;
     protected final List<Packet> recvPackets;
     private final List<InetSocketAddress> addressList;
     protected boolean connectFailed;
     protected boolean remoteDisconnected;
+    private Thread sendThread;
+    private Thread recvThread;
 
     public Connection(List<InetSocketAddress> addressList) {
         this.addressList = addressList;
@@ -33,7 +34,21 @@ public class Connection {
     }
     
     public void connect() {
-        startConnectThread(addressList.get(0));
+        Thread connectThread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    establishConnection();
+                    startSendThread();
+                    startRecvThread();
+                    try {
+                        recvThread.join();
+                        sendThread.join();
+                    } catch (InterruptedException e) { }
+                }
+            }
+        };
+        connectThread.start();
     }
     
     public boolean isConnected() {
@@ -66,32 +81,24 @@ public class Connection {
         sendPackets.add(packet);
     }
 
-    private void startConnectThread(final InetSocketAddress address) {
-        Thread connectThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    socket = new Socket();
-                    socket.connect(address);
-                    socket.setTcpNoDelay(true);
-                    inputStream = socket.getInputStream();
-                    outputStream = socket.getOutputStream();
-
-                    startSendThread();
-                    startRecvThread();
-                } catch (Exception ex) {
-                    connectFailed = true;
-                }
-            }
-        };
-        connectThread.start();
+    private void establishConnection() {
+        boolean connectionEstablished = false;
+        while (!connectionEstablished) {
+            try {
+                socket = new Socket();
+                socket.connect(addressList.get(0));
+                socket.setTcpNoDelay(true);
+                connectionEstablished = true;
+            } catch (IOException e) { }
+        }
     }
 
     private void startSendThread() {
-        Thread sendThread = new Thread() {
+        sendThread = new Thread() {
             @Override
             public void run() {
                 try {
+                    OutputStream outputStream = socket.getOutputStream();
                     while (!remoteDisconnected) {
                         try {
                             Thread.sleep(INTERVAL);
@@ -112,9 +119,10 @@ public class Connection {
     }
 
     private void startRecvThread() {
-        Thread recvThread = new Thread() {
+        recvThread = new Thread() {
             @Override
             public void run() {
+
                 try {
                     while (!remoteDisconnected) {
                         byte[] idArray = readArray(1);
@@ -139,24 +147,22 @@ public class Connection {
                     remoteDisconnected = true;
                 }
             }
+
+            private byte[] readArray(int size) throws IOException {
+                InputStream inputStream = socket.getInputStream();
+                byte[] array = new byte[size];
+                int totalRead = 0;
+
+                while (totalRead < array.length) {
+                    int bytesRead = inputStream.read(array, totalRead, array.length - totalRead);
+                    if (bytesRead == -1) return null;
+                    totalRead += bytesRead;
+                }
+
+                return array;
+            }
         };
         recvThread.start();
     }
 
-    private byte[] readArray(int size) throws IOException {
-        byte[] array = new byte[size];
-
-        int totalRead = 0;
-        while (totalRead < array.length) {
-            int bytesRead = inputStream.read(array, totalRead, array.length - totalRead);
-
-            if (bytesRead == -1) {
-                return null;
-            }
-
-            totalRead += bytesRead;
-        }
-
-        return array;
-    }
 }
