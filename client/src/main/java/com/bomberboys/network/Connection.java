@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 public class Connection {
@@ -19,18 +20,20 @@ public class Connection {
 
     protected final List<Packet> sendPackets;
     protected final List<Packet> recvPackets;
+    private final List<InetSocketAddress> addressList;
     protected boolean connectFailed;
     protected boolean remoteDisconnected;
 
-    public Connection() {
+    public Connection(List<InetSocketAddress> addressList) {
+        this.addressList = addressList;
         sendPackets = Collections.synchronizedList(new LinkedList<Packet>());
         recvPackets = Collections.synchronizedList(new LinkedList<Packet>());
         connectFailed = false;
         remoteDisconnected = false;
     }
     
-    public void connect(String ip, int port) {
-        startConnectThread(ip, port);
+    public void connect() {
+        startConnectThread(addressList.get(0));
     }
     
     public boolean isConnected() {
@@ -63,12 +66,13 @@ public class Connection {
         sendPackets.add(packet);
     }
 
-    private void startConnectThread(final String ip, final int port) {
+    private void startConnectThread(final InetSocketAddress address) {
         Thread connectThread = new Thread() {
             @Override
             public void run() {
                 try {
-                    socket = new Socket(ip, port);
+                    socket = new Socket();
+                    socket.connect(address);
                     socket.setTcpNoDelay(true);
                     inputStream = socket.getInputStream();
                     outputStream = socket.getOutputStream();

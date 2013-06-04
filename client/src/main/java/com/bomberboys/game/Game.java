@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.net.InetSocketAddress;
 
 public class Game {
     public static final Dimension MAP_SIZE = new Dimension(600, 420);
@@ -21,7 +22,6 @@ public class Game {
     private List<Player> discardedPlayers;
     
     public Game() {
-        connection = new Connection();
         players = new HashMap<>();
         bombs = new HashMap<>();
         discardedBombs = new ArrayList<>();
@@ -29,7 +29,12 @@ public class Game {
     }
 
     public void connect(String address, int port) {
-        connection.connect(address, port);
+        List<InetSocketAddress> addressList = new ArrayList<>();
+        addressList.add(new InetSocketAddress(address, port));
+
+        connection = new Connection(addressList);
+
+        connection.connect();
         
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put("Test".getBytes());
