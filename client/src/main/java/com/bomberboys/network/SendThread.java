@@ -26,8 +26,8 @@ class SendThread extends Thread {
                 try { Thread.sleep(15); } catch (InterruptedException ex) { }
 
                 while (!packetList.isEmpty()) {
-                    Packet packet = packetList.remove(0);
-                    stream.write(packet.serialize().array());
+                    stream.write(packetList.get(0).serialize().array());
+                    packetList.remove(0);
                 }
             }
         } catch (IOException ex) {
