@@ -13,9 +13,10 @@ public class Main {
     public static void main(String[] args) throws Exception {
         if (args.length >= 3) {
             List<InetSocketAddress> addressList = new ArrayList<>();
-            for (int i = 1; i < args.length; i += 2) {
-                addressList.add(new InetSocketAddress(args[i], Integer.parseInt(args[i + 1])));
-                System.out.println("Address " + args[i] + ":" + args[i + 1] + " added.");
+            for (int i = 1; i < args.length; ++i) {
+                String[] address = args[i].split(":");
+                addressList.add(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
+                System.out.println("Address " + address[0] + ":" + address[1] + " added.");
             }
 
             Connection connection = new Connection(addressList);
@@ -38,7 +39,7 @@ public class Main {
                                     .addKeyEventDispatcher(listener);
             }
         } else {
-            System.out.println("Usage: client [h|b] [ip port]+");
+            System.out.println("Usage: client [h|b] ip:port+");
         }
     }
 }
