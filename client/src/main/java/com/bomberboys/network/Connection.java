@@ -1,13 +1,14 @@
 package com.bomberboys.network;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.Random;
 
 public class Connection {
@@ -88,23 +89,35 @@ public class Connection {
     }
 
     private void establishConnection() {
-        Random rand = new Random();
-
         boolean connectionEstablished = false;
         while (!connectionEstablished) {
             try {
-                InetSocketAddress address;
-                do {
-                    address = addressList.get(Math.abs(rand.nextInt() % addressList.size()));
-                    System.out.println("Trying to connect with " + address.getHostName() + ":" + address.getPort());
-                } while (!address.getAddress().isReachable(1000));
-
+                InetSocketAddress address = getReachableAddress();
                 socket = new Socket();
                 socket.connect(address);
                 socket.setTcpNoDelay(true);
                 connectionEstablished = true;
                 System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
             } catch (IOException e) { }
+        }
+    }
+
+    private InetSocketAddress getReachableAddress() throws IOException {
+        Random rand = new Random();
+        List<InetSocketAddress> remainingAddresses = new ArrayList<>();
+
+        while (true) {
+            remainingAddresses.addAll(addressList); 
+
+            while (!remainingAddresses.isEmpty()) {
+                int randomIndex = Math.abs(rand.nextInt() % remainingAddresses.size());
+                InetSocketAddress address = remainingAddresses.remove(randomIndex);
+
+                if (address.getAddress().isReachable(1000))
+                    return address;
+            }
+
+            System.out.println("No reachable address, retrying.");
         }
     }
 }
