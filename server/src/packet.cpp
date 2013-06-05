@@ -25,10 +25,6 @@ int Packet::getSize(int id)
             size = PACKET_EXPLODE_BOMB_SIZE; break;
         case PACKET_FALL_PLAYER:
             size = PACKET_FALL_PLAYER_SIZE; break;
-        case PACKET_PING:
-            size = PACKET_PING_SIZE; break;
-        case PACKET_PONG:
-            size = PACKET_PONG_SIZE; break;
         case PACKET_SHUTDOWN:
             size = PACKET_SHUTDOWN_SIZE; break;
         case PACKET_LOGIN_EX:

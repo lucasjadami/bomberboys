@@ -211,8 +211,6 @@ void WorldGame::updatePlayerPackets(Player* player)
                 parseMoveMePacket(packet, player, 0);
             else if (packet->getId() == PACKET_PLANT_BOMB)
                 parsePlantBombPacket(packet, player, 0);
-            else if (packet->getId() == PACKET_PING)
-                parsePingPacket(packet, player);
         }
         delete packet;
     }

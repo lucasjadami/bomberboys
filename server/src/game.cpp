@@ -108,23 +108,12 @@ void Game::createBombBody(Bomb* bomb, Player* player)
     bomb->setBody(body);
 }
 
-void Game::parsePingPacket(Packet* packet, Player* player)
-{
-    player->getSocket()->addOutPacket(createPongPacket());
-}
-
 Packet* Game::createRemovePlayerPacket(int id)
 {
     char* data = new char[PACKET_REMOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_REMOVE_PLAYER_SIZE);
     Packet::putBytes(data, id, ID_SIZE);
     return new Packet(PACKET_REMOVE_PLAYER, data);
-}
-
-Packet* Game::createPongPacket()
-{
-    char* data = new char[PACKET_PONG_SIZE];
-    return new Packet(PACKET_PONG, data);
 }
 
 Packet* Game::createAddBombPacket(Bomb* bomb)

@@ -31,9 +31,7 @@ protected:
 
     void            createPlayerBody(Player*);
     void            createBombBody(Bomb*, Player*);
-    void            parsePingPacket(Packet*, Player*);
     Packet*         createRemovePlayerPacket(int);
-    Packet*         createPongPacket();
     Packet*         createAddBombPacket(Bomb*);
     virtual Packet* createAddPlayerPacket(Player*);
 
