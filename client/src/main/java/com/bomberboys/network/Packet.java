@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public class Packet {
     public enum Id {
-        LOGIN(20),
+        LOGIN(28),
         ADD_PLAYER(28),
         REMOVE_PLAYER(4),
         MOVE_ME(1),

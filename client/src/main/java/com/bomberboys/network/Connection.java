@@ -22,9 +22,13 @@ public class Connection {
     protected boolean remoteDisconnected;
     private SendThread send;
     private ReceiveThread recv;
+    private byte[] sid;
+    private String username;
 
-    public Connection(List<InetSocketAddress> addressList) {
+    public Connection(String username, byte[] sid, List<InetSocketAddress> addressList) {
         this.addressList = addressList;
+        this.sid = sid;
+        this.username = username;
         sendPackets = Collections.synchronizedList(new LinkedList<Packet>());
         recvPackets = Collections.synchronizedList(new LinkedList<Packet>());
         connectFailed = false;
@@ -106,5 +110,10 @@ public class Connection {
                 System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
             } catch (IOException e) { }
         }
+
+        ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
+        buffer.put(username.getBytes());
+        buffer.put(sid);
+        sendPacket(new Packet(Packet.Id.LOGIN, buffer));
     }
 }

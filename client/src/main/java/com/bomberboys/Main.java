@@ -1,13 +1,14 @@
 package com.bomberboys;
 
 import com.bomberboys.game.Game;
-import com.bomberboys.ui.PlayerKeyboardListener;
-import com.bomberboys.ui.GameWindow;
 import com.bomberboys.network.Connection;
+import com.bomberboys.ui.GameWindow;
+import com.bomberboys.ui.PlayerKeyboardListener;
 import java.awt.KeyboardFocusManager;
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -18,11 +19,12 @@ public class Main {
                 System.out.println("Address " + args[i] + ":" + args[i + 1] + " added.");
             }
 
-            Connection connection = new Connection(addressList);
+            byte[] sid = new byte[8];
+            new Random().nextBytes(sid);
+            Connection connection = new Connection("Test", sid, addressList);
             connection.connect();
 
             Game game = new Game(connection);
-            game.login();
 
             GameWindow window = new GameWindow(game);
             window.setup();
