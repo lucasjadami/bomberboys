@@ -112,8 +112,8 @@ public class Connection {
         }
 
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
-        buffer.put(username.getBytes());
         buffer.put(sid);
+        buffer.put(username.getBytes());
         sendPacket(new Packet(Packet.Id.LOGIN, buffer));
     }
 }
