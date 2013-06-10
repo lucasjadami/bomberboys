@@ -19,17 +19,17 @@ private:
 
     void (*offlineHandler)(void);
 
-    void updateServerPackets();
-    void updatePlayerPackets(Player*);
-    void routePacketToClients(Packet*);
-    void routePacketToServer(Player*, Packet*);
-    void parseAddPlayerPacket(Packet*);
-    void parseRemovePlayerPacket(Packet*);
-    void parseMovePlayerPacket(Packet*);
-    void parseAddBombPacket(Packet*);
-    void parseExplodeBombPacket(Packet*);
-    void parseFallPlayerPacket(Packet*);
-    void parseShutdownPacket(Packet*);
+    void    updateServerPackets();
+    void    updatePlayerPackets(Player*);
+    void    routePacketToClients(Packet*);
+    void    routePacketToServer(Player*, Packet*);
+    Player* parseAddPlayerExPacket(Packet*);
+    void    parseRemovePlayerPacket(Packet*);
+    void    parseMovePlayerPacket(Packet*);
+    void    parseAddBombPacket(Packet*);
+    void    parseExplodeBombPacket(Packet*);
+    void    parseFallPlayerPacket(Packet*);
+    void    parseShutdownPacket(Packet*);
     Packet* createAddPlayerPacket(Player*);
 
 };

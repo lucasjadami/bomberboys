@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "socket.h"
+#include "game_type.h"
 #include <Box2D/Box2D.h>
 
 #define PLAYER_RADIUS 10.0f
@@ -26,16 +27,19 @@ public:
    void     applyImpulse(b2Vec2&);
    bool     isLocal();
    int      getId();
+   ULL      getSId();
+   void     setSId(ULL);
 
 private:
 
-    int         id;
-    Socket*     socket;
-    char*       name;
-    b2Body*     body;
-    int         lastX;
-    int         lastY;
-    long long   lastImpulse;
+    int     id;
+    ULL     sId;
+    Socket* socket;
+    char*   name;
+    b2Body* body;
+    int     lastX;
+    int     lastY;
+    LL      lastImpulse;
 
 };
 

@@ -144,7 +144,7 @@ void WorldGame::sendGameStateToServer(Socket* socket)
         if (!it->second->isPlaying())
             continue;
 
-        socket->addOutPacket(createAddPlayerPacket(it->second));
+        socket->addOutPacket(createAddPlayerExPacket(it->second));
     }
 
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
@@ -171,7 +171,7 @@ void WorldGame::broadcastPacketToServers(Packet* packet)
 void WorldGame::updateShutdown()
 {
     timespec time;
-    long long now = getTimeLL(getTime(&time));
+    LL now = getTimeLL(getTime(&time));
     if (now - startupTime > SHUTDOWN_TIME)
     {
         info("Shutdown sent!");
@@ -315,8 +315,13 @@ void WorldGame::explodeBomb(Bomb* bomb)
 void WorldGame::parseLoginPacket(Packet* packet, Player* player)
 {
     char* name = new char[NAME_SIZE];
-    memcpy(name, packet->getData(), sizeof(char) * NAME_SIZE);
+    ULL sId;
+
+    sId = Packet::getULongLong(packet->getData());
+    memcpy(name, packet->getData() + SID_SIZE, sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
+
+    player->setSId(sId);
     player->setName(name);
 
     createPlayerBody(player);
@@ -338,7 +343,7 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         player->getSocket()->addOutPacket(createAddBombPacket(it->second));
 
-    broadcastPacketToServers(createAddPlayerPacket(player));
+    broadcastPacketToServers(createAddPlayerExPacket(player));
 }
 
 void WorldGame::parseMoveMePacket(Packet* packet, Player* player, int offset)
@@ -427,9 +432,14 @@ void WorldGame::parseLoginExPacket(Packet* packet)
     int id = Packet::getInt(packet->getData());
     Player* player = players[id];
 
+    ULL sId;
     char* name = new char[NAME_SIZE];
-    memcpy(name, packet->getData(), sizeof(char) * NAME_SIZE);
+
+    sId = Packet::getULongLong(packet->getData());
+    memcpy(name, packet->getData() + SID_SIZE, sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
+
+    player->setSId(sId);
     player->setName(name);
 
     createPlayerBody(player);
@@ -443,7 +453,7 @@ void WorldGame::parseLoginExPacket(Packet* packet)
         it->second->getSocket()->addOutPacket(createAddPlayerPacket(player));
     }
 
-    broadcastPacketToServers(createAddPlayerPacket(player));
+    broadcastPacketToServers(createAddPlayerExPacket(player));
 }
 
 void WorldGame::parseMoveMeExPacket(Packet* packet)
@@ -488,4 +498,16 @@ Packet* WorldGame::createShutdownPacket()
 {
     char* data = new char[PACKET_SHUTDOWN_SIZE];
     return new Packet(PACKET_SHUTDOWN, data);
+}
+
+Packet* WorldGame::createAddPlayerExPacket(Player* player)
+{
+    char* data = new char[PACKET_ADD_PLAYER_EX_SIZE];
+    memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_EX_SIZE);
+    Packet::putBytes(data, player->getId(), ID_SIZE);
+    Packet::putBytes(data + ID_SIZE, player->getSId(), SID_SIZE);
+    Packet::putBytes(data + ID_SIZE + SID_SIZE, player->getBody()->GetPosition().x, 2);
+    Packet::putBytes(data + ID_SIZE + SID_SIZE + 2, player->getBody()->GetPosition().y, 2);
+    memcpy(data + ID_SIZE + SID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
+    return new Packet(PACKET_ADD_PLAYER_EX, data);
 }

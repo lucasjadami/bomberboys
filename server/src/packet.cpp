@@ -29,6 +29,8 @@ int Packet::getSize(int id)
             size = PACKET_SHUTDOWN_SIZE; break;
         case PACKET_LOGIN_EX:
             size = PACKET_LOGIN_EX_SIZE; break;
+        case PACKET_ADD_PLAYER_EX:
+            size = PACKET_ADD_PLAYER_EX_SIZE; break;
         case PACKET_MOVE_ME_EX:
             size = PACKET_MOVE_ME_EX_SIZE; break;
         case PACKET_PLANT_BOMB_EX:
@@ -37,7 +39,7 @@ int Packet::getSize(int id)
     return size;
 }
 
-void Packet::putBytes(char* data, int value, int bytes)
+void Packet::putBytes(char* data, ULL value, int bytes)
 {
     int mask = 0xFF;
 
@@ -78,25 +80,40 @@ short Packet::getShort(char* data)
     return value;
 }
 
-double Packet::getDouble(char* data)
+ULL Packet::getULongLong(char* data)
 {
-    long long numerator = 0;
+    ULL value = 0;
     int mask = 0;
 
     for (int i = 7; i > -1; --i)
     {
-        long long value = (unsigned char) data[i];
+        ULL buffer = (unsigned char) data[i];
+        value |= buffer << mask;
+        mask += 8;
+    }
+
+    return value;
+}
+
+double Packet::getDouble(char* data)
+{
+    LL numerator = 0;
+    int mask = 0;
+
+    for (int i = 7; i > -1; --i)
+    {
+        LL value = (unsigned char) data[i];
         numerator |= value << mask;
         mask += 8;
     }
 
-    long long denominator = 0;
+    LL denominator = 0;
     mask = 0;
     data += 8;
 
     for (int i = 7; i > -1; --i)
     {
-        long long value = (unsigned char) data[i];
+        LL value = (unsigned char) data[i];
         denominator |= value << mask;
         mask += 8;
     }

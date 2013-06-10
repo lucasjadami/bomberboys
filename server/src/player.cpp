@@ -6,6 +6,7 @@ Player::Player(Socket* socket)
 {
     this->socket = socket;
     this->id = socket->getId();
+    sId = 0;
     body = NULL;
     name = NULL;
     lastImpulse = 0;
@@ -17,6 +18,7 @@ Player::Player(int id)
 {
     this->socket = NULL;
     this->id = id;
+    sId = 0;
     body = NULL;
     name = NULL;
     lastImpulse = 0;
@@ -52,7 +54,7 @@ void Player::setSocket(Socket* socket)
 
 bool Player::isPlaying()
 {
-    return name != NULL;
+    return sId != 0;
 }
 
 b2Body* Player::getBody()
@@ -79,7 +81,7 @@ bool Player::isLastPositionDifferent()
 void Player::applyImpulse(b2Vec2& impulse)
 {
     timespec time;
-    long long now = getTimeLL(getTime(&time));
+    LL now = getTimeLL(getTime(&time));
     if (now - lastImpulse > 50)
     {
         lastImpulse = now;
@@ -95,4 +97,14 @@ bool Player::isLocal()
 int Player::getId()
 {
     return id;
+}
+
+ULL Player::getSId()
+{
+    return sId;
+}
+
+void Player::setSId(ULL sId)
+{
+    this->sId = sId;
 }

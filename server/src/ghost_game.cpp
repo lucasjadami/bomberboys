@@ -64,22 +64,29 @@ void GhostGame::updateServerPackets()
     Packet* packet;
     while (server != NULL && (packet = server->getSocket()->getInPacket()) != NULL)
     {
-        routePacketToClients(packet);
+        if (packet->getId() == PACKET_ADD_PLAYER_EX)
+        {
+            Packet* newPacket = createAddPlayerPacket(parseAddPlayerExPacket(packet));
+            routePacketToClients(newPacket);
+            delete newPacket;
+        }
+        else
+        {
+            routePacketToClients(packet);
 
-        if (packet->getId() == PACKET_ADD_PLAYER)
-            parseAddPlayerPacket(packet);
-        else if (packet->getId() == PACKET_REMOVE_PLAYER)
-            parseRemovePlayerPacket(packet);
-        else if (packet->getId() == PACKET_MOVE_PLAYER)
-            parseMovePlayerPacket(packet);
-        else if (packet->getId() == PACKET_ADD_BOMB)
-            parseAddBombPacket(packet);
-        else if (packet->getId() == PACKET_EXPLODE_BOMB)
-            parseExplodeBombPacket(packet);
-        else if (packet->getId() == PACKET_FALL_PLAYER)
-            parseFallPlayerPacket(packet);
-        else if (packet->getId() == PACKET_SHUTDOWN)
-            parseShutdownPacket(packet);
+            if (packet->getId() == PACKET_REMOVE_PLAYER)
+                parseRemovePlayerPacket(packet);
+            else if (packet->getId() == PACKET_MOVE_PLAYER)
+                parseMovePlayerPacket(packet);
+            else if (packet->getId() == PACKET_ADD_BOMB)
+                parseAddBombPacket(packet);
+            else if (packet->getId() == PACKET_EXPLODE_BOMB)
+                parseExplodeBombPacket(packet);
+            else if (packet->getId() == PACKET_FALL_PLAYER)
+                parseFallPlayerPacket(packet);
+            else if (packet->getId() == PACKET_SHUTDOWN)
+                parseShutdownPacket(packet);
+        }
 
         delete packet;
     }
@@ -108,19 +115,21 @@ void GhostGame::routePacketToClients(Packet* packet)
 void GhostGame::routePacketToServer(Player* player, Packet* packet)
 {
     Packet* newPacket = packet->clone(packet->getId() + EX_GAP);
-    Packet::putBytes(newPacket->getData(), player->getId(), 4);
+    Packet::putBytes(newPacket->getData(), player->getId(), ID_SIZE);
 
     if (server != NULL)
         server->getSocket()->addOutPacket(newPacket);
 }
 
-void GhostGame::parseAddPlayerPacket(Packet* packet)
+Player* GhostGame::parseAddPlayerExPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
-    int x = Packet::getShort(packet->getData() + ID_SIZE);
-    int y = Packet::getShort(packet->getData() + ID_SIZE + 2);
+    ULL sId = Packet::getULongLong(packet->getData() + ID_SIZE);
+    int x = Packet::getShort(packet->getData() + ID_SIZE + SID_SIZE);
+    int y = Packet::getShort(packet->getData() + ID_SIZE + SID_SIZE + 2);
+
     char* name = new char[NAME_SIZE];
-    memcpy(name, packet->getData() + ID_SIZE + 4, sizeof(char) * NAME_SIZE);
+    memcpy(name, packet->getData() + ID_SIZE + SID_SIZE + 4, sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
 
     Player* player;
@@ -148,6 +157,7 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
             player->getSocket()->addOutPacket(createAddBombPacket(it->second));
     }
 
+    player->setSId(sId);
     player->setName(name);
 
     createPlayerBody(player);
@@ -157,6 +167,8 @@ void GhostGame::parseAddPlayerPacket(Packet* packet)
     player->getBody()->SetTransform(position, 0.0f);
 
     players.insert(std::make_pair(id, player));
+
+    return player;
 }
 
 void GhostGame::parseRemovePlayerPacket(Packet* packet)

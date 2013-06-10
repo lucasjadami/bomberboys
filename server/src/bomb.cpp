@@ -22,7 +22,7 @@ void Bomb::setBody(b2Body* body)
 bool Bomb::explode()
 {
     timespec time;
-    long long now = getTimeLL(getTime(&time));
+    LL now = getTimeLL(getTime(&time));
     return now - plantedTime > BOMB_TIME;
 }
 

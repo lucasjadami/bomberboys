@@ -20,7 +20,7 @@ public:
 private:
 
     std::vector<Server*> servers;
-    long long            startupTime;
+    LL                   startupTime;
 
     void    sendGameStateToServer(Socket*);
     void    explodePlayerBombs(int);
@@ -43,6 +43,7 @@ private:
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
     Packet* createShutdownPacket();
+    Packet* createAddPlayerExPacket(Player*);
 
 };
 
