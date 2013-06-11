@@ -119,6 +119,9 @@
 		<Unit filename="../src/game.h">
 			<Option virtualFolder="game/" />
 		</Unit>
+		<Unit filename="../src/game_type.h">
+			<Option virtualFolder="misc/" />
+		</Unit>
 		<Unit filename="../src/ghost_game.cpp">
 			<Option virtualFolder="game/" />
 		</Unit>
