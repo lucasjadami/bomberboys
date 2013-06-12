@@ -314,7 +314,7 @@ void WorldGame::explodeBomb(Bomb* bomb)
 
 void WorldGame::parseLoginPacket(Packet* packet, Player* player)
 {
-    char* name = new char[NAME_SIZE];
+    char name[NAME_SIZE];
     ULL sId;
 
     sId = Packet::getULongLong(packet->getData());
@@ -329,6 +329,8 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
 
     player->getSocket()->addOutPacket(createAddPlayerPacket(player));
 
+    sendGameStateToClient(player);
+
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
         if (it->second == player || !it->second->isPlaying())
@@ -336,12 +338,7 @@ void WorldGame::parseLoginPacket(Packet* packet, Player* player)
 
         if (it->second->isLocal())
             it->second->getSocket()->addOutPacket(createAddPlayerPacket(player));
-
-        player->getSocket()->addOutPacket(createAddPlayerPacket(it->second));
     }
-
-    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
-        player->getSocket()->addOutPacket(createAddBombPacket(it->second));
 
     broadcastPacketToServers(createAddPlayerExPacket(player));
 }
@@ -433,10 +430,10 @@ void WorldGame::parseLoginExPacket(Packet* packet)
     Player* player = players[id];
 
     ULL sId;
-    char* name = new char[NAME_SIZE];
+    char name[NAME_SIZE];
 
-    sId = Packet::getULongLong(packet->getData());
-    memcpy(name, packet->getData() + SID_SIZE, sizeof(char) * NAME_SIZE);
+    sId = Packet::getULongLong(packet->getData() + ID_SIZE);
+    memcpy(name, packet->getData() + ID_SIZE + SID_SIZE, sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
 
     player->setSId(sId);

@@ -8,7 +8,7 @@ Player::Player(Socket* socket)
     this->id = socket->getId();
     sId = 0;
     body = NULL;
-    name = NULL;
+    name = new char[NAME_SIZE];
     lastImpulse = 0;
     lastX = -1;
     lastY = -1;
@@ -20,7 +20,7 @@ Player::Player(int id)
     this->id = id;
     sId = 0;
     body = NULL;
-    name = NULL;
+    name = new char[NAME_SIZE];
     lastImpulse = 0;
     lastX = -1;
     lastY = -1;
@@ -28,8 +28,7 @@ Player::Player(int id)
 
 Player::~Player()
 {
-    if (name != NULL)
-        delete[] name;
+    delete[] name;
 }
 
 char* Player::getName()
@@ -39,7 +38,7 @@ char* Player::getName()
 
 void Player::setName(char* name)
 {
-    this->name = name;
+    strcpy(this->name, name);
 }
 
 Socket* Player::getSocket()

@@ -29,15 +29,16 @@ protected:
     std::map<int, Bomb*>   bombs;
     b2World*               world;
 
-    void            createPlayerBody(Player*);
-    void            createBombBody(Bomb*, Player*);
-    Packet*         createRemovePlayerPacket(int);
-    Packet*         createAddBombPacket(Bomb*);
-    virtual Packet* createAddPlayerPacket(Player*);
+    void     sendGameStateToClient(Player*);
+    void     createPlayerBody(Player*);
+    void     createBombBody(Bomb*, Player*);
+    Packet*  createRemovePlayerPacket(int);
+    Packet*  createAddBombPacket(Bomb*);
+    Packet*  createAddPlayerPacket(Player*);
 
 private:
 
-    bool                    destructorDisabled;
+    bool destructorDisabled;
 
 };
 

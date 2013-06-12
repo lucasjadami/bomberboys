@@ -63,6 +63,20 @@ void Game::copyTo(Game* game)
         game->bombs.insert(std::make_pair(it->first, it->second));
 }
 
+void Game::sendGameStateToClient(Player* player)
+{
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+    {
+        if (it->second == player || !it->second->isPlaying())
+            continue;
+
+        player->getSocket()->addOutPacket(createAddPlayerPacket(it->second));
+    }
+
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        player->getSocket()->addOutPacket(createAddBombPacket(it->second));
+}
+
 void Game::createPlayerBody(Player* player)
 {
     b2BodyDef bodyDef;
@@ -131,8 +145,8 @@ Packet* Game::createAddPlayerPacket(Player* player)
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
     Packet::putBytes(data, player->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, player->getBody()->GetPosition().x, 2);
-    Packet::putBytes(data + ID_SIZE + 2, player->getBody()->GetPosition().y, 2);
+    Packet::putBytes(data + ID_SIZE, player->getBody() != NULL ? player->getBody()->GetPosition().x : 0, 2);
+    Packet::putBytes(data + ID_SIZE + 2, player->getBody() != NULL ? player->getBody()->GetPosition().y : 0, 2);
     memcpy(data + ID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
     return new Packet(PACKET_ADD_PLAYER, data);
 }

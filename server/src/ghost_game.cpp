@@ -66,9 +66,14 @@ void GhostGame::updateServerPackets()
     {
         if (packet->getId() == PACKET_ADD_PLAYER_EX)
         {
-            Packet* newPacket = createAddPlayerPacket(parseAddPlayerExPacket(packet));
+            Player* player = parseAddPlayerExPacket(packet);
+
+            Packet* newPacket = Game::createAddPlayerPacket(player);
             routePacketToClients(newPacket);
             delete newPacket;
+
+            if (player->isLocal())
+                sendGameStateToClient(player);
         }
         else
         {
@@ -128,7 +133,7 @@ Player* GhostGame::parseAddPlayerExPacket(Packet* packet)
     int x = Packet::getShort(packet->getData() + ID_SIZE + SID_SIZE);
     int y = Packet::getShort(packet->getData() + ID_SIZE + SID_SIZE + 2);
 
-    char* name = new char[NAME_SIZE];
+    char name[NAME_SIZE];
     memcpy(name, packet->getData() + ID_SIZE + SID_SIZE + 4, sizeof(char) * NAME_SIZE);
     name[NAME_SIZE - 1] = '\0';
 
@@ -144,17 +149,6 @@ Player* GhostGame::parseAddPlayerExPacket(Packet* packet)
     {
         // The player is local.
         player = it->second;
-
-        for (it = players.begin(); it != players.end(); ++it)
-        {
-            if (it->second == player)
-                continue;
-
-            player->getSocket()->addOutPacket(Game::createAddPlayerPacket(it->second));
-        }
-
-        for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
-            player->getSocket()->addOutPacket(createAddBombPacket(it->second));
     }
 
     player->setSId(sId);
@@ -230,16 +224,4 @@ void GhostGame::parseFallPlayerPacket(Packet* packet)
 void GhostGame::parseShutdownPacket(Packet* packet)
 {
     // Do nothing for now.
-}
-
-Packet* GhostGame::createAddPlayerPacket(Player* player)
-{
-    // This add ṕlayer packet is an add player packet with empty fields.
-    char* data = new char[PACKET_ADD_PLAYER_SIZE];
-    memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    Packet::putBytes(data, player->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, 0, 2);
-    Packet::putBytes(data + ID_SIZE + 2, 0, 2);
-    memcpy(data + ID_SIZE + 4, "", sizeof(char) * NAME_SIZE);
-    return new Packet(PACKET_ADD_PLAYER, data);
 }
