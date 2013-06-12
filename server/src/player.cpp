@@ -9,6 +9,7 @@ Player::Player(Socket* socket)
     sId = 0;
     body = NULL;
     name = new char[NAME_SIZE];
+    memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
     lastX = -1;
     lastY = -1;
@@ -21,6 +22,7 @@ Player::Player(int id)
     sId = 0;
     body = NULL;
     name = new char[NAME_SIZE];
+    memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
     lastX = -1;
     lastY = -1;
