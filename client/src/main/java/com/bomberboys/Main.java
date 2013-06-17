@@ -9,10 +9,12 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        if (args.length >= 3) {
+        if (args.length >= 2) {
             List<InetSocketAddress> addressList = new ArrayList<>();
             for (int i = 1; i < args.length; i++) {
                 String[] address = args[i].split(":");
@@ -20,8 +22,15 @@ public class Main {
                 System.out.println("Address " + args[i] + " added.");
             }
 
-            byte[] sid = new byte[8];
-            new Random().nextBytes(sid);
+            long random = new Random().nextLong();
+
+            ByteBuffer buffer = ByteBuffer.allocate(8);
+            buffer.putLong(random);
+
+            byte[] sid = buffer.array();
+
+            System.out.println("Using sid: " + random);
+
             Connection connection = new Connection("Test", sid, addressList);
             connection.connect();
 
@@ -38,7 +47,7 @@ public class Main {
             } else {
                 PlayerKeyboardListener listener = new PlayerKeyboardListener(game);
                 KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                                    .addKeyEventDispatcher(listener);
+                    .addKeyEventDispatcher(listener);
             }
         } else {
             System.out.println("Usage: client [h|b] [ip:port]+");
