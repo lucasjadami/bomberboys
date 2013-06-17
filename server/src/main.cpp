@@ -224,7 +224,7 @@ int main(int argc, char** argv)
 
     info("Using non-blocking TCP connection");
 
-    serverId = 1;
+    serverId = 0;
     currentServerId = -1;
 
     connection = new NonBlockingTcpConnection(serverId, &connectionHandler);

@@ -4,7 +4,7 @@
 
 int Packet::getSize(int id)
 {
-    int size = INT_MAX / 2;
+    int size = 0;
     switch (id)
     {
         case PACKET_LOGIN:
@@ -27,6 +27,8 @@ int Packet::getSize(int id)
             size = PACKET_FALL_PLAYER_SIZE; break;
         case PACKET_SHUTDOWN:
             size = PACKET_SHUTDOWN_SIZE; break;
+        case PACKET_ACKNOWLEDGE:
+            size = PACKET_ACKNOWLEDGE_SIZE; break;
         case PACKET_LOGIN_EX:
             size = PACKET_LOGIN_EX_SIZE; break;
         case PACKET_ADD_PLAYER_EX:
