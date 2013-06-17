@@ -53,12 +53,8 @@ public class Connection {
 
                         send.join();
                         recv.join();
-                        ack.join();
-                    } catch (Exception e) {
-                        send.deactivate();
-                        recv.deactivate();
                         ack.deactivate();
-                        try { socket.close(); } catch (IOException ie) { }
+                    } catch (Exception e) {
                     }
                 }
             }
