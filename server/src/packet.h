@@ -43,7 +43,7 @@ class Packet
 public:
 
     static int          getSize(int);
-    static void         putBytes(char*, ULL, int);
+    static void         putIntBytes(char*, ULL, int);
     static int          getInt(char*);
     static short        getShort(char*);
     static ULL          getULongLong(char* data);

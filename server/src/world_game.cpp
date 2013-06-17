@@ -484,9 +484,9 @@ Packet* WorldGame::createMovePlayerPacket(Player* player)
 {
     char* data = new char[PACKET_MOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_MOVE_PLAYER_SIZE);
-    Packet::putBytes(data, player->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, (int) player->getBody()->GetPosition().x, 2);
-    Packet::putBytes(data + ID_SIZE + 2, (int) player->getBody()->GetPosition().y, 2);
+    Packet::putIntBytes(data, player->getId(), ID_SIZE);
+    Packet::putIntBytes(data + ID_SIZE, (int) player->getBody()->GetPosition().x, 2);
+    Packet::putIntBytes(data + ID_SIZE + 2, (int) player->getBody()->GetPosition().y, 2);
     return new Packet(PACKET_MOVE_PLAYER, data);
 }
 
@@ -494,7 +494,7 @@ Packet* WorldGame::createExplodeBombPacket(Bomb* bomb)
 {
     char* data = new char[PACKET_EXPLODE_BOMB_SIZE];
     memset(data, 0, sizeof(char) * PACKET_EXPLODE_BOMB_SIZE);
-    Packet::putBytes(data, bomb->getId(), ID_SIZE);
+    Packet::putIntBytes(data, bomb->getId(), ID_SIZE);
     return new Packet(PACKET_EXPLODE_BOMB, data);
 }
 
@@ -502,7 +502,7 @@ Packet* WorldGame::createFallPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_FALL_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_FALL_PLAYER_SIZE);
-    Packet::putBytes(data, player->getId(), ID_SIZE);
+    Packet::putIntBytes(data, player->getId(), ID_SIZE);
     return new Packet(PACKET_FALL_PLAYER, data);
 }
 
@@ -516,10 +516,10 @@ Packet* WorldGame::createAddPlayerExPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_EX_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_EX_SIZE);
-    Packet::putBytes(data, player->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, player->getSId(), SID_SIZE);
-    Packet::putBytes(data + ID_SIZE + SID_SIZE, player->getBody()->GetPosition().x, 2);
-    Packet::putBytes(data + ID_SIZE + SID_SIZE + 2, player->getBody()->GetPosition().y, 2);
+    Packet::putIntBytes(data, player->getId(), ID_SIZE);
+    Packet::putIntBytes(data + ID_SIZE, player->getSId(), SID_SIZE);
+    Packet::putIntBytes(data + ID_SIZE + SID_SIZE, player->getBody()->GetPosition().x, 2);
+    Packet::putIntBytes(data + ID_SIZE + SID_SIZE + 2, player->getBody()->GetPosition().y, 2);
     memcpy(data + ID_SIZE + SID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
     return new Packet(PACKET_ADD_PLAYER_EX, data);
 }

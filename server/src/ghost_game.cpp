@@ -128,7 +128,7 @@ void GhostGame::routePacketToClients(Packet* packet)
 void GhostGame::routePacketToServer(Player* player, Packet* packet)
 {
     Packet* newPacket = packet->clone(packet->getId() + EX_GAP);
-    Packet::putBytes(newPacket->getData(), player->getId(), ID_SIZE);
+    Packet::putIntBytes(newPacket->getData(), player->getId(), ID_SIZE);
 
     if (server != NULL)
         server->getSocket()->addOutPacket(newPacket);

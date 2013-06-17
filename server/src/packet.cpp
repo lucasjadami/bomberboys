@@ -39,14 +39,14 @@ int Packet::getSize(int id)
     return size;
 }
 
-void Packet::putBytes(char* data, ULL value, int bytes)
+void Packet::putIntBytes(char* data, ULL value, int bytes)
 {
-    int mask = 0xFF;
+    int mask = 0;
 
     for (int i = 0; i < bytes; ++i)
     {
-        data[bytes - i - 1] = (value & mask) >> (8 * i);
-        mask = mask << 8;
+        data[bytes - i - 1] = (value & (255ULL << mask)) >> mask;
+        mask += 8;
     }
 }
 
