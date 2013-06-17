@@ -10,6 +10,8 @@
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
+#define RECONNECT_INTERVAL 10000
+
 class Game
 {
 public:
@@ -25,6 +27,7 @@ public:
 
 protected:
 
+    std::map<ULL, Player*> sessions;
     std::map<int, Player*> players;
     std::map<int, Bomb*>   bombs;
     b2World*               world;

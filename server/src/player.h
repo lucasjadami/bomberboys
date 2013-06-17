@@ -29,6 +29,8 @@ public:
    int      getId();
    ULL      getSId();
    void     setSId(ULL);
+   LL       getLastAlive();
+   void     setLastAlive();
 
 private:
 
@@ -40,6 +42,7 @@ private:
     int     lastX;
     int     lastY;
     LL      lastImpulse;
+    LL      lastAlive;
 
 };
 

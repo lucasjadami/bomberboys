@@ -109,3 +109,14 @@ void Player::setSId(ULL sId)
 {
     this->sId = sId;
 }
+
+LL Player::getLastAlive()
+{
+    return lastAlive;
+}
+
+void Player::setLastAlive()
+{
+    timespec time;
+    lastAlive = getTimeLL(getTime(&time));
+}

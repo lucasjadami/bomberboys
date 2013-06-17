@@ -19,6 +19,14 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
     {
         delete server;
         server = NULL;
+
+        for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+        {
+            Player* player = it->second;
+            if (!player->isLocal())
+                player->setLastAlive();
+        }
+
         offlineHandler();
     }
     else if (eventId == EVENT_CLIENT_CONNECTED)
@@ -161,6 +169,7 @@ Player* GhostGame::parseAddPlayerExPacket(Packet* packet)
     player->getBody()->SetTransform(position, 0.0f);
 
     players.insert(std::make_pair(id, player));
+    sessions.insert(std::make_pair(sId, player));
 
     return player;
 }
@@ -173,8 +182,9 @@ void GhostGame::parseRemovePlayerPacket(Packet* packet)
     if (!player->isLocal())
         server->getPlayers()->erase(id);
 
-    delete player;
     players.erase(id);
+    sessions.erase(player->getSId());
+    delete player;
 }
 
 void GhostGame::parseMovePlayerPacket(Packet* packet)

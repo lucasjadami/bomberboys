@@ -22,8 +22,16 @@ Game::~Game()
 
     if (world != NULL)
         delete world;
+
+    for (std::map<ULL, Player*>::iterator it = sessions.begin(); it != sessions.end(); ++it)
+    {
+        if (players.find(it->second->getId()) == players.end())
+            delete it->second;
+    }
+
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         delete it->second;
+
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
 }
