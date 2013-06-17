@@ -22,6 +22,7 @@ public class Connection {
     protected boolean remoteDisconnected;
     private SendThread send;
     private ReceiveThread recv;
+    private AckThread ack;
     private byte[] sid;
     private String username;
 
@@ -44,15 +45,19 @@ public class Connection {
                     try {
                         send = new SendThread(socket.getOutputStream(), sendPackets);
                         recv = new ReceiveThread(socket.getInputStream(), recvPackets);
+                        ack  = new AckThread(sendPackets);
 
                         send.start();
                         recv.start();
+                        ack.start();
 
                         send.join();
                         recv.join();
+                        ack.join();
                     } catch (Exception e) {
                         send.deactivate();
                         recv.deactivate();
+                        ack.deactivate();
                         try { socket.close(); } catch (IOException ie) { }
                     }
                 }

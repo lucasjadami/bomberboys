@@ -13,6 +13,7 @@ public class Packet {
         ADD_BOMB(8),
         EXPLODE_BOMB(4),
         FALL_PLAYER(4),
+        ACK(0),
         SHUTDOWN(0);
         
         private int size;
@@ -31,11 +32,13 @@ public class Packet {
 
     public Packet(Id id, ByteBuffer data) {
         this.id = id;
-        if (data == null) {
-            data = ByteBuffer.allocate(0);
-        }
         data.rewind();
         this.data = data;
+    }
+
+    public Packet(Id id) {
+        this.id = id;
+        this.data = ByteBuffer.allocate(0);
     }
 
     public ByteBuffer serialize() {
