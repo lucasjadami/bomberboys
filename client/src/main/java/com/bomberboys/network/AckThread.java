@@ -21,7 +21,7 @@ class AckThread extends Thread {
     public void run() {
         while (activated) {
             try {
-                Thread.sleep(15);
+                Thread.sleep(15000);
             } catch (InterruptedException ex) { }
             packets.add(new Packet(Packet.Id.ACK));
         }

@@ -13,8 +13,8 @@ public class Packet {
         ADD_BOMB(8),
         EXPLODE_BOMB(4),
         FALL_PLAYER(4),
-        ACK(0),
-        SHUTDOWN(0);
+        SHUTDOWN(0),
+        ACK(0);
         
         private int size;
         
