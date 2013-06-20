@@ -37,6 +37,8 @@ int Packet::getSize(int id)
             size = PACKET_MOVE_ME_EX_SIZE; break;
         case PACKET_PLANT_BOMB_EX:
             size = PACKET_PLANT_BOMB_EX_SIZE; break;
+        case PACKET_ACKNOWLEDGE_EX:
+            size = PACKET_ACKNOWLEDGE_EX_SIZE; break;
     }
     return size;
 }

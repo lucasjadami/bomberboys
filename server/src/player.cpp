@@ -11,6 +11,7 @@ Player::Player(Socket* socket)
     name = new char[NAME_SIZE];
     memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
+    lastAlive = 0;
     lastX = -1;
     lastY = -1;
 }
@@ -24,6 +25,7 @@ Player::Player(int id)
     name = new char[NAME_SIZE];
     memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
+    lastAlive = 0;
     lastX = -1;
     lastY = -1;
 }
@@ -119,4 +121,10 @@ void Player::setLastAlive()
 {
     timespec time;
     lastAlive = getTimeLL(getTime(&time));
+}
+
+bool Player::isIdle()
+{
+    timespec time;
+    return getTimeLL(getTime(&time)) - lastAlive > RECONNECT_INTERVAL;
 }

@@ -4,13 +4,15 @@
 #include "player.h"
 #include "socket.h"
 #include "bomb.h"
+#include "output.h"
 #include <map>
 #include <Box2D/Dynamics/b2World.h>
 
 #define MAP_WIDTH   600
 #define MAP_HEIGHT  420
 
-#define RECONNECT_INTERVAL 10000
+#define assertPlayerIsValid(id) if (players.find(id) == players.end()) { warning("Player assert is invalid, id: %d", id); return; }
+#define assertBombIsValid(id) if (bombs.find(id) == bombs.end()) { warning("Bomb assert is invalid, id: %d", id); return; }
 
 class Game
 {

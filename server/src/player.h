@@ -5,8 +5,9 @@
 #include "game_type.h"
 #include <Box2D/Box2D.h>
 
-#define PLAYER_RADIUS 10.0f
-#define MOVEMENT_IMPULSE 10.0f
+#define PLAYER_RADIUS       10.0f
+#define MOVEMENT_IMPULSE    10.0f
+#define RECONNECT_INTERVAL  10000
 
 class Player
 {
@@ -31,6 +32,7 @@ public:
    void     setSId(ULL);
    LL       getLastAlive();
    void     setLastAlive();
+   bool     isIdle();
 
 private:
 

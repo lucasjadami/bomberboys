@@ -22,6 +22,7 @@ private:
     std::vector<Server*> servers;
     LL                   startupTime;
 
+    void    disconnectPlayer(int);
     void    reconnectPlayer(Player*);
     void    sendGameStateToServer(Socket*);
     void    explodePlayerBombs(int);

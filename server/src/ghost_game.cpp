@@ -20,12 +20,9 @@ void GhostGame::connectionHandler(int eventId, Socket* socket)
         delete server;
         server = NULL;
 
+        // Offers chance for every player to reconnect if this ghost server turns into an world one.
         for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
-        {
-            Player* player = it->second;
-            if (!player->isLocal())
-                player->setLastAlive();
-        }
+            it->second->setLastAlive();
 
         offlineHandler();
     }
@@ -85,8 +82,6 @@ void GhostGame::updateServerPackets()
         }
         else
         {
-            routePacketToClients(packet);
-
             if (packet->getId() == PACKET_REMOVE_PLAYER)
                 parseRemovePlayerPacket(packet);
             else if (packet->getId() == PACKET_MOVE_PLAYER)
@@ -99,6 +94,8 @@ void GhostGame::updateServerPackets()
                 parseFallPlayerPacket(packet);
             else if (packet->getId() == PACKET_SHUTDOWN)
                 parseShutdownPacket(packet);
+
+            routePacketToClients(packet);
         }
 
         delete packet;
@@ -177,6 +174,8 @@ Player* GhostGame::parseAddPlayerExPacket(Packet* packet)
 void GhostGame::parseRemovePlayerPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
+    assertPlayerIsValid(id);
+
     Player* player = players[id];
 
     if (!player->isLocal())
@@ -190,6 +189,8 @@ void GhostGame::parseRemovePlayerPacket(Packet* packet)
 void GhostGame::parseMovePlayerPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
+    assertPlayerIsValid(id);
+
     int x = Packet::getShort(packet->getData() + ID_SIZE);
     int y = Packet::getShort(packet->getData() + ID_SIZE + 2);
 
@@ -203,6 +204,8 @@ void GhostGame::parseMovePlayerPacket(Packet* packet)
 void GhostGame::parseAddBombPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
+    assertPlayerIsValid(id);
+
     int x = Packet::getShort(packet->getData() + ID_SIZE);
     int y = Packet::getShort(packet->getData() + ID_SIZE + 2);
 
@@ -221,6 +224,8 @@ void GhostGame::parseAddBombPacket(Packet* packet)
 void GhostGame::parseExplodeBombPacket(Packet* packet)
 {
     int id = Packet::getInt(packet->getData());
+    assertBombIsValid(id);
+
     Bomb* bomb = bombs[id];
     delete bomb;
     bombs.erase(id);
