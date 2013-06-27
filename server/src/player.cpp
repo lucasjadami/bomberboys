@@ -6,24 +6,33 @@ Player::Player(Socket* socket)
 {
     this->socket = socket;
     this->id = socket->getId();
+    sId = 0;
     body = NULL;
-    name = NULL;
+    name = new char[NAME_SIZE];
+    memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
+    lastAlive = 0;
+    lastX = -1;
+    lastY = -1;
 }
 
 Player::Player(int id)
 {
     this->socket = NULL;
     this->id = id;
+    sId = 0;
     body = NULL;
-    name = NULL;
+    name = new char[NAME_SIZE];
+    memset(name, 0, sizeof(char) * NAME_SIZE);
     lastImpulse = 0;
+    lastAlive = 0;
+    lastX = -1;
+    lastY = -1;
 }
 
 Player::~Player()
 {
-    if (name != NULL)
-        delete[] name;
+    delete[] name;
 }
 
 char* Player::getName()
@@ -33,7 +42,7 @@ char* Player::getName()
 
 void Player::setName(char* name)
 {
-    this->name = name;
+    strcpy(this->name, name);
 }
 
 Socket* Player::getSocket()
@@ -48,7 +57,7 @@ void Player::setSocket(Socket* socket)
 
 bool Player::isPlaying()
 {
-    return name != NULL;
+    return sId != 0;
 }
 
 b2Body* Player::getBody()
@@ -75,7 +84,7 @@ bool Player::isLastPositionDifferent()
 void Player::applyImpulse(b2Vec2& impulse)
 {
     timespec time;
-    long long now = getTimeLL(getTime(&time));
+    LL now = getTimeLL(getTime(&time));
     if (now - lastImpulse > 50)
     {
         lastImpulse = now;
@@ -91,4 +100,31 @@ bool Player::isLocal()
 int Player::getId()
 {
     return id;
+}
+
+ULL Player::getSId()
+{
+    return sId;
+}
+
+void Player::setSId(ULL sId)
+{
+    this->sId = sId;
+}
+
+LL Player::getLastAlive()
+{
+    return lastAlive;
+}
+
+void Player::setLastAlive()
+{
+    timespec time;
+    lastAlive = getTimeLL(getTime(&time));
+}
+
+bool Player::isIdle()
+{
+    timespec time;
+    return getTimeLL(getTime(&time)) - lastAlive > RECONNECT_INTERVAL;
 }

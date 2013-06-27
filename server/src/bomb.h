@@ -1,6 +1,7 @@
 #ifndef BOMB_H
 #define BOMB_H
 
+#include "game_type.h"
 #include <Box2D/Box2D.h>
 
 #define BOMB_TIME           5000
@@ -19,9 +20,9 @@ public:
 
 private:
 
-    b2Body*     body;
-    long long   plantedTime;
-    int         id;
+    b2Body* body;
+    LL      plantedTime;
+    int     id;
 
 };
 

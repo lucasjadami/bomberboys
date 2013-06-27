@@ -15,7 +15,9 @@
 
 struct sigaction    sigIntHandler;
 Connection* 	    connection;
-Game*               game;
+Game*               game = NULL;
+int                 serverId;
+int                 currentServerId;
 
 #ifdef TESTBED
 DebugDraw           debugDraw;
@@ -23,6 +25,9 @@ b2Profile           maxProfile;
 b2Profile           totalProfile;
 int                 stepCount;
 #endif
+
+void handleServerOffline();
+void changeServer();
 
 void exitHandler(int s)
 {
@@ -165,41 +170,47 @@ void gameUpdateHandler(Settings* settings)
 }
 #endif
 
-void createGhostGame()
+void handleServerOffline()
 {
-    std::set<std::string> ghostServers;
-
-    connection = new NonBlockingTcpConnection(ghostServers, 1, &connectionHandler);
-
-    int port = 10012;
-	connection->init(port);
-
-	info("Server connection stabilished at port %d", port);
-
-    const char* portS = "10011";
-    const char* serverName = "127.0.0.1";
-	connection->connectToWorldServer(serverName, portS);
-
-	info("Connected to world server on IP %s at port %s", serverName, portS);
-
-	game = new GhostGame(connection->getWorldServerSocket());
-	game->createWorld();
+    changeServer();
 }
 
-void createWorldGame()
+void changeServer()
 {
-    std::set<std::string> ghostServers;
-    ghostServers.insert(std::string("127.0.0.1"));
+    currentServerId = (currentServerId + 1) % SERVER_COUNT;
 
-	connection = new NonBlockingTcpConnection(ghostServers, 0, &connectionHandler);
+    if (currentServerId == serverId)
+    {
+        if (game == NULL)
+            game = new WorldGame();
+        else
+        {
+            WorldGame* newGame = new WorldGame();
+            game->setDestructorDisabled(true);
+            game->copyTo(newGame);
+            delete game;
+            newGame->updateServers();
+            game = newGame;
+        }
 
-    int port = 10011;
-	connection->init(port);
+        info("Created world game");
+    }
+    else
+    {
+        connection->connectToWorldServer(serverNames[currentServerId][0], serverNames[currentServerId][1]);
 
-	info("Server connection stabilished at port %d", port);
+        if (game == NULL)
+            game = new GhostGame(connection->getWorldServerSocket(), handleServerOffline);
+        else
+        {
+            GhostGame* newGame = new GhostGame(connection->getWorldServerSocket(), handleServerOffline);
+            game->setDestructorDisabled(true);
+            game->copyTo(newGame);
+            delete game;
+        }
 
-	game = new WorldGame();
-	game->createWorld();
+        info("Created ghost game. World game is %s %s", serverNames[currentServerId][0], serverNames[currentServerId][1]);
+    }
 }
 
 int main(int argc, char** argv)
@@ -213,9 +224,17 @@ int main(int argc, char** argv)
 
     info("Using non-blocking TCP connection");
 
-    //createWorldGame();
-    createGhostGame();
+    serverId = 0;
+    currentServerId = -1;
 
+    connection = new NonBlockingTcpConnection(serverId, &connectionHandler);
+	connection->init(atoi(serverNames[serverId][1]));
+
+	info("Server connection stabilished at port %s", serverNames[serverId][1]);
+
+    changeServer();
+
+    game->createWorld();
 	info("World created");
 
 #ifndef TESTBED

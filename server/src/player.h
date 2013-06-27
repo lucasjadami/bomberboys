@@ -2,10 +2,12 @@
 #define PLAYER_H
 
 #include "socket.h"
+#include "game_type.h"
 #include <Box2D/Box2D.h>
 
-#define PLAYER_RADIUS 10.0f
-#define MOVEMENT_IMPULSE 10.0f
+#define PLAYER_RADIUS       10.0f
+#define MOVEMENT_IMPULSE    10.0f
+#define RECONNECT_INTERVAL  10000
 
 class Player
 {
@@ -26,16 +28,23 @@ public:
    void     applyImpulse(b2Vec2&);
    bool     isLocal();
    int      getId();
+   ULL      getSId();
+   void     setSId(ULL);
+   LL       getLastAlive();
+   void     setLastAlive();
+   bool     isIdle();
 
 private:
 
-    int         id;
-    Socket*     socket;
-    char*       name;
-    b2Body*     body;
-    int         lastX;
-    int         lastY;
-    long long   lastImpulse;
+    int     id;
+    ULL     sId;
+    Socket* socket;
+    char*   name;
+    b2Body* body;
+    int     lastX;
+    int     lastY;
+    LL      lastImpulse;
+    LL      lastAlive;
 
 };
 

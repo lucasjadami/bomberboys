@@ -12,14 +12,26 @@
 Game::Game()
 {
     world = NULL;
+    destructorDisabled = false;
 }
 
 Game::~Game()
 {
+    if (destructorDisabled)
+        return;
+
     if (world != NULL)
         delete world;
+
+    for (std::map<ULL, Player*>::iterator it = sessions.begin(); it != sessions.end(); ++it)
+    {
+        if (players.find(it->second->getId()) == players.end())
+            delete it->second;
+    }
+
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
         delete it->second;
+
     for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
         delete it->second;
 }
@@ -43,6 +55,36 @@ void Game::update(float time, float velocityIterations, float positionIterations
 b2World* Game::getWorld()
 {
     return world;
+}
+
+void Game::setDestructorDisabled(bool destructorDisabled)
+{
+    this->destructorDisabled = destructorDisabled;
+}
+
+void Game::copyTo(Game* game)
+{
+    game->world = world;
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+        game->players.insert(std::make_pair(it->first, it->second));
+    for (std::map<ULL, Player*>::iterator it = sessions.begin(); it != sessions.end(); ++it)
+        game->sessions.insert(std::make_pair(it->first, it->second));
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        game->bombs.insert(std::make_pair(it->first, it->second));
+}
+
+void Game::sendGameStateToClient(Player* player)
+{
+    for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
+    {
+        if (it->second == player || !it->second->isPlaying())
+            continue;
+
+        player->getSocket()->addOutPacket(createAddPlayerPacket(it->second));
+    }
+
+    for (std::map<int, Bomb*>::iterator it = bombs.begin(); it != bombs.end(); ++it)
+        player->getSocket()->addOutPacket(createAddBombPacket(it->second));
 }
 
 void Game::createPlayerBody(Player* player)
@@ -90,32 +132,21 @@ void Game::createBombBody(Bomb* bomb, Player* player)
     bomb->setBody(body);
 }
 
-void Game::parsePingPacket(Packet* packet, Player* player)
-{
-    player->getSocket()->addOutPacket(createPongPacket());
-}
-
 Packet* Game::createRemovePlayerPacket(int id)
 {
     char* data = new char[PACKET_REMOVE_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_REMOVE_PLAYER_SIZE);
-    Packet::putBytes(data, id, ID_SIZE);
+    Packet::putIntBytes(data, id, ID_SIZE);
     return new Packet(PACKET_REMOVE_PLAYER, data);
-}
-
-Packet* Game::createPongPacket()
-{
-    char* data = new char[PACKET_PONG_SIZE];
-    return new Packet(PACKET_PONG, data);
 }
 
 Packet* Game::createAddBombPacket(Bomb* bomb)
 {
     char* data = new char[PACKET_ADD_BOMB_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_BOMB_SIZE);
-    Packet::putBytes(data, bomb->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, (int) bomb->getBody()->GetPosition().x, 2);
-    Packet::putBytes(data + ID_SIZE + 2, (int) bomb->getBody()->GetPosition().y, 2);
+    Packet::putIntBytes(data, bomb->getId(), ID_SIZE);
+    Packet::putIntBytes(data + ID_SIZE, (int) bomb->getBody()->GetPosition().x, 2);
+    Packet::putIntBytes(data + ID_SIZE + 2, (int) bomb->getBody()->GetPosition().y, 2);
     return new Packet(PACKET_ADD_BOMB, data);
 }
 
@@ -123,9 +154,9 @@ Packet* Game::createAddPlayerPacket(Player* player)
 {
     char* data = new char[PACKET_ADD_PLAYER_SIZE];
     memset(data, 0, sizeof(char) * PACKET_ADD_PLAYER_SIZE);
-    Packet::putBytes(data, player->getId(), ID_SIZE);
-    Packet::putBytes(data + ID_SIZE, player->getBody()->GetPosition().x, 2);
-    Packet::putBytes(data + ID_SIZE + 2, player->getBody()->GetPosition().y, 2);
+    Packet::putIntBytes(data, player->getId(), ID_SIZE);
+    Packet::putIntBytes(data + ID_SIZE, player->getBody() != NULL ? player->getBody()->GetPosition().x : 0, 2);
+    Packet::putIntBytes(data + ID_SIZE + 2, player->getBody() != NULL ? player->getBody()->GetPosition().y : 0, 2);
     memcpy(data + ID_SIZE + 4, player->getName(), sizeof(char) * NAME_SIZE);
     return new Packet(PACKET_ADD_PLAYER, data);
 }

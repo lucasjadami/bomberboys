@@ -4,7 +4,7 @@
 
 int Packet::getSize(int id)
 {
-    int size = INT_MAX / 2;
+    int size = 0;
     switch (id)
     {
         case PACKET_LOGIN:
@@ -25,30 +25,32 @@ int Packet::getSize(int id)
             size = PACKET_EXPLODE_BOMB_SIZE; break;
         case PACKET_FALL_PLAYER:
             size = PACKET_FALL_PLAYER_SIZE; break;
-        case PACKET_PING:
-            size = PACKET_PING_SIZE; break;
-        case PACKET_PONG:
-            size = PACKET_PONG_SIZE; break;
         case PACKET_SHUTDOWN:
             size = PACKET_SHUTDOWN_SIZE; break;
+        case PACKET_ACKNOWLEDGE:
+            size = PACKET_ACKNOWLEDGE_SIZE; break;
         case PACKET_LOGIN_EX:
             size = PACKET_LOGIN_EX_SIZE; break;
+        case PACKET_ADD_PLAYER_EX:
+            size = PACKET_ADD_PLAYER_EX_SIZE; break;
         case PACKET_MOVE_ME_EX:
             size = PACKET_MOVE_ME_EX_SIZE; break;
         case PACKET_PLANT_BOMB_EX:
             size = PACKET_PLANT_BOMB_EX_SIZE; break;
+        case PACKET_ACKNOWLEDGE_EX:
+            size = PACKET_ACKNOWLEDGE_EX_SIZE; break;
     }
     return size;
 }
 
-void Packet::putBytes(char* data, int value, int bytes)
+void Packet::putIntBytes(char* data, ULL value, int bytes)
 {
-    int mask = 0xFF;
+    int mask = 0;
 
     for (int i = 0; i < bytes; ++i)
     {
-        data[bytes - i - 1] = (value & mask) >> (8 * i);
-        mask = mask << 8;
+        data[bytes - i - 1] = (value & (255ULL << mask)) >> mask;
+        mask += 8;
     }
 }
 
@@ -82,25 +84,40 @@ short Packet::getShort(char* data)
     return value;
 }
 
-double Packet::getDouble(char* data)
+ULL Packet::getULongLong(char* data)
 {
-    long long numerator = 0;
+    ULL value = 0;
     int mask = 0;
 
     for (int i = 7; i > -1; --i)
     {
-        long long value = (unsigned char) data[i];
+        ULL buffer = (unsigned char) data[i];
+        value |= buffer << mask;
+        mask += 8;
+    }
+
+    return value;
+}
+
+double Packet::getDouble(char* data)
+{
+    LL numerator = 0;
+    int mask = 0;
+
+    for (int i = 7; i > -1; --i)
+    {
+        LL value = (unsigned char) data[i];
         numerator |= value << mask;
         mask += 8;
     }
 
-    long long denominator = 0;
+    LL denominator = 0;
     mask = 0;
     data += 8;
 
     for (int i = 7; i > -1; --i)
     {
-        long long value = (unsigned char) data[i];
+        LL value = (unsigned char) data[i];
         denominator |= value << mask;
         mask += 8;
     }

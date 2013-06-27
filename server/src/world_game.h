@@ -11,15 +11,20 @@ class WorldGame : public Game
 public:
 
             WorldGame();
+            WorldGame(b2World);
            ~WorldGame();
     void    connectionHandler(int, Socket*);
     void    update(float, float, float);
+    void    updateServers();
 
 private:
 
     std::vector<Server*> servers;
-    long long            startupTime;
+    LL                   startupTime;
 
+    void    disconnectPlayer(int);
+    void    reconnectPlayer(Player*);
+    void    sendGameStateToServer(Socket*);
     void    explodePlayerBombs(int);
     void    broadcastPacketToServers(Packet*);
     void    updateShutdown();
@@ -40,6 +45,7 @@ private:
     Packet* createExplodeBombPacket(Bomb*);
     Packet* createFallPlayerPacket(Player*);
     Packet* createShutdownPacket();
+    Packet* createAddPlayerExPacket(Player*);
 
 };
 

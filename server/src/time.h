@@ -28,7 +28,7 @@ inline timespec* getTime(timespec* time)
     return time;
 }
 
-inline long long getTimeLL(struct timespec *time)
+inline LL getTimeLL(struct timespec *time)
 {
     return time->tv_sec * 1000LL + time->tv_nsec / 1000000;
 }
