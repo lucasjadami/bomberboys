@@ -117,7 +117,7 @@ void GhostGame::routePacketToClients(Packet* packet)
     for (std::map<int, Player*>::iterator it = players.begin(); it != players.end(); ++it)
     {
         Player* player = it->second;
-        if (player->isLocal())
+        if (player->isLocal() && player->isPlaying())
             player->getSocket()->addOutPacket(packet->clone(packet->getId()));
     }
 }

@@ -445,6 +445,7 @@ void WorldGame::parseRemovePlayerPacket(Packet* packet, Server* server)
     assertPlayerIsValid(id);
 
     disconnectPlayer(id);
+    server->getPlayers()->erase(id);
 }
 
 void WorldGame::parseLoginExPacket(Packet* packet)
