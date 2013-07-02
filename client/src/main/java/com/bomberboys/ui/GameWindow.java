@@ -19,7 +19,7 @@ public class GameWindow {
     }
 
     public void setup() throws IOException {
-        setupImages();
+        loadImages();
         panel = new GamePanel(game);
         panel.setup();
         timer = new Timer(30, new GameUpdater(game, panel));
@@ -35,26 +35,60 @@ public class GameWindow {
         frame.setVisible(true);
     }
 
-    private void setupImages() throws IOException {
+    private void loadImages() throws IOException {
+        loadBackgroundImages();
+        loadCraterImages();
+        loadBombImages();
+        loadBomberImages();
+    }
+
+    private void loadBackgroundImages() throws IOException {
         ClassLoader load = getClass().getClassLoader();
         Images.put("background", ImageIO.read(load.getResourceAsStream("images/ground1.png")));
+    }
 
+    private void loadCraterImages() throws IOException {
+        ClassLoader load = getClass().getClassLoader();
         Images.put("crater1", ImageIO.read(load.getResourceAsStream("images/crater1.png")));
+    }
+
+    private void loadBomberImages() throws IOException {
+        loadBomberImagesWithPrefix("bomber-a");
+        loadBomberImagesWithPrefix("bomber-c");
+        loadBomberImagesWithPrefix("bomber-d");
+        loadBomberImagesWithPrefix("bomber-l");
+        loadBomberImagesWithPrefix("bomber-r");
+        loadBomberImagesWithPrefix("bomber-u");
+    }
+
+    private void loadBomberImagesWithPrefix(String prefix) throws IOException {
+        ClassLoader load = getClass().getClassLoader();
+
+        for (int i = 1; i < 6; i++) {
+            String path = "images/bomber/" + prefix + i + ".png";
+            BufferedImage b = ImageIO.read(load.getResourceAsStream(path));
+            Images.put(prefix + i, getScaledInstance(b, 2*b.getWidth(), 2*b.getHeight()));
+            b.getGraphics().dispose();
+        }
+    }
+
+    private void loadBombImages() throws IOException {
+        ClassLoader load = getClass().getClassLoader();
+
+        BufferedImage b1 = ImageIO.read(load.getResourceAsStream("images/bomb1.png"));
+        BufferedImage b3 = ImageIO.read(load.getResourceAsStream("images/bomb3.png"));
+        BufferedImage b = ImageIO.read(load.getResourceAsStream("images/bomb2.png"));
+
+        int dimension = b.getHeight()/2;
 
         //bombs
-        BufferedImage b1 = ImageIO.read(load.getResourceAsStream("images/bomb1.png"));
-        Images.put("bomb1", b1);
+        Images.put("bomb1", getScaledInstance(b1, dimension, dimension));
+        Images.put("bomb2", getScaledInstance(b, 5*dimension/6, 5*dimension/6));
+        Images.put("bomb3", getScaledInstance(b3, dimension, dimension));
+        Images.put("bomb4", getScaledInstance(b, 7*dimension/6, 7*dimension/6));
 
-        BufferedImage b3 = ImageIO.read(load.getResourceAsStream("images/bomb3.png"));
-        Images.put("bomb3", b3);
-
-
-        BufferedImage b = ImageIO.read(load.getResourceAsStream("images/bomb2.png"));
-        int s = b.getHeight();
-
-        Images.put("bomb2", getScaledInstance(b, 5*s/6, 5*s/6));
-        Images.put("bomb4", getScaledInstance(b, 7*s/6, 7*s/6));
-
+        b1.getGraphics().dispose();
+        b3.getGraphics().dispose();
         b.getGraphics().dispose();
     }
 

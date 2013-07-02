@@ -23,9 +23,14 @@ public class Connection {
     protected boolean remoteDisconnected;
     private SendThread send;
     private ReceiveThread recv;
+    private AckThread ack;
+    private byte[] sid;
+    private String username;
 
-    public Connection(List<InetSocketAddress> addressList) {
+    public Connection(String username, byte[] sid, List<InetSocketAddress> addressList) {
         this.addressList = addressList;
+        this.sid = sid;
+        this.username = username;
         sendPackets = Collections.synchronizedList(new LinkedList<Packet>());
         recvPackets = Collections.synchronizedList(new LinkedList<Packet>());
         connectFailed = false;
@@ -41,16 +46,16 @@ public class Connection {
                     try {
                         send = new SendThread(socket.getOutputStream(), sendPackets);
                         recv = new ReceiveThread(socket.getInputStream(), recvPackets);
+                        ack  = new AckThread(sendPackets);
 
                         send.start();
                         recv.start();
+                        ack.start();
 
                         send.join();
                         recv.join();
+                        ack.deactivate();
                     } catch (Exception e) {
-                        send.deactivate();
-                        recv.deactivate();
-                        try { socket.close(); } catch (IOException ie) { }
                     }
                 }
             }
@@ -100,6 +105,11 @@ public class Connection {
                 System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
             } catch (IOException e) { }
         }
+
+        ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
+        buffer.put(sid);
+        buffer.put(username.getBytes());
+        sendPacket(new Packet(Packet.Id.LOGIN, buffer));
     }
 
     private InetSocketAddress getReachableAddress() throws IOException {
