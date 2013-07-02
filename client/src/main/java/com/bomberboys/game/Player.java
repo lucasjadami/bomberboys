@@ -9,6 +9,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Player extends MapObject {
+    private enum Direction { UP, DOWN, LEFT, RIGHT }
+
     public static final int RADIUS = 10;
     private static final String[] spritesA =
         {"bomber-a1", "bomber-a2", "bomber-a3", "bomber-a4", "bomber-a5"};
@@ -26,17 +28,109 @@ public class Player extends MapObject {
     private String name;
     private boolean player;
 
+    private int state;
+    private int accX, accY;
+    private int oldX, oldY;
+    private BufferedImage currentSprite;
+
     public Player(int x, int y, String name, boolean player) {
         super(x, y);
         this.name = name;
         this.player = player;
+        accX = 0;
+        accY = 0;
+        currentSprite = Images.get("bomber-d3");
+        state = 0;
+    }
+
+    @Override
+    public void setX(int x) {
+        if (x - oldX > 0) {
+            accX += 1;
+        } else if (x - oldX < 0) {
+            accX -= 1;
+        }
+
+        oldX = getX();
+        super.setX(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        if (y - oldY > 0) {
+            accY += 1;
+        } else if (y - oldY < 0) {
+            accY -= 1;
+        }
+
+        oldY = getY();
+        super.setY(y);
     }
 
     @Override
     public void draw(Graphics2D g) {
-        /* g2D.setColor(player ? Color.GREEN : Color.WHITE); */
-        /* g2D.fillArc(x - RADIUS, MAP_HEIGHT - (y + RADIUS), RADIUS * 2, RADIUS * 2, 0, 360); */
-        BufferedImage sprite = Images.get("bomber-d3");
+        if (isMoving()) {
+            currentSprite = getNextSprite();
+        }
+
+        drawBomber(g, currentSprite);
+
+        if (oldX == getX()) {
+            accX = 0;
+        } else {
+            oldX = getX();
+        }
+
+        if (oldY == getY()) {
+            accY = 0;
+        } else {
+            oldY = getY();
+        }
+    }
+
+    private boolean isMoving() {
+        return Math.abs(accX) > 0 || Math.abs(accY) > 0;
+    }
+
+    private BufferedImage getNextSprite() {
+        String[] currentSprites = spritesDown;
+        switch (getDirection()) {
+            case UP:    currentSprites = spritesUp;    break;
+            case DOWN:  currentSprites = spritesDown;  break;
+            case LEFT:  currentSprites = spritesLeft;  break;
+            case RIGHT: currentSprites = spritesRight; break;
+        }
+
+        state = (state + 1) % 20;
+
+        return Images.get(currentSprites[state / 4]);
+    }
+
+    private Direction getDirection() {
+        //RIGHT
+        if (Math.abs(accX) > Math.abs(accY) && accX > 0) {
+            return Direction.RIGHT;
+        }
+
+        //LEFT
+        if (Math.abs(accX) > Math.abs(accY) && accX < 0) {
+            return Direction.LEFT;
+        }
+
+        //UP
+        if (Math.abs(accX) < Math.abs(accY) && accY > 0) {
+            return Direction.UP;
+        }
+
+        //DOWN
+        if (Math.abs(accX) < Math.abs(accY) && accY < 0) {
+            return Direction.DOWN;
+        }
+
+        return Direction.DOWN;
+    }
+
+    private void drawBomber(Graphics2D g, BufferedImage sprite) {
         int size = sprite.getHeight();
         g.drawImage(sprite, x - size / 2, MAP_HEIGHT - (y + size / 2), null);
     }
