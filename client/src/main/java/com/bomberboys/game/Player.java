@@ -3,6 +3,7 @@ package com.bomberboys.game;
 import com.bomberboys.ui.Images;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class Player extends MapObject {
     private int oldX, oldY;
     private BufferedImage currentSprite;
 
+    private Color fontColor;
+
     public Player(int x, int y, String name, boolean player) {
         super(x, y);
         this.name = name;
@@ -41,6 +44,7 @@ public class Player extends MapObject {
         accY = 0;
         currentSprite = Images.get("bomber-d3");
         state = 0;
+        fontColor = player ? Color.GREEN : Color.RED;
     }
 
     @Override
@@ -74,6 +78,7 @@ public class Player extends MapObject {
         }
 
         drawBomber(g, currentSprite);
+        drawName(g);
 
         if (oldX == getX()) {
             accX = 0;
@@ -133,6 +138,13 @@ public class Player extends MapObject {
     private void drawBomber(Graphics2D g, BufferedImage sprite) {
         int size = sprite.getHeight();
         g.drawImage(sprite, x - size / 2, MAP_HEIGHT - (y + size / 2), null);
+    }
+
+    private void drawName(Graphics2D g) {
+        int size = currentSprite.getHeight();
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        g.setColor(fontColor);
+        g.drawString(name, x - size / 2, MAP_HEIGHT - (y + size / 2) + 60);
     }
 
     public void kill() {
