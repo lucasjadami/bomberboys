@@ -14,9 +14,9 @@ import java.nio.ByteBuffer;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        if (args.length >= 2) {
+        if (args.length >= 3) {
             List<InetSocketAddress> addressList = new ArrayList<>();
-            for (int i = 1; i < args.length; i++) {
+            for (int i = 2; i < args.length; i++) {
                 String[] address = args[i].split(":");
                 addressList.add(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
                 System.out.println("Address " + args[i] + " added.");
@@ -31,7 +31,7 @@ public class Main {
 
             System.out.println("Using sid: " + random);
 
-            Connection connection = new Connection("Test", sid, addressList);
+            Connection connection = new Connection(args[0], sid, addressList);
             connection.connect();
 
             Game game = new Game(connection);
@@ -50,7 +50,7 @@ public class Main {
                     .addKeyEventDispatcher(listener);
             }
         } else {
-            System.out.println("Usage: client [h|b] [ip:port]+");
+            System.out.println("Usage: client name [h|b] [ip:port]+");
         }
     }
 }
