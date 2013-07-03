@@ -141,10 +141,10 @@ public class Player extends MapObject {
     }
 
     private void drawName(Graphics2D g) {
-        int size = currentSprite.getHeight();
         g.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        int size = g.getFontMetrics().stringWidth(name);
         g.setColor(fontColor);
-        g.drawString(name, x - size / 2, MAP_HEIGHT - (y + size / 2) + 60);
+        g.drawString(name, x - size / 2 - 10, MAP_HEIGHT - (y + currentSprite.getHeight() / 2) + 60);
     }
 
     public void kill() {
