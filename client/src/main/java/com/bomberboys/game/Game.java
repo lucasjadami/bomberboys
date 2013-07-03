@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.List;
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,21 +19,18 @@ public class Game {
     private Map<Integer, Player> players;
     private Map<Integer, Bomb> bombs;
     private List<Bomb> discardedBombs;
-    private List<Player> discardedPlayers;
     
     public Game(Connection connection) {
         this.connection = connection;
         players = new HashMap<>();
         bombs = new HashMap<>();
         discardedBombs = new ArrayList<>();
-        discardedPlayers = new ArrayList<>();
     }
 
     public void resetWorld() {
         players = new HashMap<>();
         bombs = new HashMap<>();
         discardedBombs = new ArrayList<>();
-        discardedPlayers = new ArrayList<>();
     }
 
     public void doRandomAction() {
@@ -64,11 +62,6 @@ public class Game {
                 it.remove();
             }
         }
-        for (Iterator<Player> it = discardedPlayers.iterator(); it.hasNext();) {
-            if (!it.next().isAnimationInProgress()) {
-                it.remove();
-            }
-        }
     }
     
     public void movementKeyPressed(int direction) {
@@ -82,10 +75,8 @@ public class Game {
         connection.sendPacket(new Packet(Packet.Id.PLANT_BOMB, buffer));
     }
 
-    public List<Player> getAllPlayers() {
-        List<Player> allPlayers = new ArrayList<>(players.values());
-        allPlayers.addAll(discardedPlayers);
-        return allPlayers;
+    public Collection<Player> getAllPlayers() {
+        return players.values();
     }
 
     public List<Bomb> getAllBombs() {
@@ -123,7 +114,7 @@ public class Game {
     private void removePlayer(ByteBuffer buffer) {
         int id = buffer.getInt();
         players.get(id).kill();
-        discardedPlayers.add(players.remove(id));
+        players.remove(id);
     }
     
     private void addBomb(ByteBuffer buffer) {
