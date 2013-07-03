@@ -39,7 +39,7 @@ public class Main {
             GameWindow window = new GameWindow(game);
             window.setup();
 
-            if (args[0].equals("b")) {
+            if (args[1].equals("b")) {
                 while (true) {
                     try { Thread.sleep(50); } catch (Exception ex) { }
                     game.doRandomAction();
