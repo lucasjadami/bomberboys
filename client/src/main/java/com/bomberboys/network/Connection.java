@@ -1,5 +1,6 @@
 package com.bomberboys.network;
 
+import com.bomberboys.game.Game;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -26,6 +27,7 @@ public class Connection {
     private AckThread ack;
     private byte[] sid;
     private String username;
+    private Game game;
 
     public Connection(String username, byte[] sid, List<InetSocketAddress> addressList) {
         this.addressList = addressList;
@@ -61,6 +63,10 @@ public class Connection {
             }
         };
         connectThread.start();
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
     
     public boolean isConnected() {
@@ -105,6 +111,8 @@ public class Connection {
                 System.out.println("Successfully connected with " + address.getHostName() + ":" + address.getPort());
             } catch (IOException e) { }
         }
+
+        game.resetWorld();
 
         ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
         buffer.put(sid);

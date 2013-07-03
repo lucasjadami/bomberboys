@@ -28,10 +28,11 @@ public class Game {
         discardedPlayers = new ArrayList<>();
     }
 
-    public void login() {
-        ByteBuffer buffer = ByteBuffer.allocate(Packet.Id.LOGIN.getSize());
-        buffer.put("Test".getBytes());
-        connection.sendPacket(new Packet(Packet.Id.LOGIN, buffer));
+    public void resetWorld() {
+        players = new HashMap<>();
+        bombs = new HashMap<>();
+        discardedBombs = new ArrayList<>();
+        discardedPlayers = new ArrayList<>();
     }
 
     public void doRandomAction() {

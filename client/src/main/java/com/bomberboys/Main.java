@@ -32,9 +32,9 @@ public class Main {
             System.out.println("Using sid: " + random);
 
             Connection connection = new Connection(args[0], sid, addressList);
-            connection.connect();
-
             Game game = new Game(connection);
+            connection.setGame(game);
+            connection.connect();
 
             GameWindow window = new GameWindow(game);
             window.setup();
