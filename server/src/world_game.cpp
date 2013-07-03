@@ -131,7 +131,10 @@ void WorldGame::disconnectPlayer(int id)
     }
 
     for (unsigned int i = 0; i < servers.size(); ++i)
+    {
         servers[i]->getSocket()->addOutPacket(createRemovePlayerPacket(id));
+        servers[i]->getPlayers()->erase(id);
+    }
 }
 
 void WorldGame::reconnectPlayer(Player* player)
@@ -445,7 +448,6 @@ void WorldGame::parseRemovePlayerPacket(Packet* packet, Server* server)
     assertPlayerIsValid(id);
 
     disconnectPlayer(id);
-    server->getPlayers()->erase(id);
 }
 
 void WorldGame::parseLoginExPacket(Packet* packet)
